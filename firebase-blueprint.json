@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User full name" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User role for access control" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account creation timestamp" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "E-commerce product details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique product ID" },
+        "name": { "type": "string", "description": "Product name" },
+        "price": { "type": "number", "description": "Current selling price" },
+        "oldPrice": { "type": "number", "description": "Original price before discount" },
+        "category": { "type": "string", "description": "Product category" },
+        "image": { "type": "string", "format": "uri", "description": "Product image URL" },
+        "rating": { "type": "number", "description": "Average rating" },
+        "reviews": { "type": "number", "description": "Number of reviews" },
+        "tag": { "type": "string", "description": "Discount tag (e.g., -50%)" },
+        "sold": { "type": "string", "description": "Quantity sold (e.g., 5k+)" },
+        "description": { "type": "string", "description": "Full product description" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the product was added" }
+      },
+      "required": ["name", "price", "category", "image"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order information",
+      "type": "object",
+      "properties": {
+        "orderId": { "type": "string", "description": "Unique order ID" },
+        "userId": { "type": "string", "description": "UID of the customer" },
+        "items": { "type": "array", "description": "List of products in the order" },
+        "totalAmount": { "type": "number", "description": "Total price paid" },
+        "status": { "type": "string", "enum": ["pending", "processing", "shipped", "delivered"], "description": "Current order status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the order was placed" },
+        "customerEmail": { "type": "string", "format": "email", "description": "Email for notifications" }
+      },
+      "required": ["userId", "items", "totalAmount", "status"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Customer review for a product",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique review ID" },
+        "productId": { "type": "string", "description": "ID of the reviewed product" },
+        "userId": { "type": "string", "description": "UID of the reviewer" },
+        "userName": { "type": "string", "description": "Name of the reviewer" },
+        "rating": { "type": "number", "description": "Rating from 1 to 5" },
+        "comment": { "type": "string", "description": "Review text" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the review was posted" }
+      },
+      "required": ["productId", "userId", "userName", "rating", "comment"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Product catalog"
+    },
+    "/products/{productId}/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Product customer reviews"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer orders"
+    }
+  }
+}

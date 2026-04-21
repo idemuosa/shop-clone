@@ -1,0 +1,118 @@
+import React, { useState } from 'react';
+import { GoogleGenAI } from "@google/genai";
+import { Sparkles, Loader2, MessageSquareText, ShieldCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { motion } from 'motion/react';
+
+interface Review {
+  userName: string;
+  rating: number;
+  comment: string;
+}
+
+interface ReviewSummaryProps {
+  reviews: Review[];
+  productName: string;
+}
+
+export default function AIReviewSummarizer({ reviews, productName }: ReviewSummaryProps) {
+  const [summary, setSummary] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Model initialization
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  const model = "gemini-3-flash-preview";
+
+  const generateSummary = async () => {
+    if (reviews.length === 0) return;
+    setIsLoading(true);
+
+    try {
+      const reviewText = reviews.map(r => `[${r.rating} Stars] ${r.userName}: ${r.comment}`).join('\n');
+      
+      const prompt = `
+        Analyze the following customer reviews for "${productName}" and provide a concise, honest summary in 3 bullet points:
+        1. Overall Sentiment
+        2. Top Positive Feature
+        3. Main Complaint (if any)
+        
+        Reviews:
+        ${reviewText}
+      `;
+
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+      });
+
+      setSummary(response.text || "Unable to summarize at this time.");
+    } catch (error) {
+      console.error("Summary Error:", error);
+      setSummary("Failed to generate summary. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (reviews.length === 0) return null;
+
+  return (
+    <Card className="p-6 bg-orange-50/50 border-orange-100 rounded-[32px] overflow-hidden relative group">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-100">
+             <MessageSquareText className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="font-black uppercase tracking-tighter italic text-lg leading-tight">AI Review <span className="text-orange-600">Summarizer</span></h3>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">Get the consensus in 3 seconds</p>
+          </div>
+        </div>
+
+        {!summary ? (
+          <Button 
+            onClick={generateSummary}
+            disabled={isLoading}
+            className="bg-black hover:bg-zinc-800 text-white font-black rounded-xl h-12 px-8 flex items-center gap-2 group-hover:scale-105 transition-transform"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 text-orange-400" />
+                SUMMARIZE REVIEWS
+              </>
+            )}
+          </Button>
+        ) : (
+          <Button 
+            variant="ghost" 
+            onClick={() => setSummary(null)}
+            className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-orange-600"
+          >
+            RESET
+          </Button>
+        )}
+      </div>
+
+      {summary && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="mt-6 pt-6 border-t border-orange-100"
+        >
+          <div className="prose prose-sm font-sans font-bold text-zinc-700 whitespace-pre-line leading-relaxed">
+            {summary}
+          </div>
+          <div className="flex items-center gap-2 mt-4 text-[9px] font-black text-gray-400 uppercase tracking-widest italic">
+            <ShieldCheck className="h-3 w-3" /> Vertically integrated AI consensus
+          </div>
+        </motion.div>
+      )}
+
+      {/* Background decoration */}
+      <Sparkles className="absolute top-[-20px] right-[-20px] h-40 w-40 text-orange-600/5 rotate-12 pointer-events-none" />
+    </Card>
+  );
+}
