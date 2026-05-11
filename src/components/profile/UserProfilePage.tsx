@@ -9,6 +9,8 @@ import {
   onSnapshot, 
   doc, 
   updateDoc,
+  addDoc,
+  deleteDoc,
   serverTimestamp 
 } from 'firebase/firestore';
 import { 
@@ -31,7 +33,9 @@ import {
   Trophy,
   Truck,
   Ticket,
-  Headset
+  Headset,
+  LayoutDashboard,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +43,16 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { signOut } from 'firebase/auth';
 import PaymentMethods from '@/components/auth/PaymentMethods';
@@ -48,11 +62,14 @@ interface UserProfilePageProps {
 }
 
 export default function UserProfilePage({ onClose }: UserProfilePageProps) {
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(profile?.displayName || user?.displayName || '');
   const [loading, setLoading] = useState(false);
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [currentAddress, setCurrentAddress] = useState<any>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -65,6 +82,23 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("UserProfilePage orders error:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const q = query(
+      collection(db, 'users', user.uid, 'addresses'),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setAddresses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
 
     return () => unsubscribe();
@@ -86,6 +120,48 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
       toast.error(error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSaveAddress = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!user) return;
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const addressData = {
+      street: formData.get('street') as string,
+      city: formData.get('city') as string,
+      zipCode: formData.get('zipCode') as string,
+      country: formData.get('country') as string,
+      type: formData.get('type') as string,
+      isDefault: formData.get('isDefault') === 'on',
+      createdAt: serverTimestamp(),
+    };
+
+    try {
+      if (currentAddress) {
+        await updateDoc(doc(db, 'users', user.uid, 'addresses', currentAddress.id), addressData);
+        toast.success('Address updated successfully!');
+      } else {
+        await addDoc(collection(db, 'users', user.uid, 'addresses'), addressData);
+        toast.success('Address added successfully!');
+      }
+      setIsAddressModalOpen(false);
+      setCurrentAddress(null);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!user || !window.confirm('Are you sure you want to delete this address?')) return;
+    try {
+      await deleteDoc(doc(db, 'users', user.uid, 'addresses', id));
+      toast.success('Address deleted');
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
 
@@ -129,6 +205,22 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 <Button variant="outline" className="rounded-xl border-2 font-bold px-6 h-11" onClick={onClose}>
                   Back to Store
                 </Button>
+                {isAdmin && (
+                  <Button 
+                    onClick={() => {
+                      onClose();
+                      // We need a way to tell App to show Admin
+                      // Based on App.tsx, the Navbar handles this via onToggleAdmin
+                      // But since we're inside UserProfilePage, we could just tell the user to use the icon
+                      // or we could add a similar toggle logic. 
+                      // Actually, let's just make it simple: tell them to use the Navbar icon or provide a hint.
+                      toast.info("Access the Admin Dashboard using the icon in the Top Navbar!");
+                    }}
+                    className="bg-orange-100 hover:bg-orange-200 text-orange-600 font-bold rounded-xl px-6 h-11 border-2 border-orange-200"
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" /> Admin Tools
+                  </Button>
+                )}
                 <Button 
                   onClick={() => signOut(auth).then(() => onClose())}
                   className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6 h-11"
@@ -144,7 +236,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 <p className="text-3xl font-black text-black tracking-tighter">{orders.length}</p>
               </div>
               <div className="bg-zinc-50 p-6 rounded-3xl border border-zinc-100 text-center w-40 relative overflow-hidden group">
-                <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1 z-10 relative">Reward Points</p>
+                <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1 z-10 relative">Shopsy Coins 🪙</p>
                 <p className="text-3xl font-black text-black tracking-tighter z-10 relative">{profile?.points || 0}</p>
                 <div className="absolute bottom-[-10px] right-[-10px] opacity-10 group-hover:scale-110 transition-transform">
                    <Trophy className="h-20 w-20 text-orange-600 rotate-12" />
@@ -244,14 +336,21 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                               ))}
                            </div>
                         </div>
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-between items-center bg-gray-50/50 -mx-6 -mb-6 p-6 border-t border-gray-100 mt-6">
                           <div className="flex items-center gap-2 text-gray-400">
                             <Clock className="h-4 w-4" />
                             <span className="text-[10px] font-bold uppercase tracking-wider">{order.createdAt?.toDate().toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
                           </div>
-                          <Button variant="ghost" className="text-orange-600 font-black uppercase text-[10px] tracking-widest group-hover:translate-x-1 transition-all">
-                            Track Order <ChevronRight className="h-4 w-4 ml-1" />
-                          </Button>
+                          <div className="flex gap-4">
+                            {order.status === 'delivered' && (
+                              <Button variant="ghost" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest text-orange-600 hover:bg-orange-600 hover:text-white border-2 border-orange-600 px-6 transition-all" onClick={onClose}>
+                                 REVIEW
+                              </Button>
+                            )}
+                            <Button variant="outline" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800 px-6 transition-all active:scale-95 shadow-md shadow-zinc-100" onClick={onClose}>
+                               BUY AGAIN
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -377,42 +476,110 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                       </div>
                       <h3 className="text-xl font-black uppercase tracking-tighter italic">Shipping <span className="text-orange-600">Addresses</span></h3>
                    </div>
-                   <Button variant="outline" className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2">
-                     <Plus className="h-4 w-4" /> ADD NEW
-                   </Button>
+                   <Dialog open={isAddressModalOpen} onOpenChange={(open) => {
+                     setIsAddressModalOpen(open);
+                     if (!open) setCurrentAddress(null);
+                   }}>
+                     <DialogTrigger asChild>
+                       <Button variant="outline" className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2">
+                         <Plus className="h-4 w-4" /> ADD NEW
+                       </Button>
+                     </DialogTrigger>
+                     <DialogContent className="rounded-[32px] sm:max-w-[500px]">
+                       <DialogHeader>
+                         <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">
+                           {currentAddress ? 'Edit' : 'Add New'} <span className="text-orange-600">Address</span>
+                         </DialogTitle>
+                         <DialogDescription className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                           Enter your shipping details for faster checkout.
+                         </DialogDescription>
+                       </DialogHeader>
+                       <form onSubmit={handleSaveAddress} className="space-y-4 mt-4">
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2 col-span-2">
+                               <Label htmlFor="street" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Street Address</Label>
+                               <Input id="street" name="street" defaultValue={currentAddress?.street} required className="rounded-xl h-12" />
+                            </div>
+                            <div className="space-y-2">
+                               <Label htmlFor="city" className="text-[10px] font-black uppercase tracking-widest text-gray-400">City</Label>
+                               <Input id="city" name="city" defaultValue={currentAddress?.city} required className="rounded-xl h-12" />
+                            </div>
+                            <div className="space-y-2">
+                               <Label htmlFor="zipCode" className="text-[10px] font-black uppercase tracking-widest text-gray-400">ZIP Code</Label>
+                               <Input id="zipCode" name="zipCode" defaultValue={currentAddress?.zipCode} required className="rounded-xl h-12" />
+                            </div>
+                            <div className="space-y-2">
+                               <Label htmlFor="country" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Country</Label>
+                               <Input id="country" name="country" defaultValue={currentAddress?.country} required className="rounded-xl h-12" />
+                            </div>
+                            <div className="space-y-2">
+                               <Label htmlFor="type" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Address Type</Label>
+                               <Select name="type" defaultValue={currentAddress?.type || 'HOME'}>
+                                 <SelectTrigger className="rounded-xl h-12">
+                                   <SelectValue placeholder="Select type" />
+                                 </SelectTrigger>
+                                 <SelectContent>
+                                   <SelectItem value="HOME">HOME</SelectItem>
+                                   <SelectItem value="OFFICE">OFFICE</SelectItem>
+                                   <SelectItem value="OTHER">OTHER</SelectItem>
+                                 </SelectContent>
+                               </Select>
+                            </div>
+                         </div>
+                         <div className="flex items-center gap-2 mt-2">
+                            <input type="checkbox" id="isDefault" name="isDefault" defaultChecked={currentAddress?.isDefault} className="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                            <Label htmlFor="isDefault" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Set as default address</Label>
+                         </div>
+                         <DialogFooter className="mt-6">
+                            <Button type="submit" disabled={loading} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-12 uppercase tracking-widest">
+                               {loading ? 'SAVING...' : 'SAVE ADDRESS'}
+                            </Button>
+                         </DialogFooter>
+                       </form>
+                     </DialogContent>
+                   </Dialog>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="p-6 rounded-3xl border-2 border-orange-500 bg-orange-50/20 relative group">
-                      <div className="flex items-center gap-2 mb-4">
-                         <Badge className="bg-zinc-900 text-white font-black uppercase tracking-widest text-[9px]">DEFAULT</Badge>
-                         <Badge variant="outline" className="border-orange-500 text-orange-600 font-black uppercase tracking-widest text-[9px]">HOME</Badge>
-                      </div>
-                      <p className="font-black text-lg mb-1">{profile?.displayName || 'Resident'}</p>
-                      <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6 italic">
-                        123 Luxury Avenue, Suite 405<br />
-                        Lagos Island, Nigeria 101233
-                      </p>
-                      <div className="flex gap-4">
-                         <Button variant="link" className="text-orange-600 p-0 font-black text-[10px] tracking-widest uppercase">EDIT ADDRESS</Button>
-                         <Button variant="link" className="text-gray-300 p-0 font-black text-[10px] tracking-widest uppercase hover:text-red-500">DELETE</Button>
-                      </div>
-                   </div>
-
-                   <div className="p-6 rounded-3xl border-2 border-gray-100 hover:border-orange-200 transition-colors relative group">
-                      <div className="flex items-center gap-2 mb-4">
-                         <Badge variant="outline" className="border-gray-200 text-gray-400 font-black uppercase tracking-widest text-[9px]">OFFICE</Badge>
-                      </div>
-                      <p className="font-black text-lg mb-1">{profile?.displayName || 'Resident'}</p>
-                      <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6 italic">
-                        Tech Hub Towers, 45th Floor<br />
-                        Victoria Island, Nigeria 106101
-                      </p>
-                      <div className="flex gap-4">
-                         <Button variant="link" className="text-orange-600 p-0 font-black text-[10px] tracking-widest uppercase">EDIT ADDRESS</Button>
-                         <Button variant="link" className="text-gray-300 p-0 font-black text-[10px] tracking-widest uppercase hover:text-red-500">DELETE</Button>
-                      </div>
-                   </div>
+                   {addresses.length === 0 ? (
+                     <div className="col-span-full py-12 text-center bg-gray-50 rounded-[32px] border-2 border-dashed border-gray-200">
+                        <MapPin className="h-10 w-10 text-gray-300 mx-auto mb-4" />
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No shipping addresses saved yet.</p>
+                     </div>
+                   ) : (
+                     addresses.map((addr) => (
+                       <div key={addr.id} className={`p-6 rounded-3xl border-2 transition-all relative group ${addr.isDefault ? 'border-orange-500 bg-orange-50/20' : 'border-gray-100 hover:border-orange-200'}`}>
+                          <div className="flex items-center gap-2 mb-4">
+                             {addr.isDefault && <Badge className="bg-zinc-900 text-white font-black uppercase tracking-widest text-[9px]">DEFAULT</Badge>}
+                             <Badge variant="outline" className={`${addr.isDefault ? 'border-orange-500 text-orange-600' : 'border-gray-200 text-gray-400'} font-black uppercase tracking-widest text-[9px]`}>{addr.type}</Badge>
+                          </div>
+                          <p className="font-black text-lg mb-1">{profile?.displayName || 'Resident'}</p>
+                          <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6 italic">
+                            {addr.street}<br />
+                            {addr.city}, {addr.country} {addr.zipCode}
+                          </p>
+                          <div className="flex gap-4">
+                             <Button 
+                                variant="link" 
+                                onClick={() => {
+                                  setCurrentAddress(addr);
+                                  setIsAddressModalOpen(true);
+                                }}
+                                className="text-orange-600 p-0 font-black text-[10px] tracking-widest uppercase"
+                             >
+                               EDIT ADDRESS
+                             </Button>
+                             <Button 
+                                variant="link" 
+                                onClick={() => handleDeleteAddress(addr.id)}
+                                className="text-gray-300 p-0 font-black text-[10px] tracking-widest uppercase hover:text-red-500"
+                             >
+                               DELETE
+                             </Button>
+                          </div>
+                       </div>
+                     ))
+                   )}
                 </div>
               </Card>
             </div>

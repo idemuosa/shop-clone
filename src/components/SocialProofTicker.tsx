@@ -49,6 +49,8 @@ export default function SocialProofTicker() {
       }, 25000);
 
       return () => clearInterval(interval);
+    }, (error) => {
+      console.warn("SocialProofTicker order subscription failed (probably permission restricted):", error);
     });
 
     return () => unsubscribe();

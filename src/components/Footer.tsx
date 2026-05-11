@@ -7,7 +7,19 @@ export default function Footer() {
     <footer className="bg-black text-white pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Footer */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-16">
+          {/* About Us */}
+          <div className="space-y-6">
+            <h3 className="text-sm font-black uppercase tracking-widest text-white italic">About Shopsy</h3>
+            <p className="text-xs font-bold text-gray-400 leading-relaxed italic">
+              Shopsy.co is Africa's fastest-growing e-commerce destination. Our mission is to bridge the gap between quality and affordability, bringing world-class products to your doorstep with unmatched speed and security.
+            </p>
+            <div className="pt-2">
+              <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest">Our Vision</p>
+              <p className="text-[10px] text-gray-500 font-bold uppercase mt-1">To democratize premium retail across the continent.</p>
+            </div>
+          </div>
+
           {/* Brand & Newsletter */}
           <div className="space-y-6">
             <h2 className="text-2xl font-black tracking-tighter uppercase italic">Shopsy<span className="text-orange-600">.co</span></h2>

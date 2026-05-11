@@ -29,6 +29,7 @@
         "tag": { "type": "string", "description": "Discount tag (e.g., -50%)" },
         "sold": { "type": "string", "description": "Quantity sold (e.g., 5k+)" },
         "description": { "type": "string", "description": "Full product description" },
+        "prescription": { "type": "string", "description": "Special medical or usage instructions" },
         "createdAt": { "type": "string", "format": "date-time", "description": "When the product was added" }
       },
       "required": ["name", "price", "category", "image"]
@@ -62,12 +63,49 @@
         "createdAt": { "type": "string", "format": "date-time", "description": "When the review was posted" }
       },
       "required": ["productId", "userId", "userName", "rating", "comment"]
+    },
+    "PaymentMethod": {
+      "title": "PaymentMethod",
+      "description": "Stored user payment methods (last 4 digits only)",
+      "type": "object",
+      "properties": {
+        "last4": { "type": "string", "description": "Last 4 digits of card" },
+        "brand": { "type": "string", "description": "Card brand (Visa/Mastercard)" },
+        "expiry": { "type": "string", "description": "MM/YY expiry" },
+        "name": { "type": "string", "description": "Cardholder name" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When added" }
+      },
+      "required": ["last4", "brand", "expiry", "name"]
+    },
+    "Address": {
+      "title": "Address",
+      "description": "User shipping address",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique address ID" },
+        "street": { "type": "string", "description": "Street address" },
+        "city": { "type": "string", "description": "City" },
+        "zipCode": { "type": "string", "description": "ZIP or Postal code" },
+        "country": { "type": "string", "description": "Country" },
+        "type": { "type": "string", "enum": ["HOME", "OFFICE", "OTHER"], "description": "Address category" },
+        "isDefault": { "type": "boolean", "description": "Whether this is the primary address" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When added" }
+      },
+      "required": ["street", "city", "zipCode", "country", "type"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": "User",
       "description": "User profiles"
+    },
+    "/users/{userId}/paymentMethods/{methodId}": {
+      "schema": "PaymentMethod",
+      "description": "Stored payment methods"
+    },
+    "/users/{userId}/addresses/{addressId}": {
+      "schema": "Address",
+      "description": "Stored shipping addresses"
     },
     "/products/{productId}": {
       "schema": "Product",

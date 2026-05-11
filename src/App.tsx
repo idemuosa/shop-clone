@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import CategorySection from "./components/CategorySection";
@@ -8,29 +8,64 @@ import Footer from "./components/Footer";
 import AuthModal from "./components/auth/AuthModal";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import UserProfilePage from "./components/profile/UserProfilePage";
+import UserDashboard from "./components/dashboard/UserDashboard";
 import AIAssistant from "./components/ai/AIAssistant";
 import SocialProofTicker from "./components/SocialProofTicker";
 import BrandPartners from "./components/BrandPartners";
 import SpinToWin from "./components/games/SpinToWin";
 import CartDrawer from "./components/CartDrawer";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
-import { CartProvider } from "./lib/CartContext";
+import { CartProvider, useCart } from "./lib/CartContext";
 import { db } from "./lib/firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
-import { Truck, Headset, ShieldCheck, Zap } from "lucide-react";
+import { Truck, Headset, ShieldCheck, Zap, Search, X, Package } from "lucide-react";
 import { motion } from "motion/react";
 import { Toaster, toast } from "sonner";
 import { Button } from "./components/ui/button";
 
 function MainContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { isOpen: isCartOpen, setIsOpen: setIsCartOpen } = useCart();
   const [showAdmin, setShowAdmin] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [wishlistCount, setWishlistCount] = useState(0);
-  const { isAdmin } = useAuth();
+  const [lastViewedCategory, setLastViewedCategory] = useState<string>(() => {
+    return localStorage.getItem('lastViewedCategory') || '';
+  });
+  const { user, profile, isAdmin } = useAuth();
+
+  const handleProductView = (product: any) => {
+    if (product.category) {
+      setLastViewedCategory(product.category);
+      localStorage.setItem('lastViewedCategory', product.category);
+    }
+  };
+
+  const recommendedProducts = useMemo(() => {
+    if (!lastViewedCategory) {
+      return products.filter(p => p.tag === 'Featured' || p.rating >= 4.5).slice(0, 12);
+    }
+    const categoryMatches = products.filter(p => p.category === lastViewedCategory);
+    if (categoryMatches.length < 4) {
+      // Complement with high rated products if not enough in category
+      const others = products
+        .filter(p => p.category !== lastViewedCategory && p.rating >= 4)
+        .slice(0, 12 - categoryMatches.length);
+      return [...categoryMatches, ...others];
+    }
+    return categoryMatches.slice(0, 12);
+  }, [products, lastViewedCategory]);
+
+  useEffect(() => {
+    if (user && !showAdmin && !showProfile) {
+      setShowDashboard(true);
+    } else {
+      setShowDashboard(false);
+    }
+  }, [user, showAdmin, showProfile]);
 
   const addToWishlist = () => {
     setWishlistCount(prev => prev + 1);
@@ -59,6 +94,8 @@ function MainContent() {
         oldPrice: doc.data().oldPrice ? `$${doc.data().oldPrice}` : undefined
       }));
       setProducts(prods);
+    }, (error) => {
+      console.error("App products snapshot error:", error);
     });
     return () => unsubscribe();
   }, []);
@@ -122,6 +159,38 @@ function MainContent() {
     );
   }
 
+  if (showDashboard && user && !searchQuery) {
+    return (
+      <div className="min-h-screen bg-[#f8f9fa]">
+        <Navbar 
+          onOpenAuth={() => setIsAuthModalOpen(true)} 
+          onOpenCart={() => setIsCartOpen(true)}
+          onOpenProfile={() => {
+            setShowDashboard(false);
+            setShowProfile(true);
+          }}
+          onToggleAdmin={() => {
+            setShowDashboard(false);
+            setShowAdmin(true);
+          }}
+          onSearch={handleSearch}
+          showAdmin={showAdmin}
+          wishlistCount={wishlistCount}
+        />
+        <UserDashboard onBrowseMore={() => setShowDashboard(false)} />
+        <AIAssistant />
+        <SocialProofTicker />
+        <CartDrawer 
+          isOpen={isCartOpen} 
+          onClose={() => setIsCartOpen(false)} 
+          onCheckout={handleCheckout}
+        />
+        <Footer />
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f5f5f5] font-sans selection:bg-orange-100 selection:text-orange-600">
       <Navbar 
@@ -149,17 +218,45 @@ function MainContent() {
         </div>
 
         {searchQuery ? (
-          <div className="py-10">
+          <div className="py-12 bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+              <div className="flex items-center gap-4 bg-orange-50 p-8 rounded-[40px] border-2 border-orange-100">
+                <div className="bg-orange-600 p-4 rounded-3xl shadow-xl shadow-orange-200">
+                   <Search className="h-8 w-8 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-4xl font-black uppercase tracking-tighter italic">Search <span className="text-orange-600">Results</span></h2>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">Found {filteredProducts.length} items for <span className="text-orange-600 italic">"{searchQuery}"</span></p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => handleSearch("")}
+                  className="ml-auto font-black uppercase tracking-widest text-[10px] text-gray-400 hover:text-orange-600"
+                >
+                   Clear Search <X className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
             <ProductSection 
-              title="Search" 
-              subtitle="Results" 
+              title="Matched" 
+              subtitle="Items" 
               products={filteredProducts} 
               onAddToWishlist={addToWishlist}
+              onProductView={handleProductView}
             />
             {filteredProducts.length === 0 && (
-              <div className="text-center py-20">
-                <p className="text-xl font-bold text-gray-400 uppercase italic tracking-tighter">No items found for "{searchQuery}"</p>
-                <Button variant="link" className="text-orange-600 mt-4" onClick={() => setSearchQuery("")}>View all products</Button>
+              <div className="text-center py-24">
+                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                   <Package className="h-12 w-12 text-gray-200" />
+                </div>
+                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4 italic">No items <span className="text-orange-600">match</span> that search</h3>
+                <p className="text-gray-400 font-bold uppercase text-xs tracking-widest mb-10 max-w-md mx-auto">Try checking your spelling or using more general keywords like "Watch" or "Jersey".</p>
+                <Button 
+                  onClick={() => handleSearch("")}
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl px-12 h-16 shadow-2xl shadow-orange-200 text-lg active:scale-95 transition-all"
+                >
+                  VIEW ALL PRODUCTS
+                </Button>
               </div>
             )}
           </div>
@@ -202,6 +299,7 @@ function MainContent() {
               subtitle="Deals" 
               products={products.length > 0 ? products : []} 
               onAddToWishlist={addToWishlist}
+              onProductView={handleProductView}
             />
             
             {/* Secondary Promo Banners */}
@@ -241,7 +339,18 @@ function MainContent() {
               subtitle="Sellers" 
               products={products.filter(p => p.tag === 'Best Seller')} 
               onAddToWishlist={addToWishlist}
+              onProductView={handleProductView}
             />
+
+            {recommendedProducts.length > 0 && (
+              <ProductSection 
+                title="Recommended" 
+                subtitle="For You" 
+                products={recommendedProducts} 
+                onAddToWishlist={addToWishlist}
+                onProductView={handleProductView}
+              />
+            )}
             <BrandPartners />
             <PromoBanner />
           </>

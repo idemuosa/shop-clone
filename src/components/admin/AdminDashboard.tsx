@@ -47,6 +47,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Trash2, 
   Plus, 
@@ -65,7 +66,10 @@ import {
   BarChart3,
   Edit,
   ArrowRight,
-  TrendingDown
+  TrendingDown,
+  LayoutGrid,
+  Image as ImageIcon,
+  FileText
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -152,6 +156,8 @@ export default function AdminDashboard() {
       image: formData.get('image') as string,
       tag: formData.get('tag') as string,
       sold: formData.get('sold') as string,
+      description: formData.get('description') as string,
+      prescription: formData.get('prescription') as string,
     };
 
     try {
@@ -170,6 +176,10 @@ export default function AdminDashboard() {
     try {
       await updateDoc(doc(db, 'orders', orderId), { status: newStatus });
       toast.success(`Order status updated to ${newStatus}`);
+      
+      // Update local state for immediate feedback in the open dialog
+      setSelectedOrder((prev: any) => prev ? { ...prev, status: newStatus } : null);
+      
       fetchData();
     } catch (error: any) {
       toast.error("Failed to update status: " + error.message);
@@ -217,6 +227,8 @@ export default function AdminDashboard() {
       image: formData.get('image') as string,
       tag: formData.get('tag') as string,
       sold: formData.get('sold') as string,
+      description: formData.get('description') as string,
+      prescription: formData.get('prescription') as string,
       rating: 5.0,
       reviews: 0,
       createdAt: serverTimestamp(),
@@ -334,6 +346,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="products" className="rounded-xl font-black uppercase tracking-tighter px-6 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               <Package className="h-4 w-4 mr-2" /> Products
+            </TabsTrigger>
+            <TabsTrigger value="gallery" className="rounded-xl font-black uppercase tracking-tighter px-6 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+              <LayoutGrid className="h-4 w-4 mr-2" /> Gallery
             </TabsTrigger>
             <TabsTrigger value="orders" className="rounded-xl font-black uppercase tracking-tighter px-6 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               <ShoppingCart className="h-4 w-4 mr-2" /> Orders
@@ -483,6 +498,14 @@ export default function AdminDashboard() {
                       <Label htmlFor="sold">Sold Count (e.g. 5k+)</Label>
                       <Input id="sold" name="sold" className="rounded-xl border-2 focus:border-orange-500" />
                     </div>
+                    <div className="space-y-2">
+                       <Label htmlFor="description">Product Description</Label>
+                       <Textarea id="description" name="description" placeholder="Describe the features and details..." className="rounded-xl border-2 focus:border-orange-500 min-h-[100px]" />
+                    </div>
+                    <div className="space-y-2">
+                       <Label htmlFor="prescription">Prescription / Special Instructions</Label>
+                       <Textarea id="prescription" name="prescription" placeholder="Usage instructions or health notes..." className="rounded-xl border-2 focus:border-orange-500" />
+                    </div>
                     <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-12 mt-4" disabled={isLoading}>
                       <Plus className="h-5 w-5 mr-2" /> {isLoading ? 'Adding...' : 'ADD PRODUCT'}
                     </Button>
@@ -572,6 +595,14 @@ export default function AdminDashboard() {
                                         <Label htmlFor="edit-sold">Sold</Label>
                                         <Input id="edit-sold" name="sold" defaultValue={p.sold} className="rounded-xl" />
                                       </div>
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-description">Description</Label>
+                                        <Textarea id="edit-description" name="description" defaultValue={p.description} className="rounded-xl" />
+                                      </div>
+                                      <div className="space-y-2">
+                                        <Label htmlFor="edit-prescription">Prescription</Label>
+                                        <Textarea id="edit-prescription" name="prescription" defaultValue={p.prescription} className="rounded-xl" />
+                                      </div>
                                       <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-12" disabled={isLoading}>
                                         {isLoading ? 'SAVING...' : 'SAVE CHANGES'}
                                       </Button>
@@ -591,6 +622,90 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="gallery">
+            <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+                <div>
+                  <h2 className="text-3xl font-black uppercase tracking-tighter italic">Product <span className="text-orange-600">Gallery</span></h2>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Visual inventory browsing and management</p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge className="bg-orange-600 font-black uppercase tracking-widest text-[9px] px-3">{products.length} Products</Badge>
+                  <Button 
+                    variant="outline" 
+                    className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2"
+                    onClick={() => setActiveTab('products')}
+                  >
+                    <Plus className="h-4 w-4" /> ADD NEW
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {filteredProducts.map((p) => (
+                  <div key={p.id} className="group relative bg-white rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all overflow-hidden shadow-sm hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
+                    <div className="aspect-square relative overflow-hidden bg-gray-50">
+                      <img 
+                        src={p.image} 
+                        alt={p.name} 
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <Button 
+                          size="icon" 
+                          variant="secondary" 
+                          className="rounded-xl bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-orange-600 h-10 w-10"
+                          onClick={() => setEditingProduct(p)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="secondary" 
+                          className="rounded-xl bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-red-600 h-10 w-10"
+                          onClick={() => handleDeleteProduct(p.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {p.tag && (
+                        <div className="absolute top-3 left-3 bg-orange-600 text-white text-[8px] font-black uppercase px-2 py-1 rounded-full shadow-lg">
+                          {p.tag}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4 flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest truncate max-w-[80px]">{p.category}</p>
+                        <Badge variant="outline" className={`${p.stock < 10 ? 'border-red-200 text-red-500' : 'border-gray-100 text-gray-400'} text-[8px] font-black h-5`}>
+                          {p.stock} LEFT
+                        </Badge>
+                      </div>
+                      <h4 className="font-bold text-sm truncate leading-tight mb-1">{p.name}</h4>
+                      <div className="flex items-center justify-between">
+                        <p className="font-black text-orange-600 text-base">${p.price}</p>
+                        <div className="flex items-center gap-1 text-gray-400">
+                           <ImageIcon className="h-3 w-3" />
+                           <span className="text-[9px] font-bold uppercase tracking-tighter">{p.sold || '0 sold'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredProducts.length === 0 && (
+                <div className="py-20 text-center">
+                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                     <LayoutGrid className="h-8 w-8 text-gray-200" />
+                  </div>
+                  <p className="text-gray-400 font-bold italic">No products found in gallery</p>
+                </div>
+              )}
+            </Card>
           </TabsContent>
 
           <TabsContent value="orders">
@@ -635,7 +750,7 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Dialog>
+                            <Dialog onOpenChange={(open) => !open && setSelectedOrder(null)}>
                               <DialogTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-8 rounded-lg font-bold border-2" onClick={() => setSelectedOrder(o)}>
                                   <Eye className="h-3 w-3 mr-1" /> VIEW
@@ -700,7 +815,7 @@ export default function AdminDashboard() {
                                       <div>
                                         <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Update Status</p>
                                         <Select 
-                                          defaultValue={selectedOrder.status} 
+                                          value={selectedOrder.status} 
                                           onValueChange={(val) => handleUpdateOrderStatus(selectedOrder.id, val)}
                                         >
                                           <SelectTrigger className="w-[180px] rounded-xl font-bold">

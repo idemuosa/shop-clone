@@ -1,4 +1,4 @@
-import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Award, Info, BadgeCheck, AlertCircle, Sparkles } from "lucide-react";
+import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Award, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { db, auth } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, where } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, where, updateDoc, doc } from "firebase/firestore";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
@@ -56,6 +56,7 @@ interface Product {
   category: string;
   sold: string;
   description?: string;
+  prescription?: string;
 }
 
 interface ProductSectionProps {
@@ -63,16 +64,25 @@ interface ProductSectionProps {
   subtitle: string;
   products: Product[];
   onAddToWishlist?: () => void;
+  onProductView?: (product: Product) => void;
 }
 
-export default function ProductSection({ title, subtitle, products, onAddToWishlist }: ProductSectionProps) {
+export default function ProductSection({ title, subtitle, products, onAddToWishlist, onProductView }: ProductSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
   const [minRating, setMinRating] = useState<string>("0");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setInternalSelectedProduct] = useState<Product | null>(null);
+
+  const setSelectedProduct = (product: Product | null) => {
+    setInternalSelectedProduct(product);
+    if (product && onProductView) {
+      onProductView(product);
+    }
+  };
   const [isOrdering, setIsOrdering] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'details' | 'address' | 'payment'>('details');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
+  const [paymentType, setPaymentType] = useState<'card' | 'momo' | 'bank' | 'pod'>('card');
   const [userPaymentMethods, setUserPaymentMethods] = useState<any[]>([]);
   const [manualCardNumber, setManualCardNumber] = useState("");
   const [manualExpiry, setManualExpiry] = useState("");
@@ -88,8 +98,8 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const { user } = useAuth();
-  const { addToCart } = useCart();
+  const { user, profile } = useAuth();
+  const { addToCart, setIsOpen } = useCart();
 
   const handleAddToCart = (product: Product, quantity: number = 1) => {
     addToCart({
@@ -103,10 +113,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
       icon: <ShoppingCart className="h-4 w-4 text-orange-600" />,
       action: {
         label: "View Cart",
-        onClick: () => {
-          // Trigger cart drawer if possible, but Navbar usually manages it.
-          // For now, it's just a confirm. In a 5 real app, we might use a global state to open it.
-        }
+        onClick: () => setIsOpen(true)
       }
     });
   };
@@ -126,6 +133,8 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
       if (methods.length > 0 && !selectedPaymentMethod) {
         setSelectedPaymentMethod(methods[0]);
       }
+    }, (error) => {
+      console.error("Payment methods snapshot error:", error);
     });
 
     return () => unsubscribe();
@@ -145,6 +154,8 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const revs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setReviews(revs);
+    }, (error) => {
+      console.error("Product reviews snapshot error:", error);
     });
 
     return () => unsubscribe();
@@ -335,8 +346,9 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
           zipCode: deliveryZip
         },
         paymentMethod: {
-          last4: selectedPaymentMethod.id === 'manual' ? cardLast4 : selectedPaymentMethod.last4,
-          brand: selectedPaymentMethod.id === 'manual' ? cardBrand : selectedPaymentMethod.brand
+          type: paymentType,
+          last4: selectedPaymentMethod?.id === 'manual' ? cardLast4 : (selectedPaymentMethod?.last4 || ''),
+          brand: selectedPaymentMethod?.id === 'manual' ? cardBrand : (selectedPaymentMethod?.brand || paymentType.toUpperCase())
         },
         status: 'pending',
         createdAt: serverTimestamp(),
@@ -367,7 +379,39 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
         createdAt: serverTimestamp(),
       });
 
-      toast.success("Order placed successfully! A notification has been sent to the backend.");
+      // Send real emails via local API
+      try {
+        await fetch('/api/send-order-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: user.email, 
+            orderId: orderRef.id,
+            productName: product.name,
+            totalAmount: totalAmount.toFixed(2),
+            shippingAddress: {
+              address: deliveryAddress,
+              city: deliveryCity,
+              zipCode: deliveryZip
+            },
+            name: user.displayName
+          }),
+        });
+      } catch (emailErr) {
+        console.error('Order emails failed:', emailErr);
+      }
+
+      // Add Shopsy Coins (Loyalty Points)
+      try {
+        const pointsToEarn = Math.floor(totalAmount);
+        await updateDoc(doc(db, 'users', user.uid), {
+          points: (profile?.points || 0) + pointsToEarn,
+          updatedAt: serverTimestamp(),
+        });
+      } catch (pointErr) {
+        console.error('Failed to add points:', pointErr);
+      }
+
       setSelectedProduct(null);
       setCheckoutStep('details');
       setSelectedPaymentMethod(null);
@@ -534,6 +578,36 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Rating Quick Filter */}
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
+          <span className="text-[10px] font-black uppercase text-gray-400 tracking-widest whitespace-nowrap mr-2 flex items-center gap-1.5">
+            <Star className="h-3 w-3" /> Min Rating:
+          </span>
+          {[
+            { label: "All Ratings", value: "0" },
+            { label: "3+ Stars", value: "3" },
+            { label: "4+ Stars", value: "4" },
+            { label: "4.5+ Stars", value: "4.5" }
+          ].map((rating) => (
+            <Button
+              key={rating.value}
+              variant={minRating === rating.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMinRating(rating.value)}
+              className={`rounded-full px-4 h-8 text-[11px] font-black uppercase tracking-tighter transition-all border-2 flex-shrink-0 ${
+                minRating === rating.value 
+                  ? "bg-orange-600 border-orange-600 text-white shadow-lg shadow-orange-100" 
+                  : "bg-white border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-600"
+              }`}
+            >
+              {rating.value !== "0" && (
+                <Star className={`h-3 w-3 mr-1.5 ${minRating === rating.value ? "fill-white text-white" : "fill-orange-500 text-orange-500"}`} />
+              )}
+              {rating.label}
+            </Button>
+          ))}
         </div>
 
         {/* Active Filters Display */}
@@ -709,13 +783,14 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                         </Button>
                       </div>
                       <Button 
-                        className="w-full h-8 bg-orange-600 text-white hover:bg-orange-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm"
+                        className="w-full h-8 bg-orange-600 text-white hover:bg-orange-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm gap-2"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedProduct(product);
+                          handleAddToCart(product, productQuantities[product.id] || 1);
                         }}
                       >
-                        BUY NOW
+                        <ShoppingCart className="h-3.5 w-3.5" />
+                        ADD TO CART
                       </Button>
                   </div>
                 </motion.div>
@@ -769,8 +844,9 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                         </TabsTrigger>
                         <TabsTrigger 
                           value="reviews" 
-                          className="rounded-xl font-black text-[10px] uppercase tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all"
+                          className="rounded-xl font-black text-[10px] uppercase tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5"
                         >
+                          <Sparkles className="h-3 w-3" />
                           Reviews ({selectedProduct.reviews})
                         </TabsTrigger>
                       </TabsList>
@@ -802,8 +878,25 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                           </div>
 
                           <DialogDescription className="text-gray-600 mb-6 leading-relaxed font-medium text-base">
-                            Experience premium quality with our {selectedProduct.name}. This top-rated product from our {selectedProduct.category} collection is designed for performance and style. Limited stock available at this flash sale price!
+                            {selectedProduct.description || `Experience premium quality with our ${selectedProduct.name}. This top-rated product from our ${selectedProduct.category} collection is designed for performance and style. Limited stock available at this flash sale price!`}
                           </DialogDescription>
+
+                          {selectedProduct.prescription && (
+                            <div className="bg-blue-50 border-2 border-blue-100 p-6 rounded-[32px] mb-8 relative overflow-hidden group">
+                               <div className="relative z-10">
+                                  <div className="flex items-center gap-2 mb-3">
+                                     <div className="bg-blue-600 p-1.5 rounded-lg text-white">
+                                        <AlertCircle className="h-4 w-4" />
+                                     </div>
+                                     <h4 className="text-sm font-black uppercase tracking-tighter text-blue-900 italic">Special <span className="text-blue-600">Instructions</span></h4>
+                                  </div>
+                                  <p className="text-xs font-bold text-blue-800 leading-relaxed whitespace-pre-wrap">
+                                     {selectedProduct.prescription}
+                                  </p>
+                               </div>
+                               <FileText className="absolute right-[-10px] top-[-10px] h-24 w-24 text-blue-600/5 rotate-12 transition-transform group-hover:scale-110" />
+                            </div>
+                          )}
 
                           <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
@@ -848,79 +941,105 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                         </ScrollArea>
                       </TabsContent>
 
-                      <TabsContent value="reviews" className="flex-1 flex flex-col mt-0 focus-visible:outline-none">
+                      <TabsContent value="reviews" className="flex-1 flex flex-col mt-0 focus-visible:outline-none overflow-hidden">
                         <ScrollArea className="flex-1 pr-4 -mr-4">
                           <div className="space-y-8 pb-4">
-                            <div className="bg-orange-50/50 p-6 rounded-3xl border-2 border-orange-100">
-                              <h4 className="text-sm font-black uppercase tracking-[0.2em] mb-4 text-orange-600">Submit your review</h4>
-                              <div className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Rating</Label>
-                                  <div className="flex gap-1">
+                            <div className="bg-gradient-to-br from-orange-50 to-white p-8 rounded-[32px] border-2 border-orange-100 shadow-sm">
+                              <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-orange-600 p-2 rounded-xl text-white">
+                                  <Edit className="h-5 w-5" />
+                                </div>
+                                <h4 className="text-xl font-black uppercase tracking-tighter italic">Write a <span className="text-orange-600">Review</span></h4>
+                              </div>
+                              
+                              <div className="space-y-6">
+                                <div className="space-y-3">
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">How would you rate it?</Label>
+                                  <div className="flex gap-2">
                                     {[1, 2, 3, 4, 5].map((star) => (
                                       <button
                                         key={star}
                                         onClick={() => setNewReviewRating(star)}
-                                        className="transition-transform active:scale-125"
+                                        className="transition-all active:scale-75 hover:scale-110"
                                       >
-                                        <Star className={`h-6 w-6 ${star <= newReviewRating ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
+                                        <Star className={`h-10 w-10 ${star <= newReviewRating ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
                                       </button>
                                     ))}
                                   </div>
                                 </div>
                                 <div className="space-y-2">
-                                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Comment</Label>
+                                  <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Share your experience</Label>
                                   <textarea
                                     value={newReviewComment}
                                     onChange={(e) => setNewReviewComment(e.target.value)}
-                                    placeholder="Tell others what you think about this product..."
-                                    className="w-full min-h-[100px] p-4 rounded-2xl border-2 border-gray-100 focus:border-orange-500 focus:outline-none transition-all resize-none text-sm font-medium"
+                                    placeholder="What did you like? How was the delivery?"
+                                    className="w-full min-h-[120px] p-5 rounded-3xl border-2 border-gray-100 focus:border-orange-500 focus:outline-none transition-all resize-none text-sm font-medium bg-white/50 backdrop-blur-sm"
                                   />
                                 </div>
                                 <Button 
                                   onClick={handleSubmitReview}
                                   disabled={isSubmittingReview}
-                                  className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black uppercase tracking-widest text-xs h-12 rounded-xl shadow-lg shadow-orange-100"
+                                  className="w-full bg-black hover:bg-zinc-800 text-white font-black uppercase tracking-widest text-xs h-14 rounded-2xl shadow-xl shadow-zinc-200"
                                 >
-                                  {isSubmittingReview ? "Submitting..." : "Post Review"}
+                                  {isSubmittingReview ? "SUBMITTING..." : (user ? "POST VERIFIED REVIEW" : "LOGIN TO REVIEW")}
                                 </Button>
                               </div>
                             </div>
 
-                            <div className="space-y-4">
-                              <h4 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-900 border-b pb-4 flex items-center gap-2">
-                                <Sparkles className="h-4 w-4 text-orange-600" /> AI Consensus
-                              </h4>
+                            <div className="space-y-6 px-2">
+                              <div className="flex items-center justify-between border-b-2 border-gray-100 pb-4">
+                                <h4 className="text-base font-black uppercase tracking-tighter italic flex items-center gap-2">
+                                  <Sparkles className="h-5 w-5 text-orange-600" /> What <span className="text-orange-600">AI</span> Thinks
+                                </h4>
+                                <Badge className="bg-orange-100 text-orange-600 font-black border-none text-[9px] uppercase">BETA</Badge>
+                              </div>
                               <AIReviewSummarizer reviews={reviews} productName={selectedProduct.name} />
 
-                              <h4 className="text-sm font-black uppercase tracking-[0.2em] text-gray-400 border-b pb-4 mt-8">Recent Reviews</h4>
+                              <div className="flex items-center justify-between mt-8 border-b-2 border-gray-100 pb-4">
+                                <h4 className="text-sm font-black uppercase tracking-widest text-gray-400">Community Gallery</h4>
+                                <span className="text-[10px] font-black text-orange-600 uppercase tracking-widest">{reviews.length} total reviews</span>
+                              </div>
+
                               {reviews.length > 0 ? (
-                                reviews.map((review) => (
-                                  <div key={review.id} className="p-4 rounded-2xl border border-gray-50 bg-white">
-                                    <div className="flex justify-between items-start mb-2">
-                                      <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
-                                          <User className="h-4 w-4 text-orange-600" />
-                                        </div>
-                                        <div>
-                                          <p className="text-xs font-black uppercase tracking-tight">{review.userName}</p>
-                                          <div className="flex gap-0.5">
-                                            {[...Array(5)].map((_, i) => (
-                                              <Star key={i} className={`h-2.5 w-2.5 ${i < review.rating ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
-                                            ))}
+                                <div className="grid grid-cols-1 gap-4">
+                                  {reviews.map((review) => (
+                                    <div key={review.id} className="p-6 rounded-[24px] border-2 border-gray-50 bg-white hover:border-orange-100 transition-all shadow-sm hover:shadow-md">
+                                      <div className="flex justify-between items-start mb-4">
+                                        <div className="flex items-center gap-4">
+                                          <div className="w-12 h-12 rounded-2xl bg-orange-600 flex items-center justify-center text-white font-black shadow-lg shadow-orange-100">
+                                            {review.userName.charAt(0)}
+                                          </div>
+                                          <div>
+                                            <div className="flex items-center gap-2">
+                                              <p className="text-sm font-black uppercase tracking-tight">{review.userName}</p>
+                                              <Badge className="bg-green-100 text-green-700 border-none font-black text-[8px] uppercase px-1.5 flex items-center gap-1">
+                                                <BadgeCheck className="h-3 w-3" /> VERIFIED BUYER
+                                              </Badge>
+                                            </div>
+                                            <div className="flex gap-0.5 mt-1">
+                                              {[...Array(5)].map((_, i) => (
+                                                <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-orange-500 text-orange-500" : "text-gray-100"}`} />
+                                              ))}
+                                            </div>
                                           </div>
                                         </div>
+                                        <span className="text-[10px] text-gray-400 font-bold uppercase italic mt-1">
+                                          {review.createdAt?.toDate().toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) || "Just now"}
+                                        </span>
                                       </div>
-                                      <span className="text-[10px] text-gray-300 font-bold">
-                                        {review.createdAt?.toDate().toLocaleDateString() || "Recently"}
-                                      </span>
+                                      <p className="text-sm text-gray-700 font-medium leading-relaxed bg-gray-50/50 p-4 rounded-xl border border-gray-50 italic">
+                                        "{review.comment}"
+                                      </p>
                                     </div>
-                                    <p className="text-xs text-gray-600 font-medium leading-relaxed">{review.comment}</p>
-                                  </div>
-                                ))
+                                  ))}
+                                </div>
                               ) : (
-                                <div className="text-center py-12">
-                                  <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No reviews yet. Be the first to review!</p>
+                                <div className="text-center py-20 bg-gray-50/50 rounded-[40px] border-4 border-dashed border-gray-100">
+                                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                                    <User className="h-10 w-10 text-gray-200" />
+                                  </div>
+                                  <p className="text-gray-400 font-black uppercase tracking-[0.2em] text-xs">No reviews match your criteria yet.</p>
+                                  <Button variant="link" className="text-orange-600 mt-4 font-black uppercase text-[10px] tracking-widest">BE THE FIRST TO REVIEW</Button>
                                 </div>
                               )}
                             </div>
@@ -987,6 +1106,62 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                             SHARE
                           </Button>
                         </div>
+                      </div>
+
+                      {/* Related Products Section */}
+                      <div className="mt-12 pt-10 border-t border-gray-100">
+                        <div className="flex items-center justify-between mb-8">
+                          <div>
+                            <h3 className="text-2xl font-black uppercase tracking-tighter italic">Recommended for <span className="text-orange-600">You</span></h3>
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Customers who viewed this also bought</p>
+                          </div>
+                          <Badge className="bg-orange-100 text-orange-600 border-none font-bold text-[10px] uppercase">TOP PICKS</Badge>
+                        </div>
+                        <div className="grid grid-cols-2 gap-6 mb-10">
+                          {products
+                            .filter(p => p.category === selectedProduct.category && p.id !== selectedProduct.id)
+                            .slice(0, 4)
+                            .map((relatedP) => (
+                              <div 
+                                key={relatedP.id} 
+                                className="group cursor-pointer bg-white rounded-3xl p-3 border-2 border-transparent hover:border-orange-500 transition-all hover:shadow-xl hover:shadow-orange-100"
+                                onClick={() => {
+                                  setSelectedProduct(relatedP);
+                                  // Scroll top of the dialog
+                                  const scrollArea = document.querySelector('[role="dialog"] [data-radix-scroll-area-viewport]');
+                                  if (scrollArea) scrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                              >
+                                <div className="aspect-square rounded-[20px] overflow-hidden bg-gray-50 mb-4 relative">
+                                  <img 
+                                    src={relatedP.image} 
+                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                    referrerPolicy="no-referrer"
+                                  />
+                                  <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-md p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <ShoppingBag className="h-4 w-4 text-orange-600" />
+                                  </div>
+                                </div>
+                                <div className="px-1">
+                                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">{relatedP.tag || 'New Arrival'}</p>
+                                  <h4 className="font-bold text-sm truncate mb-2 leading-tight">{relatedP.name}</h4>
+                                  <div className="flex items-center justify-between">
+                                    <p className="font-black text-orange-600 text-lg">${relatedP.price}</p>
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3 fill-orange-500 text-orange-500" />
+                                      <span className="text-[10px] font-bold text-gray-400">{relatedP.rating || '5.0'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                        {products.filter(p => p.category === selectedProduct.category && p.id !== selectedProduct.id).length === 0 && (
+                          <div className="bg-gray-50 rounded-[32px] p-8 text-center border-2 border-dashed border-gray-100 opacity-60">
+                             <Package className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-relaxed">Checking more items in {selectedProduct.category} category...</p>
+                          </div>
+                        )}
                       </div>
                     </Tabs>
                   ) : (
@@ -1094,6 +1269,25 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                             </div>
 
                           <div className="space-y-4">
+                            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+                              {(['card', 'momo', 'bank', 'pod'] as const).map((type) => (
+                                <Button
+                                  key={type}
+                                  variant="ghost"
+                                  onClick={() => {
+                                    setPaymentType(type);
+                                    setSelectedPaymentMethod(null);
+                                  }}
+                                  className={`flex-1 rounded-lg font-black text-[9px] uppercase tracking-tighter h-9 px-1 ${
+                                    paymentType === type ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-400'
+                                  }`}
+                                >
+                                  {type === 'card' ? 'Card' : type === 'momo' ? 'MoMo' : type === 'bank' ? 'Transfer' : 'POD'}
+                                </Button>
+                              ))}
+                            </div>
+
+                            {paymentType === 'card' ? (
                             <RadioGroup 
                               value={selectedPaymentMethod?.id} 
                               onValueChange={(val) => {
@@ -1150,7 +1344,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                                     <Plus className="h-5 w-5" />
                                   </div>
                                   <div className="flex-1">
-                                    <p className="font-bold text-sm">Add New Payment Method</p>
+                                    <p className="font-bold text-sm">Add New Card</p>
                                     <p className="text-[10px] text-gray-400 uppercase font-black">Secure one-time payment</p>
                                   </div>
                                   {selectedPaymentMethod?.id === 'manual' && (
@@ -1161,6 +1355,60 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                                 </div>
                               </div>
                             </RadioGroup>
+                            ) : paymentType === 'momo' ? (
+                              <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                                <div className="bg-orange-50 p-6 rounded-3xl border-2 border-orange-100 space-y-4">
+                                  <h4 className="text-sm font-black uppercase italic tracking-tighter">Mobile <span className="text-orange-600">Money</span></h4>
+                                  <div className="space-y-3">
+                                    <div className="space-y-1">
+                                      <Label className="text-[10px] font-black uppercase text-gray-400">Select Provider</Label>
+                                      <div className="grid grid-cols-2 gap-2">
+                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'mtn' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'mtn' ? 'border-orange-500 shadow-orange-100 shadow-md' : 'border-zinc-100'}`}>
+                                          <div className="w-6 h-6 bg-yellow-400 rounded-full mr-2" /> MTN
+                                        </Button>
+                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'airtel' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'airtel' ? 'border-orange-500 shadow-orange-100 shadow-md' : 'border-zinc-100'}`}>
+                                          <div className="w-6 h-6 bg-red-600 rounded-full mr-2" /> Airtel
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                      <Label className="text-[10px] font-black uppercase text-gray-400">Phone Number</Label>
+                                      <Input placeholder="+234 ..." className="h-12 rounded-xl border-2 border-zinc-100 focus:border-orange-500 bg-white" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : paymentType === 'bank' ? (
+                              <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                                <div className="bg-zinc-900 p-6 rounded-3xl text-white space-y-4" onClick={() => setSelectedPaymentMethod({ id: 'bank' })}>
+                                  <div className="flex items-center justify-between">
+                                     <h4 className="text-sm font-black uppercase tracking-widest text-zinc-400">Bank Transfer</h4>
+                                     <Building className="h-5 w-5 text-zinc-600" />
+                                  </div>
+                                  <div className="space-y-4 bg-zinc-800/50 p-4 rounded-2xl border border-zinc-700/50">
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[10px] uppercase font-black text-zinc-500">Bank Name</span>
+                                      <span className="text-sm font-bold">WEMA BANK / ALAT</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                      <span className="text-[10px] uppercase font-black text-zinc-500">Account No.</span>
+                                      <span className="text-lg font-black tracking-widest text-orange-400">0123456789</span>
+                                    </div>
+                                  </div>
+                                  <p className="text-[9px] text-zinc-500 font-bold uppercase text-center">Transfer AND CLICK "PAY NOW"</p>
+                                </div>
+                              </div>
+                            ) : (
+                               <div className="bg-gray-50 p-8 rounded-3xl border-2 border-dashed border-gray-200 text-center space-y-3 cursor-pointer" onClick={() => setSelectedPaymentMethod({ id: 'pod' })}>
+                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
+                                   <Truck className="h-6 w-6 text-orange-600" />
+                                </div>
+                                <h4 className="font-black uppercase italic tracking-tighter">Pay on <span className="text-orange-600">Delivery</span></h4>
+                                <p className="text-[10px] text-gray-500 font-bold uppercase leading-relaxed max-w-[200px] mx-auto">
+                                  Pay cash or card when your rider arrives.
+                                </p>
+                              </div>
+                            )}
 
                             <AnimatePresence>
                               {selectedPaymentMethod?.id === 'manual' && (

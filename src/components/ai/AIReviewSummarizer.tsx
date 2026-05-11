@@ -27,29 +27,38 @@ export default function AIReviewSummarizer({ reviews, productName }: ReviewSumma
   const generateSummary = async () => {
     if (reviews.length === 0) return;
     setIsLoading(true);
+    setSummary(null);
 
     try {
-      const reviewText = reviews.map(r => `[${r.rating} Stars] ${r.userName}: ${r.comment}`).join('\n');
+      const reviewText = reviews.slice(0, 10).map(r => `[${r.rating} Stars] ${r.userName}: ${r.comment}`).join('\n');
       
       const prompt = `
-        Analyze the following customer reviews for "${productName}" and provide a concise, honest summary in 3 bullet points:
-        1. Overall Sentiment
-        2. Top Positive Feature
-        3. Main Complaint (if any)
+        You are an expert e-commerce analyst. Analyze these customer reviews for "${productName}" and provide a punchy, 3-bullet point summary for a potential buyer:
+        - Overall Vibe (Is it worth it?)
+        - Best Thing (What stood out?)
+        - Heads Up (Any warnings or minor issues?)
         
-        Reviews:
+        Keep it professional yet engaging, like a high-end tech review site.
+        Use bullet points (-) only.
+        
+        Reviews to analyze:
         ${reviewText}
       `;
 
       const response = await ai.models.generateContent({
         model,
         contents: prompt,
+        config: {
+          temperature: 0.7,
+          topP: 0.9,
+          systemInstruction: "You are a concise AI assistant that summarizes product reviews for a high-traffic e-commerce marketplace. Be honest, objective, and extremely concise."
+        }
       });
 
-      setSummary(response.text || "Unable to summarize at this time.");
+      setSummary(response.text || "AI is taking a break. Check back in a moment!");
     } catch (error) {
       console.error("Summary Error:", error);
-      setSummary("Failed to generate summary. Please try again later.");
+      setSummary("Failed to link with AI brain. Please try again!");
     } finally {
       setIsLoading(false);
     }

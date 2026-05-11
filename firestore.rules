@@ -55,8 +55,15 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && 
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' : false ||
          (request.auth.token.email == "idemudiawisdom27@gmail.com" && request.auth.token.email_verified == true));
+    }
+
+    // ===============================================================
+    // Global Deny
+    // ===============================================================
+    match /{document=**} {
+      allow read, write: if false;
     }
 
     function isValidEmail(email) {
@@ -86,7 +93,7 @@ service cloud.firestore {
              data.category is string &&
              isValidUrl(data.image) &&
              (!('oldPrice' in data) || data.oldPrice is number) &&
-             data.keys().hasOnly(['name', 'price', 'oldPrice', 'category', 'image', 'rating', 'reviews', 'tag', 'sold', 'description', 'createdAt']);
+             data.keys().hasOnly(['name', 'price', 'oldPrice', 'category', 'image', 'rating', 'reviews', 'tag', 'sold', 'description', 'prescription', 'createdAt']);
     }
 
     function isValidOrder(data) {
@@ -108,6 +115,26 @@ service cloud.firestore {
              data.createdAt == request.time;
     }
 
+    function isValidPaymentMethod(data) {
+      return data.keys().hasAll(['last4', 'brand', 'expiry', 'name']) &&
+             data.last4 is string && data.last4.size() == 4 &&
+             data.brand is string &&
+             data.expiry is string &&
+             data.name is string &&
+             data.keys().hasOnly(['last4', 'brand', 'expiry', 'name', 'createdAt']);
+    }
+
+    function isValidAddress(data) {
+      return data.keys().hasAll(['street', 'city', 'zipCode', 'country', 'type']) &&
+             data.street is string && data.street.size() > 0 &&
+             data.city is string && data.city.size() > 0 &&
+             data.zipCode is string && data.zipCode.size() > 0 &&
+             data.country is string && data.country.size() > 0 &&
+             data.type in ['HOME', 'OFFICE', 'OTHER'] &&
+             (!('isDefault' in data) || data.isDefault is bool) &&
+             data.keys().hasOnly(['street', 'city', 'zipCode', 'country', 'type', 'isDefault', 'createdAt']);
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -116,6 +143,19 @@ service cloud.firestore {
       allow read: if isOwner(userId) || isAdmin();
       allow create: if isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
       allow update: if isOwner(userId) && isValidUser(request.resource.data) && (request.resource.data.role == resource.data.role || isAdmin());
+
+      match /paymentMethods/{methodId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidPaymentMethod(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      match /addresses/{addressId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidAddress(request.resource.data);
+        allow update: if isOwner(userId) && isValidAddress(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
     }
 
     match /products/{productId} {
@@ -134,6 +174,10 @@ service cloud.firestore {
       allow create: if isAuthenticated() && isValidOrder(request.resource.data);
       allow update: if isAdmin(); // Only admin can update order status
       allow delete: if false; // Orders should not be deleted
+    }
+
+    match /notifications/{notificationId} {
+      allow read, write: if isAdmin();
     }
   }
 }

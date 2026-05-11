@@ -20,6 +20,8 @@ export default function PaymentMethods() {
     const q = query(collection(db, 'users', user.uid, 'paymentMethods'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setMethods(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      console.error("PaymentMethods snapshot error:", error);
     });
 
     return () => unsubscribe();
