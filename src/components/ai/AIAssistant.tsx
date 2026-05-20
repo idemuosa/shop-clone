@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { API_URL } from '@/lib/api';
 
 interface Message {
   role: 'user' | 'model';
@@ -42,8 +43,7 @@ export default function AIAssistant() {
 
     try {
       // 1. Fetch current catalog from Python API
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const pRes = await fetch(`${apiUrl}/products/`);
+      const pRes = await fetch(`${API_URL}/products/`);
       let productCatalog = [];
       if (pRes.ok) {
         productCatalog = await pRes.json();

@@ -26,6 +26,7 @@ import {
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { API_URL } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -99,8 +100,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
       // Send confirmation via API (Optional/Simulated)
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        await fetch(`${apiUrl}/api/send-order-confirmation`, {
+        await fetch(`${API_URL}/api/send-order-confirmation`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -127,13 +127,13 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   if (items.length === 0 && step !== 'success') {
       return (
           <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-              <div className="bg-white p-12 rounded-[40px] shadow-xl text-center max-w-md w-full border-2 border-gray-50">
-                  <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                      <ShoppingBag className="h-12 w-12 text-gray-200" />
+              <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[40px] shadow-xl text-center max-w-md w-full border-2 border-gray-50">
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8">
+                      <ShoppingBag className="h-8 w-8 md:h-12 md:w-12 text-gray-200" />
                   </div>
-                  <h2 className="text-3xl font-black  tracking-tighter italic mb-4">Your Cart is <span className="text-purple-600">Empty</span></h2>
-                  <p className="text-gray-400 font-bold  text-xs tracking-widest mb-10">Add some items to your cart before checking out.</p>
-                  <Button onClick={onBack} className="w-full h-16 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-xl shadow-purple-100">
+                  <h2 className="text-xl md:text-3xl font-black tracking-tighter italic mb-3 md:mb-4">Your Cart is <span className="text-purple-600">Empty</span></h2>
+                  <p className="text-gray-400 font-bold text-[10px] md:text-xs tracking-widest mb-6 md:mb-10 uppercase">Add some items to your cart before checking out.</p>
+                  <Button onClick={onBack} className="w-full h-12 md:h-16 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-xl shadow-purple-100 text-xs md:text-base">
                       Back to shopping
                   </Button>
               </div>
@@ -142,7 +142,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9fa] py-4 md:py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <AnimatePresence mode="wait">
           {step !== 'success' ? (
@@ -151,27 +151,27 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="grid grid-cols-1 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8"
             >
               {/* Left Column: Checkout Steps */}
-              <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
+              <div className="lg:col-span-2 space-y-4 md:space-y-8">
+                <div className="bg-white p-5 md:p-8 rounded-[32px] md:rounded-[40px] shadow-sm border border-gray-100">
                   <div className="flex items-center justify-between mb-6 md:mb-8">
                     <div className="flex items-center gap-2 md:gap-4">
                       <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100 h-8 w-8 md:h-10 md:w-10">
                         <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
                       </Button>
                       <div>
-                        <h1 className="text-xl md:text-3xl font-black tracking-tighter leading-none">Checkout</h1>
+                        <h1 className="text-lg md:text-3xl font-black tracking-tighter leading-none">Checkout</h1>
                         <p className="text-[8px] md:text-[10px] font-bold text-gray-400 tracking-widest mt-1 uppercase">Secure Payment</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${step === 'address' ? 'bg-purple-600 text-white' : 'bg-green-100 text-green-700'}`}>
-                          {step === 'address' ? '1' : <CheckCircle2 className="h-4 w-4" />}
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'address' ? 'bg-purple-600 text-white' : 'bg-green-100 text-green-700'}`}>
+                          {step === 'address' ? '1' : <CheckCircle2 className="h-3 w-3 md:h-4 md:w-4" />}
                        </div>
-                       <div className="w-8 h-1 bg-gray-100 rounded-full"></div>
-                       <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${step === 'payment' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                       <div className="w-4 md:w-8 h-1 bg-gray-100 rounded-full"></div>
+                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'payment' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
                           2
                        </div>
                     </div>
@@ -181,61 +181,61 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     <motion.div
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      className="space-y-8"
+                      className="space-y-6 md:space-y-8"
                     >
                       <div>
-                        <h3 className="text-xl font-black  tracking-tighter italic mb-6 flex items-center gap-2">
-                          <MapPin className="h-5 w-5 text-purple-600" /> Shipping <span className="text-purple-600">Details</span>
+                        <h3 className="text-lg md:text-xl font-black tracking-tighter italic mb-4 md:mb-6 flex items-center gap-2">
+                          <MapPin className="h-4 w-4 md:h-5 md:w-5 text-purple-600" /> Shipping <span className="text-purple-600">Details</span>
                         </h3>
 
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label className="text-[10px] font-black  text-gray-400 ml-1">Street Address</Label>
+                        <div className="space-y-3 md:space-y-4">
+                          <div className="space-y-1.5 md:space-y-2">
+                            <Label className="text-[9px] md:text-[10px] font-black text-gray-400 ml-1 uppercase">Street Address</Label>
                             <div className="relative">
                               <Input
                                 placeholder="House number and street name"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="pl-12 h-16 rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50"
+                                className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                               />
-                              <Home className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
+                              <Home className="absolute left-3.5 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-300" />
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label className="text-[10px] font-black  text-gray-400 ml-1">City</Label>
+                          <div className="grid grid-cols-2 gap-3 md:gap-4">
+                            <div className="space-y-1.5 md:space-y-2">
+                              <Label className="text-[9px] md:text-[10px] font-black text-gray-400 ml-1 uppercase">City</Label>
                               <div className="relative">
                                 <Input
-                                  placeholder="Lagos"
+                                  placeholder="City"
                                   value={city}
                                   onChange={(e) => setCity(e.target.value)}
-                                  className="pl-12 h-16 rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50"
+                                  className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                                 />
-                                <Building className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
+                                <Building className="absolute left-3.5 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-300" />
                               </div>
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-[10px] font-black  text-gray-400 ml-1">Zip Code</Label>
+                            <div className="space-y-1.5 md:space-y-2">
+                              <Label className="text-[9px] md:text-[10px] font-black text-gray-400 ml-1 uppercase">Zip Code</Label>
                               <Input
                                 placeholder="100001"
                                 value={zip}
                                 onChange={(e) => setZip(e.target.value)}
-                                className="h-16 rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50"
+                                className="h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                               />
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div className="bg-green-50 p-6 rounded-[32px] border-2 border-green-100 flex items-start gap-4">
-                        <div className="bg-white p-3 rounded-2xl shadow-sm">
-                           <Truck className="h-6 w-6 text-purple-600" />
+                      <div className="bg-green-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border-2 border-green-100 flex items-start gap-3 md:gap-4">
+                        <div className="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm shrink-0">
+                           <Truck className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
                         </div>
                         <div>
-                          <h4 className="font-black  italic tracking-tighter text-green-900">Vivo Express Delivery</h4>
-                          <p className="text-xs text-green-700 font-medium leading-relaxed mt-1">
-                            Your location is eligible for FREE same-day delivery if you order within the next 2 hours!
+                          <h4 className="font-black italic tracking-tighter text-green-900 text-sm md:text-base leading-none mb-1">Vivo Express Delivery</h4>
+                          <p className="text-[9px] md:xs text-green-700 font-bold leading-relaxed">
+                            Eligible for FREE same-day delivery!
                           </p>
                         </div>
                       </div>
@@ -249,10 +249,10 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                           setStep('payment');
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="w-full h-18 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95 group py-8"
+                        className="w-full h-14 md:h-20 bg-purple-600 hover:bg-purple-700 text-white font-black text-base md:text-xl rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95 group"
                       >
                         Continue to payment
-                        <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
                       </Button>
                     </motion.div>
                   ) : (

@@ -43,6 +43,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { API_URL } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import AIReviewSummarizer from "./ai/AIReviewSummarizer";
 
@@ -385,8 +386,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
 
       // Send real emails via local API
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        await fetch(`${apiUrl}/api/send-order-confirmation`, {
+        await fetch(`${API_URL}/api/send-order-confirmation`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

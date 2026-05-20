@@ -21,6 +21,7 @@ import CartDrawer from "./components/CartDrawer";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
+import { API_URL } from "./lib/api";
 import { db } from "./lib/firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { Truck, Headset, ShieldCheck, Zap, Search, X, Package } from "lucide-react";
@@ -96,11 +97,27 @@ function MainContent() {
     setShowCheckout(true);
   };
 
+  // Add keyboard navigation (ArrowLeft to go back)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        if (showCheckout) setShowCheckout(false);
+        else if (activeInfoPage) setActiveInfoPage(null);
+        else if (showAdmin) setShowAdmin(false);
+        else if (showProfile) setShowProfile(false);
+        else if (showDashboard) setShowDashboard(false);
+        else if (searchQuery) setSearchQuery("");
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCheckout, activeInfoPage, showAdmin, showProfile, showDashboard, searchQuery]);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/products/`);
+        const response = await fetch(`${API_URL}/products/`);
         const data = await response.json();
 
         const prods = data.map((p: any) => ({

@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
+import { API_URL } from "@/lib/api";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 import { toast } from "sonner";
@@ -36,8 +37,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const res = await fetch(`${apiUrl}/categories/`);
+        const res = await fetch(`${API_URL}/categories/`);
         if (res.ok) {
           const data = await res.json();
           setCategories(data);

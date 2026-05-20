@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Zap, Smartphone, Laptop, Watch, ShoppingBag, BookOpen, Footprints, Headphones, Box } from "lucide-react";
 import { useState, useEffect } from "react";
+import { API_URL } from "@/lib/api";
 
 interface Category {
   id: number;
@@ -40,8 +41,7 @@ export default function CategorySection({ onSelectCategory }: CategorySectionPro
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/categories/`);
+        const response = await fetch(`${API_URL}/categories/`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {

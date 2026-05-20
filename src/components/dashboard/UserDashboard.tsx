@@ -39,6 +39,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { API_URL } from '@/lib/api';
 import { toast } from 'sonner';
 
 interface UserDashboardProps {
@@ -58,8 +59,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
   useEffect(() => {
     const fetchDashboardProducts = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await fetch(`${apiUrl}/products/`);
+        const response = await fetch(`${API_URL}/products/`);
         const data = await response.json();
         if (Array.isArray(data)) {
           setProducts(data.slice(0, 8).map((p: any) => ({

@@ -67,6 +67,7 @@ const getResend = () => {
 };
 
 const adminEmail = process.env.ADMIN_EMAIL;
+const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
@@ -75,11 +76,11 @@ const otpStore = new Map<string, string>();
 app.post("/api/send-otp", async (req, res) => {
   const { email, phone, type } = req.body;
   const resendClient = getResend();
-  
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const identifier = email || phone;
   otpStore.set(identifier, otp);
-  
+
   setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
 
   console.log(`[OTP] Generated ${otp} for ${identifier}`);
@@ -129,7 +130,7 @@ app.post("/api/send-otp", async (req, res) => {
   if (phone) console.log(`[SMS SIMULATION] Sending OTP ${otp} to ${phone}`);
 
   res.json({
-    success: true, 
+    success: true,
     devOtp: otp // Ensure user can always log in while debugging
   });
 });
@@ -218,8 +219,6 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   res.json({ success: true });
 });
 
-const PYTHON_API = "http://localhost:8000";
-
 app.all(["/products", "/products/", "/products/*", "/categories", "/categories/", "/categories/*"], async (req, res) => {
   // Ensure the path ends with a slash for FastAPI compatibility, but preserve query params
   const pathPart = req.path.endsWith('/') ? req.path : `${req.path}/`;
@@ -266,17 +265,24 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
   } else {
+    // In production (like on Vercel), we don't use app.listen
+    // but we might still want to serve static files if not using Vercel's static hosting
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
 }
 
-startServer();
+// Export the app for Vercel
+export default app;
+
+if (process.env.NODE_ENV !== "production") {
+  startServer();
+}

@@ -75,6 +75,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { API_URL } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 export default function AdminDashboard() {
@@ -138,11 +139,10 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
       const timestamp = Date.now();
 
       // Fetch Products from Python API with cache busting
-      const pRes = await fetch(`${apiUrl}/products/?t=${timestamp}`);
+      const pRes = await fetch(`${API_URL}/products/?t=${timestamp}`);
       if (!pRes.ok) throw new Error('Failed to fetch products');
       const productsData = await pRes.json();
 
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
       setProducts(mappedProducts);
 
       // Fetch Categories from Python API
-      const cRes = await fetch(`${apiUrl}/categories/`);
+      const cRes = await fetch(`${API_URL}/categories/`);
       if (cRes.ok) {
         const categoriesData = await cRes.json();
         setCategories(Array.isArray(categoriesData) ? categoriesData : []);
@@ -253,10 +253,9 @@ export default function AdminDashboard() {
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     try {
-      const response = await fetch(`${apiUrl}/categories/`, {
+      const response = await fetch(`${API_URL}/categories/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newCategoryName, image: newCategoryImage }),
@@ -351,7 +350,6 @@ export default function AdminDashboard() {
     if (!editingProduct) return;
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     const oldPriceStr = formData.get('oldPrice') as string;
     const stockStr = formData.get('stock') as string;
@@ -370,7 +368,7 @@ export default function AdminDashboard() {
     };
 
     try {
-       const response = await fetch(`${apiUrl}/products/${editingProduct.id}`, {
+       const response = await fetch(`${API_URL}/products/${editingProduct.id}`, {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(updatedProduct),
@@ -449,7 +447,6 @@ export default function AdminDashboard() {
     const form = e.currentTarget;
     setIsLoading(true);
     const formData = new FormData(form);
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
     const categoryId = parseInt(newCategoryId);
     if (isNaN(categoryId)) {
@@ -482,7 +479,7 @@ export default function AdminDashboard() {
     }
 
     try {
-      const response = await fetch(`${apiUrl}/products/`, {
+      const response = await fetch(`${API_URL}/products/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct),
@@ -514,8 +511,7 @@ export default function AdminDashboard() {
 
     setIsLoading(true);
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/products/${id}`, {
+      const response = await fetch(`${API_URL}/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
@@ -1467,8 +1463,7 @@ export default function AdminDashboard() {
                             onClick={async () => {
                                setIsLoading(true);
                                try {
-                                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                                 const res = await fetch(`${apiUrl}/api/seed`, { method: 'POST' });
+                                 const res = await fetch(`${API_URL}/api/seed`, { method: 'POST' });
                                  const data = await res.json();
                                  toast.success(data.message);
                                  fetchData();

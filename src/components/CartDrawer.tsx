@@ -161,10 +161,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               
               <Button 
                 onClick={onCheckout}
-                className="w-full h-10 md:h-14 bg-purple-600 hover:bg-purple-700 text-white font-black text-xs md:text-lg rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                className="w-full h-12 md:h-14 bg-purple-600 hover:bg-purple-700 text-white font-black text-sm md:text-lg rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 group"
               >
-                Checkout
-                <ArrowRight className="h-3.5 w-3.5 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                Proceed to Checkout
+                <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
           </SheetFooter>

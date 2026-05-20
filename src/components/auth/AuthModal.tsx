@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
+import { API_URL } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
 import { ShieldCheck, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -84,9 +85,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const identifier = email || phone;
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      console.log(`Sending OTP to ${identifier} via ${apiUrl}`);
-      const response = await fetch(`${apiUrl}/api/send-otp`, {
+      console.log(`Sending OTP to ${identifier} via ${API_URL}`);
+      const response = await fetch(`${API_URL}/api/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -123,8 +123,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     setIsLoading(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const response = await fetch(`${apiUrl}/api/verify-otp`, {
+      const response = await fetch(`${API_URL}/api/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -167,8 +166,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         });
 
         // Send welcome
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        fetch(`${apiUrl}/api/send-welcome`, {
+        fetch(`${API_URL}/api/send-welcome`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: tempData.email, name: tempData.name }),
