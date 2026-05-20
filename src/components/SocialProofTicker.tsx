@@ -42,35 +42,24 @@ export default function SocialProofTicker() {
     const showNotification = () => {
       if (currentNotification) return;
 
-      let nextNotif: SocialProof | null = null;
-
-      if (realOrders.length > 0 && Math.random() > 0.3) {
+      // ONLY show if we have real orders from the database
+      if (realOrders.length > 0) {
         const randomOrder = realOrders[Math.floor(Math.random() * realOrders.length)];
         const email = String(randomOrder.customerEmail || "");
+
+        // Mask email for privacy (e.g., sam***) or use a fallback if email is missing
         const maskedEmail = email.includes('@') ?
           email.split('@')[0].slice(0, 3) + '***' :
-          names[Math.floor(Math.random() * names.length)];
+          'A customer';
 
-        nextNotif = {
+        const nextNotif: SocialProof = {
           ...randomOrder,
           customerEmail: maskedEmail
         };
-      } else {
-        const randomName = names[Math.floor(Math.random() * names.length)];
-        const randomCity = cities[Math.floor(Math.random() * cities.length)];
-        const products = ['Smart Watch Ultra', 'Wireless Earbuds', 'Gaming Mouse', 'Keyboard Pro', 'USB-C Hub'];
-        const randomProduct = products[Math.floor(Math.random() * products.length)];
 
-        nextNotif = {
-          id: Math.random().toString(),
-          customerEmail: randomName,
-          productName: randomProduct,
-          time: 'just now in ' + randomCity
-        };
+        setCurrentNotification(nextNotif);
+        setTimeout(() => setCurrentNotification(null), 6000);
       }
-
-      setCurrentNotification(nextNotif);
-      setTimeout(() => setCurrentNotification(null), 6000);
     };
 
     const intervalId = setInterval(showNotification, 30000);
