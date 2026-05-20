@@ -21,6 +21,10 @@ def initialize_firebase():
     if firebase_json:
         try:
             cert_dict = json.loads(firebase_json)
+            # Fix potential newline issues in the private key
+            if "private_key" in cert_dict:
+                cert_dict["private_key"] = cert_dict["private_key"].replace("\\n", "\n")
+
             cred = credentials.Certificate(cert_dict)
             firebase_admin.initialize_app(cred)
             print("Successfully initialized Firebase Admin using FIREBASE_SERVICE_ACCOUNT_JSON.")
