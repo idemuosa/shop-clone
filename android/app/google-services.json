@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "8713684475",
+    "project_id": "shopsy-ea9e4",
+    "storage_bucket": "shopsy-ea9e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:8713684475:android:caa91d3da3174554a5775e",
+        "android_client_info": {
+          "package_name": "com.shopsy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "8713684475-vmqsnaderv6brr9k77hpgj8uiompctur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOP8fn_9yfbLnAGVxb_-LhSENgT1p2A_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "8713684475-vmqsnaderv6brr9k77hpgj8uiompctur.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

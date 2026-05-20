@@ -16,13 +16,13 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const rewards = [
-  { text: '5% OFF', color: '#ea580c', value: 'SAVE5' },
+  { text: '5% OFF', color: '#9333ea', value: 'SAVE5' },
   { text: '10% OFF', color: '#18181b', value: 'SAVE10' },
-  { text: 'FREE SHIPPING', color: '#ea580c', value: 'FREESHIP' },
+  { text: 'FREE SHIPPING', color: '#9333ea', value: 'FREESHIP' },
   { text: 'NO LUCK', color: '#71717a', value: null },
-  { text: '20% OFF', color: '#ea580c', value: 'SAVE20' },
-  { text: 'SURPRISE', color: '#18181b', value: 'TEMU2026' },
-  { text: '$5 CREDIT', color: '#ea580c', value: 'CASH5' },
+  { text: '20% OFF', color: '#9333ea', value: 'SAVE20' },
+  { text: 'SURPRISE', color: '#18181b', value: 'VIVO2026' },
+  { text: '$5 CREDIT', color: '#9333ea', value: 'CASH5' },
   { text: 'TRY AGAIN', color: '#71717a', value: null },
 ];
 
@@ -61,7 +61,7 @@ export default function SpinToWin() {
       setResult(reward.text);
       toast.success(`Congratulations! You won ${reward.text}!`, {
         description: `Use code: ${reward.value}`,
-        icon: <Trophy className="h-4 w-4 text-orange-600" />
+        icon: <Trophy className="h-4 w-4 text-purple-600" />
       });
     } else {
       toast.error("Better luck next time!");
@@ -80,7 +80,7 @@ export default function SpinToWin() {
             onClick={() => setIsOpen(true)}
             className="w-14 h-14 rounded-full bg-black hover:bg-zinc-800 shadow-2xl border-4 border-white flex items-center justify-center p-0"
           >
-            <Gift className="h-6 w-6 text-orange-600 animate-bounce" />
+            <Gift className="h-6 w-6 text-purple-600 animate-bounce" />
           </Button>
         </motion.div>
       </div>
@@ -104,15 +104,15 @@ export default function SpinToWin() {
               </Button>
 
               <div className="mb-8">
-                <BadgeCheck className="h-12 w-12 text-orange-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-black uppercase tracking-tighter italic italic">Lucky <span className="text-orange-600">Spin</span> Wheel</h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Test your luck and win exclusive Temu rewards</p>
+                <BadgeCheck className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                <h2 className="text-3xl font-black uppercase tracking-tighter italic">Lucky <span className="text-purple-600">Spin</span> Wheel</h2>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Test your luck and win exclusive Vivo rewards</p>
               </div>
 
               {/* Wheel Container */}
               <div className="relative w-72 h-72 mx-auto mb-10 mt-4">
                 <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 z-10">
-                   <ChevronDown className="h-10 w-10 text-orange-600 fill-orange-600 drop-shadow-lg" />
+                   <ChevronDown className="h-10 w-10 text-purple-600 fill-purple-600 drop-shadow-lg" />
                 </div>
                 
                 <motion.div
@@ -140,15 +140,15 @@ export default function SpinToWin() {
                   ))}
                   {/* Wheel Center */}
                   <div className="absolute inset-0 m-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-zinc-900 z-10">
-                    <Zap className="h-6 w-6 text-orange-600 fill-orange-600" />
+                    <Zap className="h-6 w-6 text-purple-600 fill-purple-600" />
                   </div>
                 </motion.div>
               </div>
 
               <div className="space-y-4">
                 {result ? (
-                  <div className="bg-orange-50 p-6 rounded-3xl border-2 border-dashed border-orange-200">
-                    <p className="text-xs font-black text-orange-600 uppercase tracking-widest mb-2">Your Reward:</p>
+                  <div className="bg-green-50 p-6 rounded-3xl border-2 border-dashed border-green-200">
+                    <p className="text-xs font-black text-purple-600 uppercase tracking-widest mb-2">Your Reward:</p>
                     <h3 className="text-4xl font-black tracking-tighter italic">{result}</h3>
                     <div className="flex items-center justify-center gap-2 mt-4 text-green-600">
                       <CheckCircle2 className="h-4 w-4" />
@@ -159,7 +159,7 @@ export default function SpinToWin() {
                   <Button 
                     onClick={spinWheel}
                     disabled={isSpinning}
-                    className="w-full h-16 bg-orange-600 hover:bg-orange-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-orange-100 transition-all active:scale-95"
+                    className="w-full h-16 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95"
                   >
                     {isSpinning ? (
                       <RefreshCcw className="h-6 w-6 animate-spin" />
@@ -174,7 +174,7 @@ export default function SpinToWin() {
 
               {/* Decorative elements */}
               <Sparkles className="absolute top-10 left-10 text-yellow-400 h-6 w-6 animate-pulse" />
-              <Star className="absolute bottom-10 right-10 text-orange-200 h-8 w-8 animate-bounce" />
+              <Star className="absolute bottom-10 right-10 text-purple-200 h-8 w-8 animate-bounce" />
             </motion.div>
           </div>
         )}

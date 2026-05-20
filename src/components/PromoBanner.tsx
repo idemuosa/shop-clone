@@ -25,7 +25,7 @@ export default function PromoBanner() {
   return (
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-orange-600 rounded-[32px] overflow-hidden shadow-2xl shadow-orange-100">
+        <div className="relative bg-purple-600 rounded-[32px] overflow-hidden shadow-2xl shadow-purple-100">
           {/* Animated Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
@@ -49,25 +49,25 @@ export default function PromoBanner() {
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.hours).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Hours</span>
+                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Hours</span>
                 </div>
                 <div className="text-white text-3xl font-black self-center mb-6">:</div>
                 <div className="flex flex-col items-center">
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.minutes).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Mins</span>
+                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Mins</span>
                 </div>
                 <div className="text-white text-3xl font-black self-center mb-6">:</div>
                 <div className="flex flex-col items-center">
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.seconds).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Secs</span>
+                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Secs</span>
                 </div>
               </div>
 
-              <Button className="bg-white text-orange-600 hover:bg-yellow-400 hover:text-black px-12 py-8 rounded-2xl text-xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
+              <Button className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-12 py-8 rounded-2xl text-xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
                 Get My Coupon <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </div>
@@ -83,6 +83,9 @@ export default function PromoBanner() {
                   alt="Special Offer" 
                   className="w-full max-w-md mx-auto rounded-[32px] shadow-2xl rotate-3"
                   referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop';
+                  }}
                 />
                 <div className="absolute -bottom-6 -left-6 bg-yellow-400 text-black p-6 rounded-3xl font-black text-2xl shadow-xl border-4 border-white -rotate-6">
                   -85% OFF

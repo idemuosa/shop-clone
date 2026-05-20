@@ -67,14 +67,14 @@ export default function AIReviewSummarizer({ reviews, productName }: ReviewSumma
   if (reviews.length === 0) return null;
 
   return (
-    <Card className="p-6 bg-orange-50/50 border-orange-100 rounded-[32px] overflow-hidden relative group">
+    <Card className="p-6 bg-green-50/50 border-green-100 rounded-[32px] overflow-hidden relative group">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-100">
+          <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-100">
              <MessageSquareText className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="font-black uppercase tracking-tighter italic text-lg leading-tight">AI Review <span className="text-orange-600">Summarizer</span></h3>
+            <h3 className="font-black uppercase tracking-tighter italic text-lg leading-tight">AI Review <span className="text-purple-600">Summarizer</span></h3>
             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic">Get the consensus in 3 seconds</p>
           </div>
         </div>
@@ -98,7 +98,7 @@ export default function AIReviewSummarizer({ reviews, productName }: ReviewSumma
           <Button 
             variant="ghost" 
             onClick={() => setSummary(null)}
-            className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-orange-600"
+            className="text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-purple-600"
           >
             RESET
           </Button>
@@ -109,7 +109,7 @@ export default function AIReviewSummarizer({ reviews, productName }: ReviewSumma
         <motion.div 
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          className="mt-6 pt-6 border-t border-orange-100"
+          className="mt-6 pt-6 border-t border-green-100"
         >
           <div className="prose prose-sm font-sans font-bold text-zinc-700 whitespace-pre-line leading-relaxed">
             {summary}
@@ -121,7 +121,7 @@ export default function AIReviewSummarizer({ reviews, productName }: ReviewSumma
       )}
 
       {/* Background decoration */}
-      <Sparkles className="absolute top-[-20px] right-[-20px] h-40 w-40 text-orange-600/5 rotate-12 pointer-events-none" />
+      <Sparkles className="absolute top-[-20px] right-[-20px] h-40 w-40 text-purple-600/5 rotate-12 pointer-events-none" />
     </Card>
   );
 }

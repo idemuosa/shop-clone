@@ -10,6 +10,7 @@ import {
   SheetDescription
 } from '@/components/ui/sheet';
 import { useCart } from '@/lib/CartContext';
+import { useCurrency } from '@/lib/CurrencyContext';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { motion, AnimatePresence } from 'motion/react';
@@ -21,7 +22,8 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerProps) {
-  const { items, removeFromCart, updateQuantity, totalPrice, totalItems } = useCart();
+  const { items, removeFromCart, updateQuantity, totalPrice, totalItems, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
@@ -29,19 +31,31 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
         <SheetHeader className="p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-orange-100 p-2 rounded-xl">
-                <ShoppingBag className="h-6 w-6 text-orange-600" />
+              <div className="bg-green-100 p-2 rounded-xl">
+                <ShoppingBag className="h-6 w-6 text-purple-600" />
               </div>
               <div>
-                <SheetTitle className="text-xl font-black uppercase tracking-tighter">My <span className="text-orange-600">Cart</span></SheetTitle>
-                <SheetDescription className="text-gray-400 font-bold uppercase text-[10px] tracking-widest mt-0.5">
+                <SheetTitle className="text-xl font-black  tracking-tighter">My <span className="text-purple-600">Cart</span></SheetTitle>
+                <SheetDescription className="text-gray-400 font-bold  text-[10px] tracking-widest mt-0.5">
                   {totalItems} Items in your bag
                 </SheetDescription>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-gray-100">
-              <X className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {items.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearCart}
+                  className="text-[10px] font-black  tracking-widest text-red-400 hover:text-red-500 hover:bg-red-50"
+                >
+                  Clear Cart
+                </Button>
+              )}
+              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-gray-100">
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
         </SheetHeader>
 
@@ -50,15 +64,15 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
             {items.length === 0 ? (
               <div className="h-[60vh] flex flex-col items-center justify-center text-center px-10">
                 <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-xl shadow-gray-200/50 mb-6 group hover:scale-110 transition-transform">
-                  <ShoppingCart className="h-10 w-10 text-gray-200 group-hover:text-orange-400 transition-colors" />
+                  <ShoppingCart className="h-10 w-10 text-gray-200 group-hover:text-purple-400 transition-colors" />
                 </div>
-                <h3 className="text-xl font-black uppercase tracking-tighter mb-2">Cart is Empty</h3>
+                <h3 className="text-xl font-black  tracking-tighter mb-2">Cart is Empty</h3>
                 <p className="text-gray-400 font-medium mb-8 text-sm">Looks like you haven't added anything to your cart yet.</p>
                 <Button 
                   onClick={onClose}
-                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-10 h-12 shadow-lg shadow-orange-200 transition-all active:scale-95"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl px-10 h-12 shadow-lg shadow-purple-200 transition-all active:scale-95"
                 >
-                  START SHOPPING
+                  Start shopping
                 </Button>
               </div>
             ) : (
@@ -80,12 +94,15 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                             alt={item.name} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
+                            }}
                           />
                         </div>
                         <div className="flex-1 flex flex-col justify-between">
                           <div>
                             <h4 className="font-bold text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
-                            <p className="text-orange-600 font-black text-lg">${(item.priceValue * item.quantity).toFixed(2)}</p>
+                            <p className="text-purple-600 font-black text-lg">{formatPrice(item.priceValue * item.quantity)}</p>
                           </div>
                           
                           <div className="flex items-center justify-between mt-autp">
@@ -133,13 +150,13 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
             <div className="w-full space-y-4">
               <div className="flex justify-between items-end mb-2">
                 <div>
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Total Amount</p>
+                  <p className="text-[10px] font-black  text-gray-400 tracking-[0.2em]">Total Amount</p>
                   <p className="text-3xl font-black text-black tracking-tighter">
-                    <span className="text-orange-600">$</span>{totalPrice.toFixed(2)}
+                    {formatPrice(totalPrice)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <Badge className="bg-green-100 text-green-700 border-none font-black text-[9px] uppercase tracking-wider mb-2">
+                  <Badge className="bg-green-100 text-green-700 border-none font-black text-[9px]  tracking-wider mb-2">
                     Free Shipping Included
                   </Badge>
                 </div>
@@ -147,13 +164,13 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               
               <Button 
                 onClick={onCheckout}
-                className="w-full h-14 bg-orange-600 hover:bg-orange-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-orange-100 transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white font-black text-lg rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95 flex items-center justify-center gap-2 group"
               >
-                PROCEED TO CHECKOUT
+                Proceed to checkout
                 <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               
-              <p className="text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+              <p className="text-center text-[10px] font-bold text-gray-400  tracking-widest">
                 Safe & Secure Checkout
               </p>
             </div>

@@ -37,7 +37,7 @@ import {
   LayoutDashboard,
   AlertCircle
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -56,13 +56,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { signOut } from 'firebase/auth';
 import PaymentMethods from '@/components/auth/PaymentMethods';
+import { useCurrency } from '@/lib/CurrencyContext';
+import { cn } from '@/lib/utils';
 
 interface UserProfilePageProps {
   onClose: () => void;
+  onSwitchToAdmin?: () => void;
 }
 
-export default function UserProfilePage({ onClose }: UserProfilePageProps) {
+export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfilePageProps) {
   const { user, profile, isAdmin } = useAuth();
+  const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
@@ -183,7 +187,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group">
-              <div className="w-32 h-32 bg-orange-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-orange-100 group-hover:scale-105 transition-transform">
+              <div className="w-32 h-32 bg-purple-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-purple-100 group-hover:scale-105 transition-transform">
                 {profile?.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
               </div>
               <div className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100">
@@ -207,18 +211,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 </Button>
                 {isAdmin && (
                   <Button 
-                    onClick={() => {
-                      onClose();
-                      // We need a way to tell App to show Admin
-                      // Based on App.tsx, the Navbar handles this via onToggleAdmin
-                      // But since we're inside UserProfilePage, we could just tell the user to use the icon
-                      // or we could add a similar toggle logic. 
-                      // Actually, let's just make it simple: tell them to use the Navbar icon or provide a hint.
-                      toast.info("Access the Admin Dashboard using the icon in the Top Navbar!");
-                    }}
-                    className="bg-orange-100 hover:bg-orange-200 text-orange-600 font-bold rounded-xl px-6 h-11 border-2 border-orange-200"
+                    onClick={onSwitchToAdmin}
+                    className="bg-purple-100 hover:bg-purple-200 text-purple-600 font-bold rounded-xl px-6 h-11 border-2 border-purple-200"
                   >
-                    <LayoutDashboard className="h-4 w-4 mr-2" /> Admin Tools
+                    <LayoutDashboard className="h-4 w-4 mr-2" /> Admin Dashboard
                   </Button>
                 )}
                 <Button 
@@ -231,15 +227,15 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
             </div>
 
             <div className="hidden lg:grid grid-cols-2 gap-4">
-              <div className="bg-orange-50 p-6 rounded-3xl border border-orange-100 text-center w-40">
-                <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Total Orders</p>
+              <div className="bg-green-50 p-6 rounded-3xl border border-green-100 text-center w-40">
+                <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Total Orders</p>
                 <p className="text-3xl font-black text-black tracking-tighter">{orders.length}</p>
               </div>
               <div className="bg-zinc-50 p-6 rounded-3xl border border-zinc-100 text-center w-40 relative overflow-hidden group">
-                <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1 z-10 relative">Shopsy Coins 🪙</p>
+                <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1 z-10 relative">Shopsy Coins 🪙</p>
                 <p className="text-3xl font-black text-black tracking-tighter z-10 relative">{profile?.points || 0}</p>
                 <div className="absolute bottom-[-10px] right-[-10px] opacity-10 group-hover:scale-110 transition-transform">
-                   <Trophy className="h-20 w-20 text-orange-600 rotate-12" />
+                   <Trophy className="h-20 w-20 text-purple-600 rotate-12" />
                 </div>
               </div>
             </div>
@@ -250,19 +246,19 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
         <Tabs defaultValue="orders" className="space-y-8">
           <TabsList className="bg-white p-1.5 rounded-2xl shadow-xl shadow-gray-200/50 flex-wrap h-auto gap-1 border border-gray-50">
-            <TabsTrigger value="orders" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Package className="h-4 w-4 mr-2" /> Order History
             </TabsTrigger>
-            <TabsTrigger value="details" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="details" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <User className="h-4 w-4 mr-2" /> My Details
             </TabsTrigger>
-            <TabsTrigger value="payment" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="payment" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <CreditCard className="h-4 w-4 mr-2" /> Payment & Addresses
             </TabsTrigger>
-            <TabsTrigger value="vouchers" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="vouchers" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Ticket className="h-4 w-4 mr-2" /> Vouchers
             </TabsTrigger>
-            <TabsTrigger value="help" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="help" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Headset className="h-4 w-4 mr-2" /> Help Center
             </TabsTrigger>
           </TabsList>
@@ -276,7 +272,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                   </div>
                   <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">No orders yet</h3>
                   <p className="text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em] mb-8">Start shopping to see your history</p>
-                  <Button onClick={onClose} className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl px-10 h-14 shadow-xl shadow-orange-100">
+                  <Button onClick={onClose} className="bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl px-10 h-14 shadow-xl shadow-purple-100">
                     EXPLORE PRODUCTS
                   </Button>
                 </Card>
@@ -305,7 +301,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                             <p className="text-xs text-gray-500 font-bold">Qty: {order.quantity}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-lg font-black text-orange-600 tracking-tighter">${order.totalAmount?.toFixed(2)}</p>
+                            <p className="text-lg font-black text-purple-600 tracking-tighter">{formatPrice(order.totalAmount)}</p>
                           </div>
                         </div>
 
@@ -313,7 +309,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                         <div className="mb-6">
                            <div className="flex items-center justify-between relative">
                               <div className="absolute top-1/2 left-0 w-full h-[2px] bg-gray-100 -translate-y-1/2 z-0" />
-                              <div className={`absolute top-1/2 left-0 h-[2px] bg-orange-600 -translate-y-1/2 transition-all duration-1000 z-0 ${
+                              <div className={`absolute top-1/2 left-0 h-[2px] bg-purple-600 -translate-y-1/2 transition-all duration-1000 z-0 ${
                                 order.status === 'delivered' ? 'w-full' : 
                                 order.status === 'shipped' ? 'w-2/3' : 
                                 order.status === 'processing' ? 'w-1/3' : 'w-0'
@@ -327,7 +323,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                               ].map((step, idx) => (
                                 <div key={idx} className="relative z-10 flex flex-col items-center">
                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors ${
-                                     step.active ? 'bg-orange-600 border-orange-600 text-white' : 'bg-white border-gray-100 text-gray-300'
+                                     step.active ? 'bg-purple-600 border-purple-600 text-white' : 'bg-white border-gray-100 text-gray-300'
                                    }`}>
                                       <step.icon className="h-4 w-4" />
                                    </div>
@@ -343,7 +339,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                           </div>
                           <div className="flex gap-4">
                             {order.status === 'delivered' && (
-                              <Button variant="ghost" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest text-orange-600 hover:bg-orange-600 hover:text-white border-2 border-orange-600 px-6 transition-all" onClick={onClose}>
+                              <Button variant="ghost" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest text-purple-600 hover:bg-purple-600 hover:text-white border-2 border-purple-600 px-6 transition-all" onClick={onClose}>
                                  REVIEW
                               </Button>
                             )}
@@ -366,7 +362,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
                   <form onSubmit={handleUpdateProfile} className="space-y-6">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Personal <span className="text-orange-600">Information</span></h3>
+                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Personal <span className="text-purple-600">Information</span></h3>
                       {!isEditing ? (
                         <Button variant="outline" type="button" onClick={() => setIsEditing(true)} className="rounded-xl font-bold">
                           Edit Profile
@@ -374,7 +370,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                       ) : (
                         <div className="flex gap-2">
                            <Button variant="ghost" type="button" onClick={() => setIsEditing(false)} className="rounded-xl font-bold">Cancel</Button>
-                           <Button type="submit" disabled={loading} className="bg-orange-600 text-white rounded-xl font-bold">
+                           <Button type="submit" disabled={loading} className="bg-purple-600 text-white rounded-xl font-bold">
                              {loading ? 'Saving...' : 'Save Changes'}
                            </Button>
                         </div>
@@ -388,7 +384,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                           value={name}
                           onChange={(e) => setName(e.target.value)}
                           disabled={!isEditing}
-                          className="rounded-2xl border-gray-100 bg-gray-50/50 h-14 font-bold focus:border-orange-500 disabled:opacity-100"
+                          className="rounded-2xl border-gray-100 bg-gray-50/50 h-14 font-bold focus:border-purple-500 disabled:opacity-100"
                         />
                       </div>
                       <div className="space-y-2">
@@ -404,7 +400,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                 </Card>
 
                 <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
-                   <h3 className="text-xl font-black uppercase tracking-tighter italic mb-8">Account <span className="text-orange-600">Preferences</span></h3>
+                   <h3 className="text-xl font-black uppercase tracking-tighter italic mb-8">Account <span className="text-purple-600">Preferences</span></h3>
                    <div className="space-y-4">
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                          <div className="flex items-center gap-4">
@@ -437,12 +433,12 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
               <div className="space-y-6">
                 <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8 bg-zinc-900 text-white overflow-hidden relative">
                    <div className="relative z-10">
-                      <Badge className="bg-orange-600 text-white border-none font-black mb-4">VIP STATUS</Badge>
+                      <Badge className="bg-purple-600 text-white border-none font-black mb-4">VIP STATUS</Badge>
                       <h4 className="text-2xl font-black uppercase tracking-tighter leading-none mb-4 italic">Unlock Prime <br /> Benefits</h4>
                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-6">
                         Get free unlimited delivery and 10% cashback on all orders.
                       </p>
-                      <Button className="w-full bg-white text-black font-black rounded-2xl h-14 hover:bg-orange-100 transition-colors">
+                      <Button className="w-full bg-white text-black font-black rounded-2xl h-14 hover:bg-purple-100 transition-colors">
                         ACTIVATE NOW
                       </Button>
                    </div>
@@ -471,24 +467,32 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
               <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
                 <div className="flex justify-between items-center mb-8">
                    <div className="flex items-center gap-3">
-                      <div className="bg-orange-600 p-2.5 rounded-xl shadow-lg shadow-orange-100">
+                      <div className="bg-purple-600 p-2.5 rounded-xl shadow-lg shadow-purple-100">
                          <MapPin className="h-5 w-5 text-white" />
                       </div>
-                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Shipping <span className="text-orange-600">Addresses</span></h3>
+                      <h3 className="text-xl font-black uppercase tracking-tighter italic">Shipping <span className="text-purple-600">Addresses</span></h3>
                    </div>
                    <Dialog open={isAddressModalOpen} onOpenChange={(open) => {
                      setIsAddressModalOpen(open);
                      if (!open) setCurrentAddress(null);
                    }}>
-                     <DialogTrigger asChild>
-                       <Button variant="outline" className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2">
-                         <Plus className="h-4 w-4" /> ADD NEW
-                       </Button>
-                     </DialogTrigger>
+                     <DialogTrigger
+                       render={(props) => (
+                         <button
+                           {...props}
+                           className={cn(
+                             buttonVariants({ variant: "outline" }),
+                             "rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-purple-200 gap-2 bg-white transition-all"
+                           )}
+                         >
+                           <Plus className="h-4 w-4" /> ADD NEW
+                         </button>
+                       )}
+                     />
                      <DialogContent className="rounded-[32px] sm:max-w-[500px]">
                        <DialogHeader>
                          <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">
-                           {currentAddress ? 'Edit' : 'Add New'} <span className="text-orange-600">Address</span>
+                           {currentAddress ? 'Edit' : 'Add New'} <span className="text-purple-600">Address</span>
                          </DialogTitle>
                          <DialogDescription className="text-xs font-bold text-gray-400 uppercase tracking-widest">
                            Enter your shipping details for faster checkout.
@@ -527,11 +531,11 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                             </div>
                          </div>
                          <div className="flex items-center gap-2 mt-2">
-                            <input type="checkbox" id="isDefault" name="isDefault" defaultChecked={currentAddress?.isDefault} className="rounded border-gray-300 text-orange-600 focus:ring-orange-500" />
+                            <input type="checkbox" id="isDefault" name="isDefault" defaultChecked={currentAddress?.isDefault} className="rounded border-gray-300 text-purple-600 focus:ring-purple-500" />
                             <Label htmlFor="isDefault" className="text-[10px] font-black uppercase tracking-widest text-gray-400">Set as default address</Label>
                          </div>
                          <DialogFooter className="mt-6">
-                            <Button type="submit" disabled={loading} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-12 uppercase tracking-widest">
+                            <Button type="submit" disabled={loading} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-12 uppercase tracking-widest">
                                {loading ? 'SAVING...' : 'SAVE ADDRESS'}
                             </Button>
                          </DialogFooter>
@@ -548,10 +552,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                      </div>
                    ) : (
                      addresses.map((addr) => (
-                       <div key={addr.id} className={`p-6 rounded-3xl border-2 transition-all relative group ${addr.isDefault ? 'border-orange-500 bg-orange-50/20' : 'border-gray-100 hover:border-orange-200'}`}>
+                       <div key={addr.id} className={`p-6 rounded-3xl border-2 transition-all relative group ${addr.isDefault ? 'border-purple-500 bg-green-50/20' : 'border-gray-100 hover:border-purple-200'}`}>
                           <div className="flex items-center gap-2 mb-4">
                              {addr.isDefault && <Badge className="bg-zinc-900 text-white font-black uppercase tracking-widest text-[9px]">DEFAULT</Badge>}
-                             <Badge variant="outline" className={`${addr.isDefault ? 'border-orange-500 text-orange-600' : 'border-gray-200 text-gray-400'} font-black uppercase tracking-widest text-[9px]`}>{addr.type}</Badge>
+                             <Badge variant="outline" className={`${addr.isDefault ? 'border-purple-500 text-purple-600' : 'border-gray-200 text-gray-400'} font-black uppercase tracking-widest text-[9px]`}>{addr.type}</Badge>
                           </div>
                           <p className="font-black text-lg mb-1">{profile?.displayName || 'Resident'}</p>
                           <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6 italic">
@@ -565,7 +569,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                                   setCurrentAddress(addr);
                                   setIsAddressModalOpen(true);
                                 }}
-                                className="text-orange-600 p-0 font-black text-[10px] tracking-widest uppercase"
+                                className="text-purple-600 p-0 font-black text-[10px] tracking-widest uppercase"
                              >
                                EDIT ADDRESS
                              </Button>
@@ -589,10 +593,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
              <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                   <div>
-                    <h2 className="text-3xl font-black uppercase tracking-tighter italic">My <span className="text-orange-600">Vouchers</span></h2>
+                    <h2 className="text-3xl font-black uppercase tracking-tighter italic">My <span className="text-purple-600">Vouchers</span></h2>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Unused coupons and special discounts</p>
                   </div>
-                  <Button variant="outline" className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2">
+                  <Button variant="outline" className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-purple-200 gap-2">
                     <Plus className="h-4 w-4" /> ACTIVATE CODE
                   </Button>
                </div>
@@ -600,16 +604,16 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[
                     { code: 'WELCOME10', offer: '10% OFF', type: 'Platform Wide', date: 'Dec 31, 2024' },
-                    { code: 'TEMU90', offer: '90% OFF', type: 'Flash Sale Only', date: 'Expiring Soon' },
+                    { code: 'VIVO90', offer: '90% OFF', type: 'Flash Sale Only', date: 'Expiring Soon' },
                   ].map((v) => (
-                    <div key={v.code} className="p-1 rounded-3xl bg-gradient-to-r from-orange-600/20 to-orange-400/20 shadow-sm overflow-hidden group">
+                    <div key={v.code} className="p-1 rounded-3xl bg-gradient-to-r from-purple-600/20 to-purple-400/20 shadow-sm overflow-hidden group">
                        <div className="bg-white rounded-[22px] p-6 flex items-center gap-6 relative">
-                          <div className="w-16 h-16 bg-orange-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-orange-100">
+                          <div className="w-16 h-16 bg-purple-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-purple-100">
                              <Ticket className="h-6 w-6 mb-1" />
                              <span className="text-[8px] font-black">{v.offer}</span>
                           </div>
                           <div className="flex-1">
-                             <p className="text-[8px] font-black text-orange-600 uppercase tracking-widest mb-1 italic">{v.type}</p>
+                             <p className="text-[8px] font-black text-purple-600 uppercase tracking-widest mb-1 italic">{v.type}</p>
                              <h4 className="font-black text-xl tracking-tighter uppercase">{v.code}</h4>
                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-1">Expires: {v.date}</p>
                           </div>
@@ -623,7 +627,7 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                              COPY
                           </Button>
                           <div className="absolute top-[-10px] right-[-10px] opacity-5 group-hover:scale-110 transition-transform">
-                             <Zap className="h-24 w-24 text-orange-600 rotate-12" />
+                             <Zap className="h-24 w-24 text-purple-600 rotate-12" />
                           </div>
                        </div>
                     </div>
@@ -635,10 +639,10 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
           <TabsContent value="help">
              <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
                <div className="text-center mb-12">
-                  <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Headset className="h-10 w-10 text-orange-600" />
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                     <Headset className="h-10 w-10 text-purple-600" />
                   </div>
-                  <h2 className="text-4xl font-black uppercase tracking-tighter italic italic">How can we <span className="text-orange-600">help</span>?</h2>
+                  <h2 className="text-4xl font-black uppercase tracking-tighter italic">How can we <span className="text-purple-600">help</span>?</h2>
                   <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">24/7 Dedicated Support for Shopsy Members</p>
                </div>
 
@@ -648,20 +652,20 @@ export default function UserProfilePage({ onClose }: UserProfilePageProps) {
                     { title: 'Returns & Refunds', desc: 'Easy 30-day money back guarantee process', icon: ShieldCheck },
                     { title: 'Payments & Safety', desc: 'Secure encryption for all your transactions', icon: CreditCard },
                   ].map((h, i) => (
-                    <div key={i} className="p-8 rounded-[32px] border-2 border-gray-50 hover:border-orange-100 bg-white transition-all text-center cursor-pointer group">
-                       <h.icon className="h-8 w-8 text-orange-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+                    <div key={i} className="p-8 rounded-[32px] border-2 border-gray-50 hover:border-purple-100 bg-white transition-all text-center cursor-pointer group">
+                       <h.icon className="h-8 w-8 text-purple-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
                        <h3 className="font-black uppercase tracking-tighter mb-2">{h.title}</h3>
                        <p className="text-xs text-gray-500 font-medium leading-relaxed italic">{h.desc}</p>
                     </div>
                   ))}
                </div>
 
-               <div className="bg-zinc-900 rounded-[32px] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 border-4 border-orange-600/20">
+               <div className="bg-zinc-900 rounded-[32px] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 border-4 border-purple-600/20">
                   <div>
                      <h3 className="text-2xl font-black uppercase tracking-tighter mb-2 italic">Still need assistance?</h3>
                      <p className="text-gray-400 text-sm font-medium">Our agents are online and ready to chat with you right now.</p>
                   </div>
-                  <Button className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl h-16 px-10 text-lg shadow-xl shadow-orange-900 transition-all active:scale-95 flex items-center gap-3">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl h-16 px-10 text-lg shadow-xl shadow-purple-900 transition-all active:scale-95 flex items-center gap-3">
                      <Zap className="h-5 w-5 fill-yellow-400 text-yellow-400" /> START LIVE CHAT
                   </Button>
                </div>

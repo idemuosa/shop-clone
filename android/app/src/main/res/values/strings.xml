@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">My Shop</string>
+    <string name="title_activity_main">My Shop</string>
+    <string name="package_name">com.idemuosa.myshop</string>
+    <string name="custom_url_scheme">com.idemuosa.myshop</string>
+</resources>

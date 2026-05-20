@@ -79,7 +79,7 @@ export default function PaymentMethods() {
           <Button 
             onClick={() => setIsAdding(true)}
             variant="outline"
-            className="rounded-xl border-2 border-orange-100 hover:border-orange-500 hover:bg-orange-50 text-orange-600 gap-2"
+            className="rounded-xl border-2 border-green-100 hover:border-purple-500 hover:bg-green-50 text-purple-600 gap-2"
           >
             <Plus className="h-4 w-4" /> Add New
           </Button>
@@ -96,7 +96,7 @@ export default function PaymentMethods() {
             <Label htmlFor="cardNumber">Card Number</Label>
             <div className="relative">
               <Input id="cardNumber" name="cardNumber" placeholder="0000 0000 0000 0000" maxLength={16} required className="rounded-xl pl-10" />
-              <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -106,7 +106,7 @@ export default function PaymentMethods() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="cvc">CVC</Label>
-              <Input id="cvc" name="cvc" type="password" placeholder="123" maxLength={3} required className="rounded-xl" />
+              <Input id="cvc" name="cvc" type="password" placeholder="123" maxLength={3} required autoComplete="cc-csc" className="rounded-xl" />
             </div>
           </div>
           <div className="flex gap-3 pt-2">
@@ -120,7 +120,7 @@ export default function PaymentMethods() {
             </Button>
             <Button 
               type="submit" 
-              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl"
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl"
               disabled={isLoading}
             >
               {isLoading ? 'Saving...' : 'Save Card'}
@@ -139,7 +139,7 @@ export default function PaymentMethods() {
             </div>
           ) : (
             methods.map((method) => (
-              <div key={method.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-gray-50 hover:border-orange-100 transition-all group">
+              <div key={method.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-gray-50 hover:border-purple-100 transition-all group">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-xl ${method.brand === 'Visa' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
                     <CreditCard className="h-6 w-6" />

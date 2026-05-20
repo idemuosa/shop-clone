@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+firebase-admin
+sqlalchemy
+pydantic
+python-dotenv
+resend
+httpx
