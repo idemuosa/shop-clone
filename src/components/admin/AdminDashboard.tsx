@@ -1454,10 +1454,37 @@ export default function AdminDashboard() {
                       </div>
                     </div>
 
-                    <div className="pt-8">
+                    <div className="pt-8 space-y-4">
                       <Button type="submit" disabled={isLoading} className="w-full bg-black text-white font-black rounded-xl h-14 shadow-xl hover:bg-zinc-800 transition-all">
                         {isLoading ? 'Updating...' : 'Save store settings'}
                       </Button>
+
+                      <div className="p-6 bg-red-50 rounded-[32px] border-2 border-red-100 mt-10">
+                         <h4 className="text-sm font-black text-red-900 mb-2">Database maintenance</h4>
+                         <p className="text-[10px] text-red-700 font-bold mb-4 italic">Use this to fill your shop with demo products and images if it's empty.</p>
+                         <Button
+                            type="button"
+                            onClick={async () => {
+                               setIsLoading(true);
+                               try {
+                                 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+                                 const res = await fetch(`${apiUrl}/api/seed`, { method: 'POST' });
+                                 const data = await res.json();
+                                 toast.success(data.message);
+                                 fetchData();
+                               } catch (e) {
+                                 toast.error("Failed to seed database");
+                               } finally {
+                                 setIsLoading(false);
+                               }
+                            }}
+                            disabled={isLoading}
+                            variant="destructive"
+                            className="w-full h-12 rounded-xl font-black text-xs uppercase tracking-widest"
+                         >
+                            {isLoading ? 'Processing...' : 'Repair database & images'}
+                         </Button>
+                      </div>
                     </div>
                   </div>
                </form>

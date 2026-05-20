@@ -99,16 +99,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const value = React.useMemo(() => ({
-    user,
-    profile,
-    loading,
-    isAdmin: (profile?.role === 'admin') ||
-             (user?.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com') ||
-             (profile?.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com') ||
-             (user?.email === import.meta.env.VITE_ADMIN_EMAIL) ||
-             (profile?.email === import.meta.env.VITE_ADMIN_EMAIL)
-  }), [user, profile, loading]);
+  const value = React.useMemo(() => {
+    const adminEmail = 'idemudiawisdom27@gmail.com';
+    const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
+    const currentUserEmail = user?.email?.toLowerCase().trim();
+    const profileEmail = profile?.email?.toLowerCase().trim();
+
+    const isSystemAdmin = (currentUserEmail === adminEmail) ||
+                          (profileEmail === adminEmail) ||
+                          (currentUserEmail === envAdminEmail && !!envAdminEmail) ||
+                          (profile?.role === 'admin');
+
+    return {
+      user,
+      profile,
+      loading,
+      isAdmin: isSystemAdmin
+    };
+  }, [user, profile, loading]);
 
   return (
     <AuthContext.Provider value={value}>
