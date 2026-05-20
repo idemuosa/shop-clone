@@ -85,10 +85,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: -100 }}
-                      className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 group relative"
+                      className="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 group relative"
                     >
-                      <div className="flex gap-4">
-                        <div className="w-24 h-24 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
+                      <div className="flex gap-3">
+                        <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
                           <img 
                             src={item.image} 
                             alt={item.name} 
@@ -99,30 +99,30 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                             }}
                           />
                         </div>
-                        <div className="flex-1 flex flex-col justify-between">
+                        <div className="flex-1 flex flex-col justify-between py-0.5">
                           <div>
-                            <h4 className="font-bold text-sm leading-tight mb-1 line-clamp-1">{item.name}</h4>
-                            <p className="text-purple-600 font-black text-lg">{formatPrice(item.priceValue * item.quantity)}</p>
+                            <h4 className="font-bold text-xs leading-tight mb-1 line-clamp-1">{item.name}</h4>
+                            <p className="text-purple-600 font-black text-base">{formatPrice(item.priceValue * item.quantity)}</p>
                           </div>
                           
-                          <div className="flex items-center justify-between mt-autp">
-                            <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-1 border border-gray-100">
+                          <div className="flex items-center justify-between mt-auto">
+                            <div className="flex items-center gap-1 bg-gray-50 rounded-lg p-0.5 border border-gray-100">
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
                                 onClick={() => updateQuantity(item.id, -1)}
-                                className="h-7 w-7 rounded-md hover:bg-white text-gray-400"
+                                className="h-6 w-6 rounded-md hover:bg-white text-gray-400"
                               >
-                                <Minus className="h-3 w-3" />
+                                <Minus className="h-2.5 w-2.5" />
                               </Button>
-                              <span className="w-8 text-center font-black text-xs">{item.quantity}</span>
+                              <span className="w-6 text-center font-black text-[10px]">{item.quantity}</span>
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
                                 onClick={() => updateQuantity(item.id, 1)}
-                                className="h-7 w-7 rounded-md hover:bg-white text-gray-600"
+                                className="h-6 w-6 rounded-md hover:bg-white text-gray-600"
                               >
-                                <Plus className="h-3 w-3" />
+                                <Plus className="h-2.5 w-2.5" />
                               </Button>
                             </div>
                             
@@ -130,9 +130,9 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                               variant="ghost" 
                               size="icon" 
                               onClick={() => removeFromCart(item.id)}
-                              className="h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                              className="h-7 w-7 text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors"
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash2 className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         </div>
