@@ -446,7 +446,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Your Full Name</Label>
                            <Input
                              name="name"
-                             placeholder="Wisdom Idemudia"
+                             placeholder="Enter your Full Name"
                              required
                              autoComplete="name"
                              className="h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
