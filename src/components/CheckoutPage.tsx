@@ -156,14 +156,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
               {/* Left Column: Checkout Steps */}
               <div className="lg:col-span-2 space-y-8">
                 <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-4">
-                      <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100">
-                        <ChevronLeft className="h-6 w-6" />
+                  <div className="flex items-center justify-between mb-6 md:mb-8">
+                    <div className="flex items-center gap-2 md:gap-4">
+                      <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100 h-8 w-8 md:h-10 md:w-10">
+                        <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
                       </Button>
                       <div>
-                        <h1 className="text-3xl font-black  tracking-tighter leading-none">Checkout</h1>
-                        <p className="text-[10px] font-bold text-gray-400  tracking-widest mt-1">Safe & Secure Payment</p>
+                        <h1 className="text-xl md:text-3xl font-black tracking-tighter leading-none">Checkout</h1>
+                        <p className="text-[8px] md:text-[10px] font-bold text-gray-400 tracking-widest mt-1 uppercase">Secure Payment</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
