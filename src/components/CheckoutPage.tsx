@@ -334,25 +334,61 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                               </div>
                            </div>
                         ) : paymentType === 'bank' ? (
-                            <div className="bg-zinc-900 p-8 rounded-[40px] text-white space-y-6 relative overflow-hidden group shadow-xl">
+                            <div className="bg-white p-5 md:p-10 rounded-[32px] md:rounded-[40px] border-2 border-purple-100 shadow-xl relative overflow-hidden group">
                                <div className="relative z-10">
-                                  <div className="flex items-center justify-between mb-6">
-                                     <h4 className="text-xl font-black  italic tracking-tighter">Bank <span className="text-purple-500">Transfer</span></h4>
-                                     <Building className="h-6 w-6 text-zinc-600" />
+                                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
+                                     <div className="flex items-center gap-3">
+                                        <div className="bg-purple-600 p-2 rounded-xl text-white shadow-lg shadow-purple-200">
+                                           <Building className="h-5 w-5" />
+                                        </div>
+                                        <h4 className="text-lg md:text-2xl font-black italic tracking-tighter text-black uppercase leading-none">Bank <span className="text-purple-600">Transfer</span></h4>
+                                     </div>
+                                     <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest w-fit">Manual Verification</div>
                                   </div>
-                                  <div className="space-y-4 bg-zinc-800/50 p-6 rounded-3xl border border-zinc-700/50 backdrop-blur-sm">
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-[10px]  font-black text-zinc-500 tracking-widest">Bank Name</span>
-                                      <span className="text-sm font-bold">{storeSettings?.bankName || 'WEMA BANK / ALAT'}</span>
+
+                                  <div className="space-y-4 md:space-y-6">
+                                    <div className="p-5 md:p-8 bg-gray-50/50 rounded-2xl md:rounded-3xl border border-gray-100 backdrop-blur-sm group-hover:bg-white transition-colors duration-500">
+                                       <div className="flex justify-between items-center pb-4 border-b border-gray-100 mb-4">
+                                          <span className="text-[10px] font-black text-gray-400 tracking-widest uppercase">Beneficiary</span>
+                                          <span className="text-xs md:text-sm font-black text-black truncate ml-2">VIVO PREMIUM STORE</span>
+                                       </div>
+
+                                       <div className="space-y-4 md:space-y-6">
+                                          <div className="flex flex-col gap-1">
+                                             <span className="text-[8px] font-black text-purple-400 tracking-widest uppercase">Bank Network</span>
+                                             <span className="text-base md:text-lg font-black text-black tracking-tight">{storeSettings?.bankName || 'WEMA BANK / ALAT'}</span>
+                                          </div>
+
+                                          <div className="flex flex-col gap-1">
+                                             <span className="text-[8px] font-black text-purple-400 tracking-widest uppercase">Account Number</span>
+                                             <div className="flex items-center justify-between gap-2">
+                                                <span className="text-2xl md:text-4xl font-black tracking-[0.1em] md:tracking-[0.2em] text-purple-600 font-mono break-all">{storeSettings?.bankAccountNumber || '0123456789'}</span>
+                                                <Button
+                                                   variant="ghost"
+                                                   size="icon"
+                                                   className="rounded-full h-8 w-8 md:h-10 md:w-10 hover:bg-purple-100 hover:text-purple-600 shrink-0"
+                                                   onClick={() => {
+                                                      navigator.clipboard.writeText(storeSettings?.bankAccountNumber || '0123456789');
+                                                      toast.success("Account number copied!");
+                                                   }}
+                                                >
+                                                   <Plus className="h-4 w-4 md:h-5 md:w-5" />
+                                                </Button>
+                                             </div>
+                                          </div>
+                                       </div>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                      <span className="text-[10px]  font-black text-zinc-500 tracking-widest">Account No.</span>
-                                      <span className="text-2xl font-black tracking-widest text-purple-400 font-mono">{storeSettings?.bankAccountNumber || '0123456789'}</span>
+
+                                    <div className="bg-purple-600 p-4 rounded-xl md:rounded-2xl flex items-center gap-3 shadow-lg shadow-purple-100">
+                                       <Zap className="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400 animate-pulse shrink-0" />
+                                       <p className="text-[8px] md:text-[9px] text-white font-black uppercase tracking-widest leading-tight">
+                                          Transfer exactly <span className="text-yellow-400">{formatPrice(totalPrice)}</span> then click "Place Order" below.
+                                       </p>
                                     </div>
                                   </div>
-                                  <p className="text-[9px] text-zinc-500 font-black  text-center mt-4 tracking-widest animate-pulse">Transfer the total amount then click "Place Order"</p>
                                </div>
-                               <Zap className="absolute right-[-20px] bottom-[-20px] h-40 w-40 text-purple-600/10 rotate-12" />
+
+                               <Building className="absolute right-[-20px] bottom-[-20px] h-32 w-32 md:h-48 md:w-40 text-purple-600/5 rotate-12" />
                             </div>
                         ) : paymentType === 'momo' ? (
                             <div className="bg-green-600 p-8 rounded-[40px] text-white space-y-6 shadow-xl">
@@ -387,7 +423,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                         <Button
                           onClick={handlePlaceOrder}
                           disabled={isProcessing || (paymentType === 'card' && !selectedCard && savedCards.length > 0)}
-                          className="flex-1 h-18 bg-black hover:bg-zinc-800 text-white font-black text-xl rounded-2xl shadow-xl transition-all active:scale-95 py-8"
+                          className="flex-1 h-12 bg-black hover:bg-zinc-800 text-white font-black text-xl rounded-1xl shadow-xl transition-all active:scale-56 py-3"
                         >
                           {isProcessing ? 'Processing...' : `Place order • ${formatPrice(totalPrice)}`}
                         </Button>
@@ -465,39 +501,39 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
               key="checkout-success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="max-w-xl mx-auto py-12"
+              className="max-w-xl mx-auto py-6 md:py-12"
             >
-              <div className="bg-white p-12 rounded-[50px] shadow-2xl text-center space-y-8 border-4 border-green-50 relative overflow-hidden">
+              <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] shadow-2xl text-center space-y-6 md:space-y-8 border-4 border-green-50 relative overflow-hidden">
                  <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-600 via-green-500 to-yellow-400"></div>
 
-                 <div className="w-32 h-32 bg-green-100 rounded-full flex items-center justify-center mx-auto relative group">
-                    <CheckCircle2 className="h-16 w-16 text-green-600 group-hover:scale-110 transition-transform" />
+                 <div className="w-20 h-20 md:w-32 md:h-32 bg-green-100 rounded-full flex items-center justify-center mx-auto relative group">
+                    <CheckCircle2 className="h-10 w-10 md:h-16 md:w-16 text-green-600 group-hover:scale-110 transition-transform" />
                     <div className="absolute inset-0 rounded-full border-4 border-green-100 animate-ping opacity-25"></div>
                  </div>
 
-                 <div className="space-y-3">
-                    <h2 className="text-5xl font-black  tracking-tighter italic leading-none">Order <br /><span className="text-purple-600">Successful!</span></h2>
-                    <p className="text-gray-400 font-bold  text-[10px] tracking-widest leading-relaxed pt-2">
-                      Your premium Vivo order has been placed. <br /> Check your email for confirmation.
+                 <div className="space-y-2 md:space-y-3">
+                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter italic leading-none">Order <br /><span className="text-purple-600">Successful!</span></h2>
+                    <p className="text-gray-400 font-bold text-[8px] md:text-[10px] tracking-widest leading-relaxed pt-1 md:pt-2">
+                      Your premium Vivo order has been placed. <br className="hidden md:block" /> Check your email for confirmation.
                     </p>
                  </div>
 
-                 <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-6 rounded-[32px] border border-gray-100">
-                       <p className="text-[10px] font-black  text-gray-400 mb-1">Order Ref</p>
-                       <p className="text-sm font-black font-mono">#VIVO-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
+                 <div className="grid grid-cols-2 gap-3 md:gap-4">
+                    <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
+                       <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Order Ref</p>
+                       <p className="text-[10px] md:text-sm font-black font-mono">#VIVO-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
                     </div>
-                    <div className="bg-gray-50 p-6 rounded-[32px] border border-gray-100">
-                       <p className="text-[10px] font-black  text-gray-400 mb-1">Arrival Date</p>
-                       <p className="text-sm font-black text-green-600 ">Tomorrow, 4PM</p>
+                    <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
+                       <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Arrival Date</p>
+                       <p className="text-[10px] md:text-sm font-black text-green-600 ">Tomorrow, 4PM</p>
                     </div>
                  </div>
 
-                 <div className="space-y-4">
-                    <Button onClick={onBack} className="w-full h-18 bg-black hover:bg-zinc-800 text-white font-black text-lg rounded-2xl shadow-xl py-8">
+                 <div className="space-y-3 md:space-y-4">
+                    <Button onClick={onBack} className="w-full h-14 md:h-18 bg-black hover:bg-zinc-800 text-white font-black text-base md:text-lg rounded-2xl shadow-xl">
                         Track my order
                     </Button>
-                    <Button variant="ghost" onClick={onBack} className="w-full h-12 font-black  tracking-widest text-[10px] text-gray-400 hover:text-purple-600">
+                    <Button variant="ghost" onClick={onBack} className="w-full h-10 md:h-12 font-black tracking-widest text-[8px] md:text-[10px] text-gray-400 hover:text-purple-600">
                         Continue shopping
                     </Button>
                  </div>

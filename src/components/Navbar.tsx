@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, ShoppingCart, Heart, User, ChevronDown, Menu, Zap, LogOut, LayoutDashboard, Box } from "lucide-react";
+import { Search, ShoppingCart, Heart, User, ChevronDown, Menu, Zap, LogOut, LayoutDashboard, Box, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/AuthContext";
@@ -59,6 +59,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   };
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,13 +177,50 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             </div>
 
             <button
-              onClick={onToggleAdmin}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <Menu className="h-6 w-6" />
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-50 space-y-4 animate-in slide-in-from-top duration-300">
+            <form onSubmit={(e) => { handleSearch(e); setIsMobileMenuOpen(false); }} className="relative px-2">
+               <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+               <Input
+                 placeholder="Search..."
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 className="pl-10 h-10 rounded-xl bg-gray-100 border-none"
+               />
+            </form>
+            <div className="flex flex-col gap-1 px-2">
+               {["Flash sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+                 <button
+                   key={link}
+                   onClick={() => {
+                     onOpenInfoPage?.(link);
+                     setIsMobileMenuOpen(false);
+                   }}
+                   className="text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all"
+                 >
+                   {link}
+                 </button>
+               ))}
+            </div>
+            <div className="px-4 pt-2">
+               <Button
+                 onClick={() => { onSearch?.(""); setIsMobileMenuOpen(false); }}
+                 className="w-full bg-purple-600 text-white rounded-xl font-bold h-11"
+               >
+                 View All Products
+               </Button>
+            </div>
+          </div>
+        )}
 
         <nav className="hidden md:flex items-center justify-between py-2 border-t border-gray-50">
           <DropdownMenu>
