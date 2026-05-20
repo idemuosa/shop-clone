@@ -63,59 +63,81 @@ def read_root():
 
 @app.post("/api/seed")
 def seed_database(db: Session = Depends(get_db)):
-    # Check if we already have products to avoid duplicates
-    if db.query(models.Product).count() > 0:
-        return {"message": "Database already has data"}
-
-    # Add Categories
-    categories = [
-        models.Category(name="Electronics", image="https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop"),
-        models.Category(name="Fashion", image="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop"),
-        models.Category(name="Home & Decor", image="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop"),
-        models.Category(name="Footwear", image="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop")
+    # Add Categories first and get their IDs
+    cat_data = [
+        {"name": "Electronics", "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop"},
+        {"name": "Fashion", "image": "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop"},
+        {"name": "Home & Decor", "image": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop"},
+        {"name": "Footwear", "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop"}
     ]
-    db.add_all(categories)
-    db.commit()
 
-    # Add Products
-    products = [
-        models.Product(
-            name="Samsung Galaxy S24 Ultra",
-            description="Experience the ultimate smartphone with AI camera features.",
-            price=1299.99,
-            old_price=1399.99,
-            image="https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
-            category_id=1,
-            tag="New Arrival",
-            stock=50,
-            sold=120
-        ),
-        models.Product(
-            name="Adidas Ultraboost Light",
-            description="The most responsive Ultraboost ever.",
-            price=180.00,
-            old_price=220.00,
-            image="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
-            category_id=4,
-            tag="Best Seller",
-            stock=100,
-            sold=500
-        ),
-        models.Product(
-            name="Smart Ultra Watch Pro",
-            description="The ultimate smartwatch with 7-day battery life.",
-            price=19.99,
-            old_price=89.99,
-            image="https://images.unsplash.com/photo-1508685096489-723f0119762e?q=80&w=1000&auto=format&fit=crop",
-            category_id=1,
-            tag="Flash Sale",
-            stock=150,
-            sold=1200
-        )
+    cat_map = {}
+    for c in cat_data:
+        existing = db.query(models.Category).filter(models.Category.name == c["name"]).first()
+        if not existing:
+            new_cat = models.Category(name=c["name"], image=c["image"])
+            db.add(new_cat)
+            db.commit()
+            db.refresh(new_cat)
+            cat_map[c["name"]] = new_cat.id
+        else:
+            cat_map[c["name"]] = existing.id
+
+    # Add Products only if they don't exist
+    product_data = [
+        {
+            "name": "Samsung Galaxy S24 Ultra",
+            "description": "Experience the ultimate smartphone with AI camera features.",
+            "price": 1299.99,
+            "old_price": 1399.99,
+            "image": "https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
+            "category": "Electronics",
+            "tag": "New Arrival",
+            "stock": 50,
+            "sold": 120
+        },
+        {
+            "name": "Adidas Ultraboost Light",
+            "description": "The most responsive Ultraboost ever.",
+            "price": 180.00,
+            "old_price": 220.00,
+            "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
+            "category": "Footwear",
+            "tag": "Best Seller",
+            "stock": 100,
+            "sold": 500
+        },
+        {
+            "name": "Smart Ultra Watch Pro",
+            "description": "The ultimate smartwatch with 7-day battery life.",
+            "price": 19.99,
+            "old_price": 89.99,
+            "image": "https://images.unsplash.com/photo-1508685096489-723f0119762e?q=80&w=1000&auto=format&fit=crop",
+            "category": "Electronics",
+            "tag": "Flash Sale",
+            "stock": 150,
+            "sold": 1200
+        }
     ]
-    db.add_all(products)
+
+    for p in product_data:
+        existing_p = db.query(models.Product).filter(models.Product.name == p["name"]).first()
+        if not existing_p:
+            new_prod = models.Product(
+                name=p["name"],
+                description=p["description"],
+                price=p["price"],
+                old_price=p["old_price"],
+                image=p["image"],
+                category_id=cat_map.get(p["category"], 1),
+                tag=p["tag"],
+                stock=p.get("stock", 0),
+                sold=p.get("sold", 0)
+            )
+            db.add(new_prod)
+
     db.commit()
-    return {"message": "Success! Database seeded with images."}
+    return {"message": "Success! Database seeded and linked correctly."}
 
 # Auth & OTP Endpoints
 @app.post("/api/send-otp")
