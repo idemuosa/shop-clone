@@ -16,7 +16,6 @@ const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const InfoPage = lazy(() => import("./components/InfoPages"));
 const SpinToWin = lazy(() => import("./components/games/SpinToWin"));
 
-import SocialProofTicker from "./components/SocialProofTicker";
 import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
@@ -159,7 +158,6 @@ function MainContent() {
         />
         <CheckoutPage onBack={() => setShowCheckout(false)} />
         <AIAssistant />
-        <SocialProofTicker />
         <CartDrawer
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
@@ -196,7 +194,6 @@ function MainContent() {
           onProductView={handleProductView}
         />
         <AIAssistant />
-        <SocialProofTicker />
         <CartDrawer
           isOpen={isCartOpen}
           onClose={() => setIsCartOpen(false)}
@@ -233,8 +230,7 @@ function MainContent() {
         />
         <AdminDashboard />
         <AIAssistant />
-        <SocialProofTicker />
-        <CartDrawer 
+        <CartDrawer
           isOpen={isCartOpen} 
           onClose={() => setIsCartOpen(false)} 
           onCheckout={handleCheckout}
@@ -267,8 +263,7 @@ function MainContent() {
           }}
         />
         <AIAssistant />
-        <SocialProofTicker />
-        <CartDrawer 
+        <CartDrawer
           isOpen={isCartOpen} 
           onClose={() => setIsCartOpen(false)} 
           onCheckout={handleCheckout}
@@ -298,8 +293,7 @@ function MainContent() {
         />
         <UserDashboard onBrowseMore={() => setShowDashboard(false)} />
         <AIAssistant />
-        <SocialProofTicker />
-        <CartDrawer 
+        <CartDrawer
           isOpen={isCartOpen} 
           onClose={() => setIsCartOpen(false)} 
           onCheckout={handleCheckout}
@@ -511,7 +505,6 @@ function MainContent() {
       </main>
       <Footer />
       <AIAssistant />
-      <SocialProofTicker />
       <SpinToWin />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <CartDrawer 
