@@ -66,7 +66,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-3xl md:text-4xl font-black text-black leading-tight mb-6 uppercase italic tracking-tighter"
+            className="text-2xl md:text-4xl font-black text-black leading-tight mb-4 md:mb-6 uppercase italic tracking-tighter"
           >
             UP TO <span className="text-purple-600">90% OFF</span> <br />
             ON ALL <span className="underline decoration-yellow-400 decoration-8 underline-offset-4">TRENDING</span> ITEMS
@@ -76,7 +76,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-gray-500 max-w-lg mb-8 text-lg font-medium"
+            className="text-gray-500 max-w-lg mb-6 md:mb-8 text-sm md:text-lg font-medium"
           >
             Don't miss out on the biggest deals of the season. High-quality products at unbeatable prices. Shop the latest gadgets, fashion, and home essentials.
           </motion.p>
@@ -85,13 +85,13 @@ export default function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap justify-center md:justify-start gap-4"
+            className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4"
           >
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-10 py-7 rounded-2xl text-lg font-black shadow-xl shadow-purple-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
-              <ShoppingBag className="mr-2 h-5 w-5" /> Shop Deals Now
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black shadow-xl shadow-purple-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
+              <ShoppingBag className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Shop Deals Now
             </Button>
-            <Button variant="outline" className="border-2 border-gray-100 px-10 py-7 rounded-2xl text-lg font-black transition-all hover:bg-gray-50 uppercase tracking-tighter">
-              <Gift className="mr-2 h-5 w-5 text-purple-600" /> Claim Coupon
+            <Button variant="outline" className="border-2 border-gray-100 px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black transition-all hover:bg-gray-50 uppercase tracking-tighter">
+              <Gift className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Claim Coupon
             </Button>
           </motion.div>
 

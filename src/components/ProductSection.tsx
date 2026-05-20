@@ -469,14 +469,14 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
         </AnimatePresence>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="bg-purple-600 p-2.5 rounded-xl shadow-lg shadow-purple-100">
-              <Zap className="h-5 w-5 text-white fill-white" />
+            <div className="bg-purple-600 p-2 md:p-2.5 rounded-xl shadow-lg shadow-purple-100">
+              <Zap className="h-4 w-4 md:h-5 md:w-5 text-white fill-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-black  tracking-tighter leading-none">{title} <span className="text-purple-600 italic">{subtitle}</span></h2>
-              <p className="text-[10px] font-bold text-gray-400  tracking-widest mt-1">{filteredProducts.length} Products Found</p>
+              <h2 className="text-lg md:text-2xl font-black text-black  tracking-tighter leading-none">{title} <span className="text-purple-600 italic">{subtitle}</span></h2>
+              <p className="text-[9px] md:text-[10px] font-bold text-gray-400  tracking-widest mt-1">{filteredProducts.length} Products Found</p>
             </div>
           </div>
           
@@ -741,24 +741,23 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                     />
                   </div>
 
-                  <div className="p-3">
-                    <h3 className="text-xs font-medium text-gray-800 line-clamp-2 h-8 mb-2 group-hover:text-purple-600 transition-colors">{product.name}</h3>
+                  <div className="p-2 md:p-3">
+                    <h3 className="text-[10px] md:text-xs font-medium text-gray-800 line-clamp-2 h-7 md:h-8 mb-1 md:mb-2 group-hover:text-purple-600 transition-colors">{product.name}</h3>
                     
-                    <div className="flex items-baseline gap-1.5 mb-1">
-                      <span className="text-lg font-black text-purple-600 leading-none">{formatPrice(product.price)}</span>
+                    <div className="flex items-baseline gap-1 md:gap-1.5 mb-1">
+                      <span className="text-sm md:text-lg font-black text-purple-600 leading-none">{formatPrice(product.price)}</span>
                       {product.oldPrice && (
-                        <span className="text-[11px] text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
+                        <span className="text-[9px] md:text-[11px] text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-0.5">
-                        <Star className="h-3 w-3 fill-purple-500 text-purple-500" />
-                        <span className="text-[11px] font-bold text-gray-700">{product.rating}</span>
-                        <span className="text-[10px] text-gray-400">({product.reviews})</span>
+                        <Star className="h-2.5 w-2.5 md:h-3 md:w-3 fill-purple-500 text-purple-500" />
+                        <span className="text-[9px] md:text-[11px] font-bold text-gray-700">{product.rating}</span>
                       </div>
                       {product.sold && (
-                        <span className="text-[10px] font-bold text-gray-400">{product.sold} sold</span>
+                        <span className="text-[9px] md:text-[10px] font-bold text-gray-400">{product.sold} sold</span>
                       )}
                     </div>
                     

@@ -208,12 +208,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px] rounded-3xl border-none">
+      <DialogContent className="sm:max-w-[400px] w-[95vw] rounded-3xl border-none p-4 sm:p-6">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black text-center italic tracking-tighter">
+          <DialogTitle className="text-xl sm:text-2xl font-black text-center italic tracking-tighter">
             Welcome to <span className="text-purple-600">Vivo</span>
           </DialogTitle>
-          <DialogDescription className="text-center font-medium">
+          <DialogDescription className="text-center font-medium text-xs sm:text-sm">
             Sign in to your account or create a new one.
           </DialogDescription>
         </DialogHeader>
@@ -228,16 +228,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           }}
           className="w-full"
         >
-          <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-2'} bg-green-50 rounded-xl p-1 mb-6`}>
+          <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-2'} bg-green-50 rounded-xl p-1 mb-4 sm:mb-6`}>
             {user ? (
               <>
-                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[10px] tracking-widest leading-none py-2.5">My Profile</TabsTrigger>
-                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[10px] tracking-widest leading-none py-2.5">Wallets</TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">My Profile</TabsTrigger>
+                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Wallets</TabsTrigger>
               </>
             ) : (
               <>
-                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[10px] tracking-widest leading-none py-2.5">Login</TabsTrigger>
-                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[10px] tracking-widest leading-none py-2.5">Join Free</TabsTrigger>
+                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
+                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
               </>
             )}
           </TabsList>
@@ -245,35 +245,35 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           {user ? (
             <>
               <TabsContent value="profile">
-                <div className="space-y-6 pt-2">
-                  <div className="relative w-24 h-24 mx-auto">
-                    <div className="w-24 h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-[32px] flex items-center justify-center text-white text-4xl font-black shadow-xl shadow-purple-100 rotate-3">
+                <div className="space-y-4 sm:space-y-6 pt-2">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-[28px] sm:rounded-[32px] flex items-center justify-center text-white text-3xl sm:text-4xl font-black shadow-xl shadow-purple-100 rotate-3">
                       {user.displayName?.charAt(0) || user.email?.charAt(0)}
                     </div>
-                    <div className="absolute -bottom-2 -right-2 bg-green-500 border-4 border-white w-8 h-8 rounded-full flex items-center justify-center text-white">
-                       <CheckCircle2 className="h-4 w-4" />
+                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-green-500 border-4 border-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white">
+                       <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </div>
                   </div>
                   
                   <div className="text-center space-y-1">
-                    <h3 className="text-2xl font-black  tracking-tighter truncate">{user.displayName || 'Shop Explorer'}</h3>
-                    <p className="text-xs font-bold text-gray-400  tracking-widest">{user.email}</p>
+                    <h3 className="text-xl sm:text-2xl font-black  tracking-tighter truncate">{user.displayName || 'Shop Explorer'}</h3>
+                    <p className="text-[9px] sm:text-xs font-bold text-gray-400  tracking-widest">{user.email}</p>
                   </div>
 
-                  <div className="bg-green-50 rounded-3xl p-6 border-2 border-green-100 flex items-center justify-between">
+                  <div className="bg-green-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 border-green-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-black text-purple-600  tracking-widest">Vivo Status</p>
-                      <h4 className="text-lg font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
+                      <p className="text-[9px] font-black text-purple-600  tracking-widest uppercase">Vivo Status</p>
+                      <h4 className="text-base sm:text-lg font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
                     </div>
-                    <div className="bg-purple-600 p-2 rounded-xl text-white">
-                       <ShieldCheck className="h-6 w-6" />
+                    <div className="bg-purple-600 p-1.5 sm:p-2 rounded-xl text-white">
+                       <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
                   </div>
 
                   <Button 
                     onClick={() => signOut(auth).then(() => onClose())}
                     variant="ghost"
-                    className="w-full rounded-2xl h-14 font-black  tracking-widest text-[10px] text-red-500 hover:bg-red-50 hover:text-red-600"
+                    className="w-full rounded-2xl h-12 sm:h-14 font-black  tracking-widest text-[9px] sm:text-[10px] text-red-500 hover:bg-red-50 hover:text-red-600"
                   >
                     Sign out securely
                   </Button>

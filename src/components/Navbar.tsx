@@ -79,14 +79,14 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
 
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+        <div className="flex items-center justify-between h-16 md:h-20 gap-2 md:gap-4">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer" onClick={() => {
+          <div className="flex-shrink-0 flex items-center gap-1 md:gap-2 cursor-pointer" onClick={() => {
             if (showAdmin) onToggleAdmin();
             onSearch?.("");
             setSearchTerm("");
           }}>
-            <span className="text-3xl font-black tracking-tighter text-purple-600 italic ">Vivo</span>
+            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">Vivo</span>
           </div>
 
           {/* Search Bar - Desktop */}
@@ -107,16 +107,16 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
           </form>
 
           {/* User Actions */}
-          <div className="flex items-center gap-2 sm:gap-6">
+          <div className="flex items-center gap-1.5 sm:gap-6">
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={(props) => (
                   <button
                     {...props}
-                    className="flex items-center gap-2 px-2 sm:px-3 py-1.5 bg-gray-50 rounded-full border border-gray-100 hover:border-purple-200 transition-all cursor-pointer group outline-none"
+                    className="flex items-center gap-1 px-1.5 sm:px-3 py-1 bg-gray-50 rounded-full border border-gray-100 hover:border-purple-200 transition-all cursor-pointer group outline-none"
                   >
-                    <span className="text-[9px] sm:text-[10px] font-black text-gray-400 group-hover:text-purple-600 transition-colors ">{currency}</span>
-                    <ChevronDown className="h-3 w-3 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                    <span className="text-[8px] sm:text-[10px] font-black text-gray-400 group-hover:text-purple-600 transition-colors ">{currency}</span>
+                    <ChevronDown className="h-2.5 w-2.5 text-gray-400 group-hover:text-purple-600 transition-colors" />
                   </button>
                 )}
               />
@@ -135,17 +135,17 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             {isAdmin && (
               <div className="flex flex-col items-center cursor-pointer group" onClick={onToggleAdmin}>
                 <div className="relative">
-                  <LayoutDashboard className={`h-6 w-6 ${showAdmin ? 'text-purple-600' : 'text-gray-700'} group-hover:text-purple-600 transition-colors`} />
+                  <LayoutDashboard className={`h-5 w-5 md:h-6 md:w-6 ${showAdmin ? 'text-purple-600' : 'text-gray-700'} group-hover:text-purple-600 transition-colors`} />
                 </div>
-                <span className="text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Admin</span>
+                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Admin</span>
               </div>
             )}
 
             <div className="flex flex-col items-center cursor-pointer group" onClick={onOpenAuth}>
               <div className="relative">
-                <User className="h-6 w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                <User className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
               </div>
-              <span className="text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">
                 {user ? (profile?.displayName || 'Account') : 'Login'}
               </span>
             </div>
@@ -153,26 +153,26 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             {user && (
               <div className="flex flex-col items-center cursor-pointer group" onClick={handleLogout}>
                 <div className="relative">
-                  <LogOut className="h-6 w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                  <LogOut className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
                 </div>
-                <span className="text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Logout</span>
+                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Logout</span>
               </div>
             )}
             
             <div className="flex flex-col items-center cursor-pointer group">
               <div className="relative">
-                <Heart className="h-6 w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">{wishlistCount}</span>
+                <Heart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{wishlistCount}</span>
               </div>
-              <span className="text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Saved</span>
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Saved</span>
             </div>
             
             <div className="flex flex-col items-center cursor-pointer group" onClick={onOpenCart}>
               <div className="relative">
-                <ShoppingCart className="h-6 w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-white">{totalItems}</span>
+                <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{totalItems}</span>
               </div>
-              <span className="text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Cart</span>
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Cart</span>
             </div>
 
             <button
