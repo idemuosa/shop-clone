@@ -92,32 +92,32 @@ export default function SpinToWin() {
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
-              className="bg-white rounded-[40px] max-w-md w-full p-8 relative overflow-hidden text-center"
+              className="bg-white rounded-[32px] max-w-xs w-full p-6 relative overflow-hidden text-center"
             >
               <Button 
                  variant="ghost" 
                  size="icon" 
                  onClick={() => setIsOpen(false)}
-                 className="absolute top-6 right-6 rounded-full"
+                 className="absolute top-4 right-4 rounded-full h-8 w-8"
               >
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               </Button>
 
-              <div className="mb-8">
-                <BadgeCheck className="h-12 w-12 text-purple-600 mx-auto mb-4" />
-                <h2 className="text-3xl font-black uppercase tracking-tighter italic">Lucky <span className="text-purple-600">Spin</span> Wheel</h2>
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-2">Test your luck and win exclusive Vivo rewards</p>
+              <div className="mb-4">
+                <BadgeCheck className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <h2 className="text-xl font-black uppercase tracking-tighter italic">Lucky <span className="text-purple-600">Spin</span></h2>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Win exclusive Vivo rewards</p>
               </div>
 
               {/* Wheel Container */}
-              <div className="relative w-72 h-72 mx-auto mb-10 mt-4">
-                <div className="absolute top-[-10px] left-1/2 -translate-x-1/2 z-10">
-                   <ChevronDown className="h-10 w-10 text-purple-600 fill-purple-600 drop-shadow-lg" />
+              <div className="relative w-48 h-48 mx-auto mb-6 mt-2">
+                <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 z-10">
+                   <ChevronDown className="h-8 w-8 text-purple-600 fill-purple-600 drop-shadow-lg" />
                 </div>
                 
                 <motion.div
                   animate={controls}
-                  className="w-full h-full rounded-full border-8 border-zinc-900 shadow-2xl relative overflow-hidden"
+                  className="w-full h-full rounded-full border-4 border-zinc-900 shadow-xl relative overflow-hidden"
                   style={{ rotate: rotation }}
                 >
                   {rewards.map((reward, i) => (
@@ -131,7 +131,7 @@ export default function SpinToWin() {
                       }}
                     >
                       <span 
-                        className="absolute top-10 left-[70%] -translate-x-1/2 text-[10px] font-black text-white uppercase tracking-tighter"
+                        className="absolute top-6 left-[70%] -translate-x-1/2 text-[8px] font-black text-white uppercase tracking-tighter"
                         style={{ transform: 'rotate(22.5deg)' }}
                       >
                         {reward.text}
@@ -139,37 +139,37 @@ export default function SpinToWin() {
                     </div>
                   ))}
                   {/* Wheel Center */}
-                  <div className="absolute inset-0 m-auto w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg border-4 border-zinc-900 z-10">
-                    <Zap className="h-6 w-6 text-purple-600 fill-purple-600" />
+                  <div className="absolute inset-0 m-auto w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-zinc-900 z-10">
+                    <Zap className="h-4 w-4 text-purple-600 fill-purple-600" />
                   </div>
                 </motion.div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {result ? (
-                  <div className="bg-green-50 p-6 rounded-3xl border-2 border-dashed border-green-200">
-                    <p className="text-xs font-black text-purple-600 uppercase tracking-widest mb-2">Your Reward:</p>
-                    <h3 className="text-4xl font-black tracking-tighter italic">{result}</h3>
-                    <div className="flex items-center justify-center gap-2 mt-4 text-green-600">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Added to your active coupons</span>
+                  <div className="bg-green-50 p-4 rounded-2xl border-2 border-dashed border-green-200">
+                    <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Your Reward:</p>
+                    <h3 className="text-2xl font-black tracking-tighter italic">{result}</h3>
+                    <div className="flex items-center justify-center gap-1 mt-2 text-green-600">
+                      <CheckCircle2 className="h-3 w-3" />
+                      <span className="text-[8px] font-black uppercase tracking-widest">Coupon added</span>
                     </div>
                   </div>
                 ) : (
                   <Button 
                     onClick={spinWheel}
                     disabled={isSpinning}
-                    className="w-full h-16 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95"
+                    className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-black text-base rounded-xl shadow-lg shadow-purple-100 transition-all active:scale-95"
                   >
                     {isSpinning ? (
-                      <RefreshCcw className="h-6 w-6 animate-spin" />
+                      <RefreshCcw className="h-5 w-5 animate-spin" />
                     ) : (
-                      'SPIN NOW for FREE'
+                      'SPIN NOW'
                     )}
                   </Button>
                 )}
                 
-                <p className="text-[10px] font-bold text-gray-400">1 Free Spin Available Daily</p>
+                <p className="text-[9px] font-bold text-gray-400">1 Free Spin Available Daily</p>
               </div>
 
               {/* Decorative elements */}
