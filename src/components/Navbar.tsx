@@ -72,14 +72,14 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
       <div className="bg-purple-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
         <span className="flex items-center justify-center gap-2">
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          Vivo Style Flash Sale: Up to 90% Off!
+          Vivi Style Flash Sale: Up to 90% Off!
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
         </span>
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20 gap-2 md:gap-4">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-1 md:gap-2 cursor-pointer" onClick={() => {
@@ -91,7 +91,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
           </div>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl relative">
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>

@@ -305,7 +305,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button
           variant="ghost"
           onClick={onBack}

@@ -34,7 +34,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-white overflow-hidden border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
         {/* Text Content */}
         <div className="flex-1 z-10 text-center md:text-left">
           <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
@@ -44,7 +44,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
             >
               <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              Vivo Flash Sales
+              Vivi Flash Sales
             </motion.div>
             
             <div className="flex items-center gap-2">

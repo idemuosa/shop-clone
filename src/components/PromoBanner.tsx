@@ -24,7 +24,7 @@ export default function PromoBanner() {
 
   return (
     <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative bg-purple-600 rounded-[32px] overflow-hidden shadow-2xl shadow-purple-100">
           {/* Animated Background Pattern */}
           <div className="absolute inset-0 opacity-10">

@@ -434,7 +434,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
 
   return (
     <section className="py-12 bg-[#f5f5f5]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatePresence>
           {recentBoughVisible && (
             <motion.div 
@@ -830,7 +830,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
             }
           }}
         >
-          <DialogContent className="max-w-4xl p-0 overflow-hidden rounded-3xl border-none">
+          <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl border-none">
             {selectedProduct && (
               <div className="flex flex-col md:flex-row min-h-[500px]">
                 <div className="md:w-2/5 bg-gray-50 relative">
@@ -1216,7 +1216,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                               />
                             </div>
                             <div>
-                              <p className="text-sm font-bold truncate max-w-[150px]">{selectedProduct.name}</p>
+                              <p className="text-sm font-bold truncate max-w-[120px]">{selectedProduct.name}</p>
                               <p className="text-xs text-gray-500">Qty: {productQuantities[selectedProduct.id] || 1}</p>
                             </div>
                           </div>

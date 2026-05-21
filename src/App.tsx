@@ -350,7 +350,7 @@ function MainContent() {
 
         {searchQuery ? (
           <div className="py-12 bg-white">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
               <div className="flex items-center gap-4 bg-green-50 p-8 rounded-[40px] border-2 border-green-100">
                 <div className="bg-purple-600 p-4 rounded-3xl shadow-xl shadow-purple-200">
                    <Search className="h-8 w-8 text-white" />
@@ -381,7 +381,7 @@ function MainContent() {
                    <Package className="h-12 w-12 text-gray-200" />
                 </div>
                 <h3 className="text-3xl font-black  tracking-tighter mb-4 italic">No items <span className="text-purple-600">match</span> that search</h3>
-                <p className="text-gray-400 font-bold  text-xs tracking-widest mb-10 max-w-md mx-auto">Try checking your spelling or using more general keywords like "Watch" or "Jersey".</p>
+                <p className="text-gray-400 font-bold  text-xs tracking-widest mb-10 max-w-sm mx-auto">Try checking your spelling or using more general keywords like "Watch" or "Jersey".</p>
                 <Button 
                   onClick={() => handleSearch("")}
                   className="bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl px-12 h-16 shadow-2xl shadow-purple-200 text-lg active:scale-95 transition-all"
@@ -397,7 +397,7 @@ function MainContent() {
             <CategorySection onSelectCategory={(cat) => handleSearch(cat === "all" ? "" : cat)} />
             
             {/* Flash Sale Timer Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-green-100 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="flex items-center gap-4">
                   <div className="bg-purple-600 p-3 rounded-lg text-white">
@@ -435,11 +435,11 @@ function MainContent() {
             
             {/* Secondary Promo Banners */}
             <section className="py-10">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="relative bg-purple-500 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
                     <p className="font-bold mb-2  tracking-widest opacity-80">Smart Tech</p>
-                    <h3 className="text-4xl font-black mb-6 leading-tight">The Best Smart <br /> Watch under <br /> $20</h3>
+                    <h3 className="text-3xl font-black mb-6 leading-tight">The Best Smart <br /> Watch under <br /> $20</h3>
                     <button className="bg-white text-purple-600 px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
@@ -455,7 +455,7 @@ function MainContent() {
                 <div className="relative bg-zinc-900 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
                     <p className="text-purple-500 font-bold mb-2  tracking-widest">Limited Edition</p>
-                    <h3 className="text-4xl font-black mb-6 leading-tight">Meet your new <br /> Trending Furniture <br /> Design</h3>
+                    <h3 className="text-3xl font-black mb-6 leading-tight">Meet your new <br /> Trending Furniture <br /> Design</h3>
                     <button className="bg-purple-500 text-white px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
@@ -495,7 +495,7 @@ function MainContent() {
 
         {/* Features Section */}
         <section className="py-20 bg-white border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
                 <Truck className="h-8 w-8 text-purple-600" />

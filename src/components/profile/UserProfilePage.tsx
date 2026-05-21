@@ -184,7 +184,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     <div className="min-h-screen bg-[#f5f5f5] pb-20">
       {/* Header Profile Info */}
       <div className="bg-white border-b border-gray-100 pt-10 pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group">
               <div className="w-32 h-32 bg-purple-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-purple-100 group-hover:scale-105 transition-transform">
@@ -243,7 +243,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
         <Tabs defaultValue="orders" className="space-y-8">
           <TabsList className="bg-white p-1.5 rounded-2xl shadow-xl shadow-gray-200/50 flex-wrap h-auto gap-1 border border-gray-50">
             <TabsTrigger value="orders" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
