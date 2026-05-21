@@ -1414,7 +1414,7 @@ export default function AdminDashboard() {
                   <div className="bg-purple-600 p-2 rounded-lg">
                     <Wallet className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-black  tracking-tighter italic">Store <span className="text-purple-600">settings</span></h3>
+                  <h3 className="text-xl font-black  tracking-tighter "> <span className="text-purple-600">settings</span></h3>
                </div>
 
                <form onSubmit={handleUpdateSettings} className="grid grid-cols-1 md:grid-cols-2 gap-8">
