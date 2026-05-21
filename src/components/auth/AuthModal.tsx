@@ -208,10 +208,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[350px] w-[92vw] rounded-[28px] border-none p-4 sm:p-5">
         <DialogHeader className="mb-2">
-          <DialogTitle className="text-lg sm:text-xl font-black text-center italic tracking-tighter">
+          <DialogTitle className="text-xl sm:text-2xl font-black text-center italic tracking-tighter">
             Welcome to <span className="text-purple-600">Vivi</span>
           </DialogTitle>
-          <DialogDescription className="text-center font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-60">
+          <DialogDescription className="text-center font-bold text-xs sm:text-sm uppercase tracking-widest opacity-60">
             Sign in or create account
           </DialogDescription>
         </DialogHeader>
@@ -229,13 +229,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-2'} bg-green-50 rounded-xl p-1 mb-4 sm:mb-6`}>
             {user ? (
               <>
-                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">My Profile</TabsTrigger>
-                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Wallets</TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">My Profile</TabsTrigger>
+                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Wallets</TabsTrigger>
               </>
             ) : (
               <>
-                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
-                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-[9px] sm:text-[10px] tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
+                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
+                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
               </>
             )}
           </TabsList>

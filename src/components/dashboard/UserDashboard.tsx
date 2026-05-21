@@ -116,27 +116,27 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl md:text-2xl font-black tracking-tighter italic leading-none mb-1">
+              <h1 className="text-2xl md:text-3xl font-black tracking-tighter italic leading-none mb-1">
                 User <span className="text-purple-600">Dashboard</span>
               </h1>
-              <div className="text-gray-400 font-bold text-[8px] md:text-[9px] tracking-widest flex items-center gap-2">
-                <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" /> Always secure • Always discounted
+              <div className="text-gray-400 font-bold text-xs tracking-widest flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Always secure • Always discounted
               </div>
             </div>
             
             <div className="flex items-center gap-2 md:gap-3">
               <div className="flex bg-gray-50 rounded-xl p-0.5 border border-gray-100">
                 <div className="px-3 md:px-4 py-1 text-center">
-                   <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-400 mb-0.5">Coins</p>
-                   <p className="text-xs md:text-sm font-black text-purple-600">🪙 {profile?.points || 0}</p>
+                   <p className="text-[10px] font-black uppercase text-gray-400 mb-0.5">Coins</p>
+                   <p className="text-sm md:text-base font-black text-purple-600">🪙 {profile?.points || 0}</p>
                 </div>
                 <div className="w-px h-6 bg-gray-200 self-center" />
                 <div className="px-3 md:px-4 py-1 text-center">
-                   <p className="text-[7px] md:text-[8px] font-black uppercase text-gray-400 mb-0.5">Orders</p>
-                   <p className="text-xs md:text-sm font-black text-black">{recentOrders.length}</p>
+                   <p className="text-[10px] font-black uppercase text-gray-400 mb-0.5">Orders</p>
+                   <p className="text-sm md:text-base font-black text-black">{recentOrders.length}</p>
                 </div>
               </div>
-              <Button onClick={onBrowseMore} className="bg-black hover:bg-zinc-800 text-white rounded-xl font-black uppercase tracking-widest text-[8px] md:text-[9px] h-8 md:h-10 px-4 md:px-6 shadow-xl shadow-zinc-100 transition-all active:scale-95">
+              <Button onClick={onBrowseMore} className="bg-black hover:bg-zinc-800 text-white rounded-xl font-black uppercase tracking-widest text-[10px] h-10 md:h-12 px-5 md:px-7 shadow-xl shadow-zinc-100 transition-all active:scale-95">
                 Market
               </Button>
             </div>
@@ -155,12 +155,12 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
               </div>
               <Input 
                 placeholder="Search..."
-                className="border-none bg-transparent h-8 md:h-10 focus-visible:ring-0 font-bold text-gray-600 text-xs md:text-sm"
+                className="border-none bg-transparent h-10 md:h-12 focus-visible:ring-0 font-bold text-gray-600 text-sm"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <Button type="submit" size="icon" className="h-8 w-8 md:h-9 md:w-9 rounded-lg md:rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-100 mr-1 shrink-0">
-                <Filter className="h-3.5 w-3.5" />
+              <Button type="submit" size="icon" className="h-9 w-9 md:h-10 md:w-10 rounded-lg md:rounded-xl bg-purple-600 text-white shadow-lg shadow-purple-100 mr-1 shrink-0">
+                <Filter className="h-4 w-4" />
               </Button>
             </form>
 
@@ -168,11 +168,11 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
             <div>
               <div className="flex items-center justify-between mb-3 md:mb-4">
                 <div>
-                   <h2 className="text-base md:text-lg font-black uppercase tracking-tighter italic">Top <span className="text-purple-600">Picks</span></h2>
-                   <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest">Based on browsing</p>
+                   <h2 className="text-lg md:text-xl font-black uppercase tracking-tighter italic">Top <span className="text-purple-600">Picks</span></h2>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Based on browsing</p>
                 </div>
-                <Button variant="link" className="text-purple-600 font-bold text-[9px] md:text-[10px] p-0 h-auto" onClick={onBrowseMore}>
-                  View all <ChevronRight className="h-3 w-3 ml-0.5" />
+                <Button variant="link" className="text-purple-600 font-bold text-xs p-0 h-auto" onClick={onBrowseMore}>
+                  View all <ChevronRight className="h-4 w-4 ml-0.5" />
                 </Button>
               </div>
               
@@ -194,31 +194,31 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                         }}
                       />
                       <div className="absolute top-1.5 md:top-2 right-1.5 md:right-2">
-                         <Button size="icon" variant="secondary" className="h-6 w-6 md:h-7 md:w-7 rounded-full bg-white/80 backdrop-blur-md border-none shadow-sm text-gray-400 hover:text-purple-600">
-                            <Heart className="h-3 w-3 md:h-3.5 md:w-3.5" />
+                         <Button size="icon" variant="secondary" className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-white/80 backdrop-blur-md border-none shadow-sm text-gray-400 hover:text-purple-600">
+                            <Heart className="h-3.5 w-3.5 md:h-4 md:w-4" />
                          </Button>
                       </div>
                       <div className="absolute bottom-1.5 md:bottom-2 left-1.5 md:left-2">
-                         <Badge className="bg-purple-600 text-white font-black text-[6px] md:text-[7px] uppercase tracking-widest border-none h-3.5 md:h-4 px-1.5">
+                         <Badge className="bg-purple-600 text-white font-black text-[8px] uppercase tracking-widest border-none h-4 md:h-5 px-2">
                             {product.tag || 'New'}
                          </Badge>
                       </div>
                     </div>
                     <div>
-                      <h3 className="font-black text-[10px] md:text-[11px] uppercase truncate mb-0.5">{product.name}</h3>
+                      <h3 className="font-black text-xs md:text-sm uppercase truncate mb-0.5">{product.name}</h3>
                       <div className="flex items-center justify-between">
-                         <span className="text-purple-600 font-black text-xs md:text-sm">{formatPrice(product.price)}</span>
+                         <span className="text-purple-600 font-black text-sm md:text-base">{formatPrice(product.price)}</span>
                          <div className="flex items-center gap-0.5 text-gray-400">
-                            <Star className="h-2 w-2 md:h-2.5 md:w-2.5 fill-purple-400 text-purple-400" />
-                            <span className="text-[8px] md:text-[9px] font-bold">{product.rating}</span>
+                            <Star className="h-3 w-3 fill-purple-400 text-purple-400" />
+                            <span className="text-[10px] font-bold">{product.rating}</span>
                          </div>
                       </div>
                     </div>
                   </motion.div>
                 )) : (
                   <div className="col-span-2 py-6 md:py-10 text-center bg-white rounded-2xl border-2 border-dashed border-gray-100">
-                     <ShoppingBag className="h-6 w-6 md:h-8 md:w-8 text-gray-200 mx-auto mb-2" />
-                     <p className="text-gray-400 font-bold uppercase text-[8px] md:text-[9px] tracking-widest">Loading picks...</p>
+                     <ShoppingBag className="h-8 w-8 text-gray-200 mx-auto mb-2" />
+                     <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Loading picks...</p>
                   </div>
                 )}
               </div>
@@ -227,17 +227,17 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
             {/* Promo Section */}
             <div className="bg-gradient-to-br from-zinc-900 to-black rounded-[24px] md:rounded-[32px] p-4 md:p-6 text-white relative overflow-hidden group">
                <div className="relative z-10 max-w-[70%]">
-                  <Badge className="bg-purple-600 text-white font-black mb-2 md:mb-3 h-4 md:h-5 text-[8px] md:text-[10px]">Member special</Badge>
-                  <h3 className="text-lg md:text-xl font-black uppercase tracking-tighter leading-none italic mb-2 md:mb-3">Get 20% off <br /> <span className="text-purple-600">tech items</span></h3>
-                  <p className="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-3 md:mb-4">
+                  <Badge className="bg-purple-600 text-white font-black mb-2 md:mb-3 h-5 md:h-6 text-[10px] md:text-xs">Member special</Badge>
+                  <h3 className="text-xl md:text-2xl font-black uppercase tracking-tighter leading-none italic mb-2 md:mb-3">Get 20% off <br /> <span className="text-purple-600">tech items</span></h3>
+                  <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-3 md:mb-4">
                     Over 100 Vivi Coins. Use code <span className="text-white font-black italic">Techsavvy</span>
                   </p>
-                  <Button className="bg-white text-black font-black rounded-lg md:rounded-xl h-8 md:h-10 px-4 md:px-6 text-[8px] md:text-[10px] hover:bg-green-100 transition-all active:scale-95">
+                  <Button className="bg-white text-black font-black rounded-lg md:rounded-xl h-10 md:h-12 px-5 md:px-7 text-[10px] md:text-xs hover:bg-green-100 transition-all active:scale-95">
                     Claim
                   </Button>
                </div>
                <div className="absolute right-[-10px] md:right-[-15px] bottom-[-10px] md:bottom-[-15px] opacity-20 group-hover:scale-110 transition-transform duration-700">
-                  <Zap className="h-32 w-32 md:h-40 md:w-40 text-purple-600 rotate-12" />
+                  <Zap className="h-40 w-40 md:h-52 md:w-52 text-purple-600 rotate-12" />
                </div>
             </div>
           </div>
@@ -245,20 +245,20 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
           {/* Sidebar Info */}
           <div className="space-y-4 md:space-y-6">
             {/* Recent Orders - Mini View */}
-            <Card className="rounded-3xl md:rounded-[32px] border-none shadow-2xl shadow-gray-200/50 p-3 md:p-4">
-              <div className="flex items-center justify-between mb-3 md:mb-4 px-1">
-                 <h3 className="font-black uppercase tracking-tighter italic text-[11px] md:text-xs">Recent <span className="text-purple-600">orders</span></h3>
-                 <Clock className="h-3 w-3 md:h-3.5 md:w-3.5 text-gray-300" />
+            <Card className="rounded-3xl md:rounded-[32px] border-none shadow-2xl shadow-gray-200/50 p-4 md:p-5">
+              <div className="flex items-center justify-between mb-4 md:mb-5 px-1">
+                 <h3 className="font-black uppercase tracking-tighter italic text-xs md:text-sm">Recent <span className="text-purple-600">orders</span></h3>
+                 <Clock className="h-4 w-4 text-gray-300" />
               </div>
-              <div className="space-y-2 md:space-y-3">
+              <div className="space-y-3">
                 {recentOrders.length === 0 ? (
-                  <div className="text-center py-4 md:py-6">
-                     <p className="text-[8px] md:text-[9px] font-bold text-gray-300 uppercase tracking-widest">No activity</p>
+                  <div className="text-center py-6 md:py-8">
+                     <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">No activity</p>
                   </div>
                 ) : (
                   recentOrders.map((order) => (
-                    <div key={order.id} className="flex items-center gap-2 p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer group">
-                      <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-100">
+                    <div key={order.id} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer group">
+                      <div className="w-10 h-10 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-100">
                          <img
                            src={order.productImage || (order.items?.[0]?.image)}
                            className="w-full h-full object-cover"
@@ -269,44 +269,44 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                          />
                       </div>
                       <div className="flex-1 min-w-0">
-                         <p className="text-[8px] md:text-[9px] font-black uppercase truncate leading-tight group-hover:text-purple-600 transition-colors">{order.productName || order.items?.[0]?.name}</p>
-                         <p className="text-[6px] md:text-[7px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{order.status || 'Pending'}</p>
+                         <p className="text-[10px] md:text-xs font-black uppercase truncate leading-tight group-hover:text-purple-600 transition-colors">{order.productName || order.items?.[0]?.name}</p>
+                         <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{order.status || 'Pending'}</p>
                       </div>
-                      <ChevronRight className="h-3 w-3 text-gray-300 group-hover:text-purple-600 transition-all translate-x-0 group-hover:translate-x-1" />
+                      <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-purple-600 transition-all translate-x-0 group-hover:translate-x-1" />
                     </div>
                   ))
                 )}
-                <Button variant="outline" className="w-full rounded-lg md:rounded-xl border font-black uppercase tracking-widest text-[8px] md:text-[9px] h-8 md:h-9 mt-1">
+                <Button variant="outline" className="w-full rounded-xl border-2 font-black uppercase tracking-widest text-[10px] h-10 md:h-11 mt-1">
                   History
                 </Button>
               </div>
             </Card>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-2 gap-2 md:gap-3">
-               <button onClick={() => setActiveModal('track')} className="bg-white p-3 md:p-4 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
-                  <div className="w-6 h-6 md:w-8 md:h-8 bg-green-100 rounded-lg md:rounded-xl flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:rotate-12 transition-transform">
-                     <Package className="h-3 w-3 md:h-4 md:w-4 text-purple-600" />
+            <div className="grid grid-cols-2 gap-3">
+               <button onClick={() => setActiveModal('track')} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:rotate-12 transition-transform">
+                     <Package className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
                   </div>
-                  <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest">Track</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest">Track</p>
                </button>
-               <button onClick={() => setActiveModal('wallets')} className="bg-white p-3 md:p-4 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
-                  <div className="w-6 h-6 md:w-8 md:h-8 bg-blue-100 rounded-lg md:rounded-xl flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:rotate-12 transition-transform">
-                     <CreditCard className="h-3 w-3 md:h-4 md:w-4 text-blue-600" />
+               <button onClick={() => setActiveModal('wallets')} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:rotate-12 transition-transform">
+                     <CreditCard className="h-4 w-4 md:h-5 md:w-5 text-blue-600" />
                   </div>
-                  <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest">Wallets</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest">Wallets</p>
                </button>
-               <button onClick={() => setActiveModal('alerts')} className="bg-white p-3 md:p-4 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
-                  <div className="w-6 h-6 md:w-8 md:h-8 bg-purple-100 rounded-lg md:rounded-xl flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:rotate-12 transition-transform">
-                     <Bell className="h-3 w-3 md:h-4 md:w-4 text-purple-600" />
+               <button onClick={() => setActiveModal('alerts')} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-green-50 transition-colors group">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:rotate-12 transition-transform">
+                     <Bell className="h-4 w-4 md:h-5 md:w-5 text-purple-600" />
                   </div>
-                  <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest">Alerts</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest">Alerts</p>
                </button>
-               <button onClick={() => setActiveModal('sell')} className="bg-white p-3 md:p-4 rounded-[20px] md:rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-zinc-900 group transition-colors">
-                  <div className="w-6 h-6 md:w-8 md:h-8 bg-zinc-100 rounded-lg md:rounded-xl flex items-center justify-center mx-auto mb-1.5 md:mb-2 group-hover:rotate-12 transition-transform">
-                     <TrendingUp className="h-3 w-3 md:h-4 md:w-4 text-zinc-900" />
+               <button onClick={() => setActiveModal('sell')} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm text-center hover:bg-zinc-900 group transition-colors">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-zinc-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:rotate-12 transition-transform">
+                     <TrendingUp className="h-4 w-4 md:h-5 md:w-5 text-zinc-900" />
                   </div>
-                  <p className="text-[7px] md:text-[8px] font-black uppercase tracking-widest group-hover:text-white transition-colors">Sell</p>
+                  <p className="text-[9px] font-black uppercase tracking-widest group-hover:text-white transition-colors">Sell</p>
                </button>
             </div>
 

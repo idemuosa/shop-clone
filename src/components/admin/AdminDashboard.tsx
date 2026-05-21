@@ -287,6 +287,7 @@ export default function AdminDashboard() {
     const updatedSettings = {
       bankAccountNumber: formData.get('bankAccountNumber') as string,
       bankName: formData.get('bankName') as string,
+      bankHolder: formData.get('bankHolder') as string,
       momoNumber: formData.get('momoNumber') as string,
       expenses: parseFloat(formData.get('expenses') as string) || 0,
     };
@@ -540,8 +541,8 @@ export default function AdminDashboard() {
             <Zap className="h-6 w-6 text-white fill-white" />
           </div>
           <div className="flex-1">
-            <h1 className="text-xl md:text-2xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
-            <p className="text-gray-500 font-bold text-[8px] tracking-widest mt-0.5">Inventory & Orders</p>
+            <h1 className="text-2xl md:text-3xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
+            <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5">Inventory & Orders</p>
           </div>
           <div className="flex gap-1.5">
             <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
@@ -551,7 +552,7 @@ export default function AdminDashboard() {
                     {...props}
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "rounded-lg border-2 font-black text-[8px] px-3 h-9 border-gray-100 hover:border-purple-200 gap-1.5 transition-all bg-white"
+                      "rounded-lg border-2 font-black text-xs px-3 h-9 border-gray-100 hover:border-purple-200 gap-1.5 transition-all bg-white"
                     )}
                   >
                     <Plus className="h-3.5 w-3.5" /> Category
@@ -612,8 +613,8 @@ export default function AdminDashboard() {
                   <TrendingUp className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Sales</p>
-              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.totalSales)}</h3>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Sales</p>
+              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.totalSales)}</h3>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
@@ -623,8 +624,8 @@ export default function AdminDashboard() {
                   <TrendingDown className="h-4 w-4 text-red-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Expenses</p>
-              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.expenses)}</h3>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Expenses</p>
+              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.expenses)}</h3>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
@@ -634,8 +635,8 @@ export default function AdminDashboard() {
                   <DollarSign className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Profit</p>
-              <h3 className={`text-lg font-black italic tracking-tighter leading-tight ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Profit</p>
+              <h3 className={`text-xl font-black italic tracking-tighter leading-tight ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPrice(stats.profit)}
               </h3>
             </CardContent>
@@ -647,8 +648,8 @@ export default function AdminDashboard() {
                   <Package className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Inventory</p>
-              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Inventory</p>
+              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">
                 <span className="text-green-600">{stats.totalStockIn}</span>
                 <span className="text-gray-300 mx-1">/</span>
                 <span className="text-red-500">{stats.totalStockOut}</span>
@@ -659,25 +660,25 @@ export default function AdminDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="bg-white p-0.5 rounded-xl shadow-sm border border-gray-100 flex-wrap h-auto gap-0.5">
-            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Products
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Gallery
             </TabsTrigger>
-            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Admins
             </TabsTrigger>
-            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Logs
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Settings
             </TabsTrigger>
           </TabsList>
@@ -872,10 +873,10 @@ export default function AdminDashboard() {
                     <Table>
                       <TableHeader className="bg-gray-50">
                         <TableRow>
-                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Item</TableHead>
-                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Price</TableHead>
-                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Stock</TableHead>
-                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2 text-right">Actions</TableHead>
+                          <TableHead className="font-black text-xs tracking-widest uppercase py-2">Item</TableHead>
+                          <TableHead className="font-black text-xs tracking-widest uppercase py-2">Price</TableHead>
+                          <TableHead className="font-black text-xs tracking-widest uppercase py-2">Stock</TableHead>
+                          <TableHead className="font-black text-xs tracking-widest uppercase py-2 text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -885,17 +886,17 @@ export default function AdminDashboard() {
                               <div className="flex items-center gap-2">
                                 <img
                                   src={p.image}
-                                  className="w-7 h-7 rounded-md object-cover"
+                                  className="w-8 h-8 rounded-md object-cover"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                                   }}
                                 />
-                                <span className="text-[11px] truncate max-w-[100px]">{p.name}</span>
+                                <span className="text-sm truncate max-w-[150px]">{p.name}</span>
                               </div>
                             </TableCell>
-                            <TableCell className="font-black text-purple-600 text-[11px] py-2">{formatPrice(p.price)}</TableCell>
+                            <TableCell className="font-black text-purple-600 text-sm py-2">{formatPrice(p.price)}</TableCell>
                             <TableCell className="py-2">
-                              <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold text-[9px] h-5`}>
+                              <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold text-xs h-6 px-2`}>
                                 {p.stock || 0}
                               </Badge>
                             </TableCell>
@@ -1035,28 +1036,28 @@ export default function AdminDashboard() {
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Order id</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Customer</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Address</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Total</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Status</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest">Date</TableHead>
-                      <TableHead className="font-black  text-[10px] tracking-widest text-right">Actions</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Order id</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Customer</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Address</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Total</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Status</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest">Date</TableHead>
+                      <TableHead className="font-black  text-xs tracking-widest text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredOrders.map((o) => (
                       <TableRow key={o.id} className="group hover:bg-green-50/30 transition-colors">
-                        <TableCell className="text-[10px] text-gray-500">#{o.id.slice(-6).toUpperCase()}</TableCell>
-                        <TableCell className="font-bold text-sm">
+                        <TableCell className="text-xs text-gray-500">#{o.id.slice(-6).toUpperCase()}</TableCell>
+                        <TableCell className="font-bold text-base">
                           {o.customerEmail}
                         </TableCell>
                         <TableCell className="max-w-[150px] truncate">
-                          <span className="text-xs text-gray-500 font-medium">
+                          <span className="text-sm text-gray-500 font-medium">
                             {o.shippingAddress?.address}, {o.shippingAddress?.city}
                           </span>
                         </TableCell>
-                        <TableCell className="font-black text-purple-600">{formatPrice(o.totalAmount)}</TableCell>
+                        <TableCell className="font-black text-purple-600 text-sm">{formatPrice(o.totalAmount)}</TableCell>
                         <TableCell>
                           {getStatusBadge(o.status)}
                         </TableCell>
