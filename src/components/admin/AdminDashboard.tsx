@@ -533,17 +533,17 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] p-4 md:p-8">
+    <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-purple-600 p-3 rounded-2xl shadow-lg shadow-purple-200">
-            <Zap className="h-8 w-8 text-white fill-white" />
+        <div className="flex items-center gap-2 mb-4 md:mb-6">
+          <div className="bg-purple-600 p-2 rounded-xl shadow-lg shadow-purple-200">
+            <Zap className="h-6 w-6 text-white fill-white" />
           </div>
           <div className="flex-1">
-            <h1 className="text-3xl font-black text-black italic tracking-tighter">Admin dashboard</h1>
-            <p className="text-gray-500 font-bold  text-xs tracking-widest">Manage your store products and orders</p>
+            <h1 className="text-xl md:text-2xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
+            <p className="text-gray-500 font-bold text-[8px] tracking-widest mt-0.5">Inventory & Orders</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
               <DialogTrigger
                 render={(props) => (
@@ -551,146 +551,138 @@ export default function AdminDashboard() {
                     {...props}
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-purple-200 gap-2 transition-all bg-white"
+                      "rounded-lg border-2 font-black text-[8px] px-3 h-9 border-gray-100 hover:border-purple-200 gap-1.5 transition-all bg-white"
                     )}
                   >
-                    <Plus className="h-4 w-4" /> New category
+                    <Plus className="h-3.5 w-3.5" /> Category
                   </button>
                 )}
               />
-              <DialogContent className="rounded-3xl">
+              <DialogContent className="rounded-3xl max-w-sm">
                 <DialogHeader>
-                  <DialogTitle className="text-xl font-black  tracking-tighter">Add category</DialogTitle>
+                  <DialogTitle className="text-lg font-black tracking-tighter">Add category</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleAddCategory} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="cat-name">Category name</Label>
+                <form onSubmit={handleAddCategory} className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="cat-name" className="text-[10px]">Name</Label>
                     <Input
                       id="cat-name"
                       value={newCategoryName}
                       onChange={(e) => setNewCategoryName(e.target.value)}
                       required
-                      className="rounded-xl"
-                      placeholder="e.g. Tech, Shoes"
+                      className="rounded-xl h-10"
+                      placeholder="Tech, Shoes"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cat-image">Icon/Image URL</Label>
+                  <div className="space-y-1">
+                    <Label htmlFor="cat-image" className="text-[10px]">Image URL</Label>
                     <Input
                       id="cat-image"
                       value={newCategoryImage}
                       onChange={(e) => setNewCategoryImage(e.target.value)}
                       required
-                      className="rounded-xl"
-                      placeholder="https://images.unsplash.com/..."
+                      className="rounded-xl h-10"
+                      placeholder="https://..."
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-12" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
                     {isLoading ? 'Creating...' : 'Create category'}
                   </Button>
                 </form>
               </DialogContent>
             </Dialog>
-            <div className="relative w-64 md:w-80">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <div className="relative w-40 md:w-60">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
               <Input
-                placeholder="Search products or orders..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 rounded-xl border-gray-200 focus:border-purple-500 transition-all bg-white"
+                className="pl-8 h-9 rounded-lg border-gray-200 focus:border-purple-500 transition-all bg-white text-xs"
+              />
+            </div>
+          </div>
+        </div>
               />
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="rounded-3xl border-none shadow-lg shadow-gray-200/50 bg-gradient-to-br from-white to-green-50/30">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-green-100 rounded-xl">
-                  <TrendingUp className="h-5 w-5 text-purple-600" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50 bg-gradient-to-br from-white to-green-50/30">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div className="p-1.5 bg-green-100 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-xs font-black  tracking-widest mb-1">Total revenue</p>
-              <h3 className="text-2xl font-black italic tracking-tighter text-black">{formatPrice(stats.totalSales)}</h3>
-              <div className="mt-2 flex items-center text-[10px] text-green-600 font-bold">
-                Gross sales from orders
-              </div>
+              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Sales</p>
+              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.totalSales)}</h3>
             </CardContent>
           </Card>
-          <Card className="rounded-3xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-red-100 rounded-xl">
-                  <TrendingDown className="h-5 w-5 text-red-600" />
+          <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div className="p-1.5 bg-red-100 rounded-lg">
+                  <TrendingDown className="h-4 w-4 text-red-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-xs font-black  tracking-widest mb-1">Total expenses</p>
-              <h3 className="text-2xl font-black italic tracking-tighter text-black">{formatPrice(stats.expenses)}</h3>
-              <div className="mt-2 flex items-center text-[10px] text-red-600 font-bold">
-                Operational costs
-              </div>
+              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Expenses</p>
+              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.expenses)}</h3>
             </CardContent>
           </Card>
-          <Card className="rounded-3xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-purple-100 rounded-xl">
-                  <DollarSign className="h-5 w-5 text-purple-600" />
+          <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div className="p-1.5 bg-purple-100 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-xs font-black  tracking-widest mb-1">Profit / Loss</p>
-              <h3 className={`text-2xl font-black italic tracking-tighter ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Profit</p>
+              <h3 className={`text-lg font-black italic tracking-tighter leading-tight ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPrice(stats.profit)}
               </h3>
-              <div className={`mt-2 flex items-center text-[10px] font-bold ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {stats.profit >= 0 ? 'Surplus recorded' : 'Deficit detected'}
-              </div>
             </CardContent>
           </Card>
-          <Card className="rounded-3xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-blue-100 rounded-xl">
-                  <Package className="h-5 w-5 text-blue-600" />
+          <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
+            <CardContent className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                <div className="p-1.5 bg-blue-100 rounded-lg">
+                  <Package className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-xs font-black  tracking-widest mb-1">Inventory flow</p>
-              <h3 className="text-2xl font-black italic tracking-tighter text-black">
+              <p className="text-gray-500 text-[8px] font-black tracking-widest mb-0.5 uppercase">Inventory</p>
+              <h3 className="text-lg font-black italic tracking-tighter text-black leading-tight">
                 <span className="text-green-600">{stats.totalStockIn}</span>
                 <span className="text-gray-300 mx-1">/</span>
                 <span className="text-red-500">{stats.totalStockOut}</span>
               </h3>
-              <div className="mt-2 flex items-center text-[10px] text-gray-500 font-bold">
-                Stock in / Stock out (total)
-              </div>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white p-1 rounded-2xl shadow-sm border border-gray-100 flex-wrap h-auto gap-1">
-            <TabsTrigger value="overview" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <BarChart3 className="h-4 w-4 mr-2" /> Overview
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="bg-white p-0.5 rounded-xl shadow-sm border border-gray-100 flex-wrap h-auto gap-0.5">
+            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <Package className="h-4 w-4 mr-2" /> Products
+            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Products
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <LayoutGrid className="h-4 w-4 mr-2" /> Gallery
+            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Gallery
             </TabsTrigger>
-            <TabsTrigger value="orders" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <ShoppingCart className="h-4 w-4 mr-2" /> Orders
+            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <UserIcon className="h-4 w-4 mr-2" /> Admins
+            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Admins
             </TabsTrigger>
-            <TabsTrigger value="emails" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <Mail className="h-4 w-4 mr-2" /> Logs
+            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Logs
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-xl font-black  tracking-tighter px-8 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-              <Wallet className="h-4 w-4 mr-2" /> Settings
+            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-[10px] data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Settings
             </TabsTrigger>
           </TabsList>
 
@@ -803,34 +795,34 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="products" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <TabsContent value="products" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
               {/* Add Product Form */}
-              <Card className="lg:col-span-1 rounded-3xl border-none shadow-xl shadow-gray-200/50">
-                <CardHeader>
-                  <CardTitle className="text-xl font-black  tracking-tighter">Add new product</CardTitle>
+              <Card className="lg:col-span-1 rounded-2xl border-none shadow-xl shadow-gray-200/50">
+                <CardHeader className="py-4">
+                  <CardTitle className="text-lg font-black tracking-tighter">Add product</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleAddProduct} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name">Product name</Label>
-                      <Input id="name" name="name" required className="rounded-xl border-2 focus:border-purple-500" />
+                  <form onSubmit={handleAddProduct} className="space-y-3">
+                    <div className="space-y-1">
+                      <Label className="text-[10px]">Product name</Label>
+                      <Input id="name" name="name" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="price">Price ($)</Label>
-                        <Input id="price" name="price" type="number" step="0.01" required className="rounded-xl border-2 focus:border-purple-500" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Price ($)</Label>
+                        <Input id="price" name="price" type="number" step="0.01" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="oldPrice">Old price ($)</Label>
-                        <Input id="oldPrice" name="oldPrice" type="number" step="0.01" className="rounded-xl border-2 focus:border-purple-500" />
+                      <div className="space-y-1">
+                        <Label className="text-[10px]">Stock</Label>
+                        <Input id="stock" name="stock" type="number" defaultValue="100" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="categoryId">Category</Label>
+                    <div className="space-y-1">
+                      <Label className="text-[10px]">Category</Label>
                       <Select value={newCategoryId} onValueChange={setNewCategoryId} required>
-                        <SelectTrigger className="rounded-xl border-2 w-full h-11">
-                          <SelectValue placeholder="Select a category" />
+                        <SelectTrigger className="rounded-lg border-2 w-full h-10 text-xs">
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
                           {categories.map((cat) => (
@@ -841,210 +833,97 @@ export default function AdminDashboard() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="image">Product image</Label>
-                      <div className="flex flex-col gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-[10px]">Image</Label>
+                      <div className="flex flex-col gap-2">
                         <Input
                           id="image"
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleImageUpload(e, 'new')}
-                          className="rounded-xl border-2 focus:border-purple-500 h-auto py-2 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                          className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-purple-50 file:text-purple-700"
                         />
                         {newProductImage && (
-                          <div className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-gray-100 bg-gray-50">
+                          <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
                              <img src={newProductImage} className="w-full h-full object-cover" />
                              <Button
                                type="button"
                                variant="destructive"
-                               size="icon-xs"
-                               className="absolute top-2 right-2 rounded-full shadow-lg"
+                               size="icon"
+                               className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full"
                                onClick={() => setNewProductImage("")}
                              >
-                               <Trash2 className="h-3 w-3" />
+                               <Trash2 className="h-2 w-2" />
                              </Button>
                           </div>
                         )}
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="tag">Tag (e.g. -50%)</Label>
-                        <Input id="tag" name="tag" className="rounded-xl border-2 focus:border-purple-500" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="stock">Available stock</Label>
-                        <Input id="stock" name="stock" type="number" defaultValue="100" required className="rounded-xl border-2 focus:border-purple-500" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="sold">Sold count (e.g. 5k+)</Label>
-                      <Input id="sold" name="sold" className="rounded-xl border-2 focus:border-purple-500" />
-                    </div>
-                    <div className="space-y-2">
-                       <Label htmlFor="description">Product description</Label>
-                       <Textarea id="description" name="description" placeholder="Describe the features and details..." className="rounded-xl border-2 focus:border-purple-500 min-h-[100px]" />
-                    </div>
-                    <div className="space-y-2">
-                       <Label htmlFor="prescription">Prescription / Special instructions</Label>
-                       <Textarea id="prescription" name="prescription" placeholder="Usage instructions or health notes..." className="rounded-xl border-2 focus:border-purple-500" />
-                    </div>
-                    <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-12 mt-4" disabled={isLoading}>
-                      <Plus className="h-5 w-5 mr-2" /> {isLoading ? 'Adding...' : 'Add product'}
+                    <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-lg h-10 text-xs mt-2" disabled={isLoading}>
+                      <Plus className="h-4 w-4 mr-1.5" /> {isLoading ? 'Adding...' : 'Add product'}
                     </Button>
                   </form>
                 </CardContent>
               </Card>
 
               {/* Product List */}
-              <Card className="lg:col-span-2 rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="text-xl font-black  tracking-tighter">Product inventory</CardTitle>
+              <Card className="lg:col-span-3 rounded-2xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
+                <CardHeader className="py-4">
+                  <CardTitle className="text-lg font-black tracking-tighter">Inventory</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-gray-50">
                         <TableRow>
-                          <TableHead className="font-black  text-[10px] tracking-widest">Product</TableHead>
-                          <TableHead className="font-black  text-[10px] tracking-widest">Category</TableHead>
-                          <TableHead className="font-black  text-[10px] tracking-widest">Price</TableHead>
-                          <TableHead className="font-black  text-[10px] tracking-widest">Stock</TableHead>
-                          <TableHead className="font-black  text-[10px] tracking-widest text-right">Actions</TableHead>
+                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Item</TableHead>
+                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Price</TableHead>
+                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2">Stock</TableHead>
+                          <TableHead className="font-black text-[9px] tracking-widest uppercase py-2 text-right">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {filteredProducts.map((p) => (
                           <TableRow key={p.id} className="hover:bg-green-50/30 transition-colors">
-                            <TableCell className="font-bold">
-                              <div className="flex items-center gap-3">
+                            <TableCell className="font-bold py-2">
+                              <div className="flex items-center gap-2">
                                 <img
                                   src={p.image}
-                                  className="w-10 h-10 rounded-lg object-cover"
+                                  className="w-7 h-7 rounded-md object-cover"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                                   }}
                                 />
-                                <span>{p.name}</span>
+                                <span className="text-[11px] truncate max-w-[100px]">{p.name}</span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-gray-500 font-medium">{p.category}</TableCell>
-                            <TableCell className="font-black text-purple-600">{formatPrice(p.price)}</TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold`}>
-                                {p.stock || 0} left
+                            <TableCell className="font-black text-purple-600 text-[11px] py-2">{formatPrice(p.price)}</TableCell>
+                            <TableCell className="py-2">
+                              <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold text-[9px] h-5`}>
+                                {p.stock || 0}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Dialog open={editingProduct?.id === p.id} onOpenChange={(open) => {
-                                  if (!open) {
-                                    setEditingProduct(null);
-                                    setEditProductImage("");
-                                    setEditCategoryId("");
-                                  }
-                                }}>
-                                  <DialogTrigger
-                                    render={(props) => (
-                                      <button
-                                        {...props}
-                                        className={cn(
-                                          buttonVariants({ variant: "ghost", size: "icon" }),
-                                          "text-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-colors"
-                                        )}
-                                        onClick={(e) => {
-                                          props.onClick?.(e);
-                                          setEditingProduct(p);
-                                          setEditCategoryId(categories.find(c => c.name === (p.category_name || p.category))?.id?.toString() || "");
-                                        }}
-                                      >
-                                        <Edit className="h-4 w-4" />
-                                      </button>
-                                    )}
-                                  />
-                                  <DialogContent className="rounded-3xl">
-                                    <DialogHeader>
-                                      <DialogTitle className="text-xl font-black  tracking-tighter">Edit product</DialogTitle>
-                                    </DialogHeader>
-                                    <form onSubmit={handleUpdateProduct} className="space-y-4">
-                                      <div className="space-y-2">
-                                        <Label htmlFor="edit-name">Product name</Label>
-                                        <Input id="edit-name" name="name" defaultValue={p.name} required className="rounded-xl" />
-                                      </div>
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                          <Label htmlFor="edit-price">Price ($)</Label>
-                                          <Input id="edit-price" name="price" type="number" step="0.01" defaultValue={p.price} required className="rounded-xl" />
-                                        </div>
-                                        <div className="space-y-2">
-                                          <Label htmlFor="edit-oldPrice">Old price ($)</Label>
-                                          <Input id="edit-oldPrice" name="oldPrice" type="number" step="0.01" defaultValue={p.oldPrice} className="rounded-xl" />
-                                        </div>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <Label htmlFor="edit-categoryId">Category</Label>
-                                        <Select value={editCategoryId} onValueChange={setEditCategoryId}>
-                                          <SelectTrigger className="rounded-xl border-2 w-full h-11">
-                                            <SelectValue placeholder="Select a category" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            {categories.map((cat) => (
-                                              <SelectItem key={cat.id} value={cat.id.toString()}>
-                                                {cat.name}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <Label htmlFor="edit-image">Product image</Label>
-                                        <div className="flex flex-col gap-3">
-                                          <Input
-                                            id="edit-image"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => handleImageUpload(e, 'edit')}
-                                            className="rounded-xl border-2 h-auto py-2 file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                                          />
-                                          <div className="relative w-full aspect-square rounded-xl overflow-hidden border-2 border-gray-100 bg-gray-50">
-                                             <img src={editProductImage || p.image} className="w-full h-full object-cover" />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                          <Label htmlFor="edit-tag">Tag</Label>
-                                          <Input id="edit-tag" name="tag" defaultValue={p.tag} className="rounded-xl" />
-                                        </div>
-                                        <div className="space-y-2">
-                                          <Label htmlFor="edit-stock">Stock (Restock)</Label>
-                                          <Input id="edit-stock" name="stock" type="number" defaultValue={p.stock || 0} required className="rounded-xl border-purple-200 focus:border-purple-500" />
-                                        </div>
-                                        <div className="space-y-2">
-                                          <Label htmlFor="edit-sold">Items sold</Label>
-                                          <Input id="edit-sold" name="sold" type="number" defaultValue={p.sold || 0} required className="rounded-xl" />
-                                        </div>
-                                      </div>
-                                      <div className="space-y-2">
-                                        <Label htmlFor="edit-description">Description</Label>
-                                        <Textarea id="edit-description" name="description" defaultValue={p.description} className="rounded-xl" />
-                                      </div>
-                                      <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-12" disabled={isLoading}>
-                                        {isLoading ? 'Saving...' : 'Save changes'}
-                                      </Button>
-                                    </form>
-                                  </DialogContent>
-                                </Dialog>
-                                <button
-                                  onClick={() => handleDeleteProduct(p.id)}
-                                  className={cn(
-                                    buttonVariants({ variant: "ghost", size: "icon" }),
-                                    "text-red-500 hover:text-red-700 hover:bg-red-50"
-                                  )}
-                                  title="Delete product"
+                            <TableCell className="text-right py-2">
+                              <div className="flex justify-end gap-1.5 pr-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-blue-500"
+                                  onClick={() => {
+                                    setEditingProduct(p);
+                                    setEditCategoryId(categories.find(c => c.name === (p.category_name || p.category))?.id?.toString() || "");
+                                  }}
                                 >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
+                                  <Edit className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-red-500"
+                                  onClick={() => handleDeleteProduct(p.id)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>

@@ -206,13 +206,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px] w-[95vw] rounded-3xl border-none p-4 sm:p-6">
-        <DialogHeader>
-          <DialogTitle className="text-xl sm:text-2xl font-black text-center italic tracking-tighter">
+      <DialogContent className="sm:max-w-[350px] w-[92vw] rounded-[28px] border-none p-4 sm:p-5">
+        <DialogHeader className="mb-2">
+          <DialogTitle className="text-lg sm:text-xl font-black text-center italic tracking-tighter">
             Welcome to <span className="text-purple-600">Vivi</span>
           </DialogTitle>
-          <DialogDescription className="text-center font-medium text-xs sm:text-sm">
-            Sign in to your account or create a new one.
+          <DialogDescription className="text-center font-bold text-[10px] sm:text-[11px] uppercase tracking-widest opacity-60">
+            Sign in or create account
           </DialogDescription>
         </DialogHeader>
 
@@ -244,34 +244,34 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <>
               <TabsContent value="profile">
                 <div className="space-y-4 sm:space-y-6 pt-2">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24 mx-auto">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-purple-400 to-purple-600 rounded-[28px] sm:rounded-[32px] flex items-center justify-center text-white text-3xl sm:text-4xl font-black shadow-xl shadow-purple-100 rotate-3">
+                  <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-[24px] sm:rounded-[28px] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-xl shadow-purple-100 rotate-3">
                       {user.displayName?.charAt(0) || user.email?.charAt(0)}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 sm:-bottom-2 sm:-right-2 bg-green-500 border-4 border-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white">
-                       <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                    <div className="absolute -bottom-1 -right-1 sm:-bottom-1.5 sm:-right-1.5 bg-green-500 border-2 border-white w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white">
+                       <CheckCircle2 className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                     </div>
                   </div>
                   
-                  <div className="text-center space-y-1">
-                    <h3 className="text-xl sm:text-2xl font-black  tracking-tighter truncate">{user.displayName || 'Shop Explorer'}</h3>
-                    <p className="text-[9px] sm:text-xs font-bold text-gray-400  tracking-widest">{user.email}</p>
+                  <div className="text-center space-y-0.5">
+                    <h3 className="text-lg sm:text-xl font-black  tracking-tighter truncate">{user.displayName || 'Explorer'}</h3>
+                    <p className="text-[8px] sm:text-[9px] font-bold text-gray-400  tracking-widest uppercase">{user.email}</p>
                   </div>
 
-                  <div className="bg-green-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 border-green-100 flex items-center justify-between">
+                  <div className="bg-green-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-green-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[9px] font-black text-purple-600  tracking-widest uppercase">Vivi Status</p>
-                      <h4 className="text-base sm:text-lg font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
+                      <p className="text-[7px] font-black text-purple-600  tracking-widest uppercase">Vivi Status</p>
+                      <h4 className="text-sm sm:text-base font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
                     </div>
-                    <div className="bg-purple-600 p-1.5 sm:p-2 rounded-xl text-white">
-                       <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
+                    <div className="bg-purple-600 p-1 sm:p-1.5 rounded-lg text-white">
+                       <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                   </div>
 
-                  <Button 
+                    <Button
                     onClick={() => signOut(auth).then(() => onClose())}
                     variant="ghost"
-                    className="w-full rounded-2xl h-12 sm:h-14 font-black  tracking-widest text-[9px] sm:text-[10px] text-red-500 hover:bg-red-50 hover:text-red-600"
+                    className="w-full rounded-xl h-10 sm:h-12 font-black  tracking-widest text-[8px] sm:text-[9px] text-red-500 hover:bg-red-50 hover:text-red-600"
                   >
                     Sign out securely
                   </Button>
@@ -358,19 +358,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                <Input
                                  name="email"
                                  type="email"
-                                 placeholder="hello@vivo.co"
+                                 placeholder="hello@vivi.co"
                                  required
                                  autoComplete="username"
-                                 className="pl-12 h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all"
+                                 className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm"
                                />
-                               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
+                               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                              </div>
                           </div>
-                          <div className="space-y-2">
-                             <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Secure Password</Label>
+                          <div className="space-y-1.5">
+                             <Label className="text-[9px] font-black  tracking-widest text-gray-400 ml-1">Secure Password</Label>
                              <div className="relative">
-                               <Input name="password" type="password" placeholder="••••••••" required autoComplete="current-password" className="pl-12 h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all" />
-                               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
+                               <Input name="password" type="password" placeholder="••••••••" required autoComplete="current-password" className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm" />
+                               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                              </div>
                           </div>
                         </div>
@@ -384,10 +384,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         </div>
                       )}
 
-                      <Button type="submit" disabled={isLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl h-16 shadow-2xl shadow-purple-200 transition-all active:scale-95 text-lg group">
+                      <Button type="submit" disabled={isLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-14 shadow-2xl shadow-purple-200 transition-all active:scale-95 text-base group">
                         {isLoading ? 'Preparing...' : (
                           <div className="flex items-center gap-2">
-                             Send Secure OTP <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                             Secure Entry <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </div>
                         )}
                       </Button>
