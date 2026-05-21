@@ -16,7 +16,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
           <div className="space-y-6">
             <h3 className="text-sm font-black  tracking-widest text-white italic">About Vivo</h3>
             <p className="text-xs font-bold text-gray-400 leading-relaxed italic">
-              Vivo.co is Africa's fastest-growing e-commerce destination. Our mission is to bridge the gap between quality and affordability, bringing world-class products to your doorstep with unmatched speed and security.
+              Vivi.co is Africa's fastest-growing e-commerce destination. Our mission is to bridge the gap between quality and affordability, bringing world-class products to your doorstep with unmatched speed and security.
             </p>
             <div className="pt-2">
               <p className="text-[10px] font-black text-purple-600  tracking-widest">Our Vision</p>
@@ -28,7 +28,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
           <div className="space-y-6">
             <h2 className="text-2xl font-black tracking-tighter  italic">Vivo<span className="text-purple-600">.co</span></h2>
             <p className="text-gray-400 text-sm leading-relaxed font-medium">
-              Join the Vivo.co community and stay updated with our latest offers!
+              Join the Vivi.co community and stay updated with our latest offers!
             </p>
             <div className="relative">
               <Input 
@@ -52,7 +52,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-purple-600 shrink-0" />
-                <span>+234 (0) 800-VIVO</span>
+                <span>+234 (0) 800-VIVI</span>
               </li>
               <li className="flex items-center gap-3" onClick={() => onOpenInfoPage?.('Help')}>
                 <Mail className="h-5 w-5 text-purple-600 shrink-0" />
@@ -98,7 +98,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
         {/* Bottom Footer */}
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-[10px] font-black  tracking-widest text-gray-500">
-            © 2024 Vivo.co - All rights reserved
+            © 2024 Vivi.co - All rights reserved
           </p>
           
           <div className="flex items-center gap-4">

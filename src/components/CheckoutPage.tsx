@@ -514,14 +514,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                  <div className="space-y-2 md:space-y-3">
                     <h2 className="text-3xl md:text-5xl font-black tracking-tighter italic leading-none">Order <br /><span className="text-purple-600">Successful!</span></h2>
                     <p className="text-gray-400 font-bold text-[8px] md:text-[10px] tracking-widest leading-relaxed pt-1 md:pt-2">
-                      Your premium Vivo order has been placed. <br className="hidden md:block" /> Check your email for confirmation.
+                      Your premium Vivi order has been placed. <br className="hidden md:block" /> Check your email for confirmation.
                     </p>
                  </div>
 
                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
                        <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Order Ref</p>
-                       <p className="text-[10px] md:text-sm font-black">#VIVO-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
+                       <p className="text-[10px] md:text-sm font-black">#VIVI-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
                     </div>
                     <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
                        <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Arrival Date</p>

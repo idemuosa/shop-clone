@@ -1431,6 +1431,18 @@ export default function AdminDashboard() {
                           <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-12" />
                         </div>
                         <div className="space-y-2">
+                                                  <Label>Bank account number</Label>
+                                                  <Input name="bankAccountNumber" defaultValue={settings?.bankAccountNumber} className="rounded-xl h-12" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                  <Label>Bank name</Label>
+                                                  <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-12" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                                                              <Label>Account  Name</Label>
+                                                                                                  <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-12" />
+                                                                                                </div>
+                        <div className="space-y-2">
                           <Label>Airtime / phone number</Label>
                           <Input name="momoNumber" defaultValue={settings?.momoNumber} className="rounded-xl h-12" />
                         </div>
