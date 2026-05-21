@@ -173,7 +173,3 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
     </Sheet>
   );
 }
-      </SheetContent>
-    </Sheet>
-  );
-}

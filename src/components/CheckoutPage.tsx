@@ -362,7 +362,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                           <div className="flex flex-col gap-1">
                                              <span className="text-[8px] font-black text-purple-400 tracking-widest uppercase">Account Number</span>
                                              <div className="flex items-center justify-between gap-2">
-                                                <span className="text-2xl md:text-4xl font-black tracking-[0.1em] md:tracking-[0.2em] text-purple-600 font-mono break-all">{storeSettings?.bankAccountNumber || '0123456789'}</span>
+                                                <span className="text-2xl md:text-4xl font-black tracking-[0.1em] md:tracking-[0.2em] text-purple-600 break-all">{storeSettings?.bankAccountNumber || '0123456789'}</span>
                                                 <Button
                                                    variant="ghost"
                                                    size="icon"
@@ -521,7 +521,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                  <div className="grid grid-cols-2 gap-3 md:gap-4">
                     <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
                        <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Order Ref</p>
-                       <p className="text-[10px] md:text-sm font-black font-mono">#VIVO-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
+                       <p className="text-[10px] md:text-sm font-black">#VIVO-{Math.random().toString(36).slice(-6).toUpperCase()}</p>
                     </div>
                     <div className="bg-gray-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border border-gray-100">
                        <p className="text-[8px] md:text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">Arrival Date</p>

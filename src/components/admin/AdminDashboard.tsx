@@ -1172,7 +1172,7 @@ export default function AdminDashboard() {
                   <TableBody>
                     {filteredOrders.map((o) => (
                       <TableRow key={o.id} className="group hover:bg-green-50/30 transition-colors">
-                        <TableCell className="font-mono text-[10px] text-gray-500">#{o.id.slice(-6).toUpperCase()}</TableCell>
+                        <TableCell className="text-[10px] text-gray-500">#{o.id.slice(-6).toUpperCase()}</TableCell>
                         <TableCell className="font-bold text-sm">
                           {o.customerEmail}
                         </TableCell>

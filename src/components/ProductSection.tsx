@@ -1559,7 +1559,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                         <div className="pt-6 border-t border-dashed border-gray-200">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-gray-500 font-medium text-sm">Subtotal</span>
-                            <span className="font-bold text-sm font-mono">{formatPrice((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price.toString().replace(/[^\d.]/g, ''))) * (productQuantities[selectedProduct.id] || 1))}</span>
+                            <span className="font-bold text-sm">{formatPrice((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price.toString().replace(/[^\d.]/g, ''))) * (productQuantities[selectedProduct.id] || 1))}</span>
                           </div>
                           <div className="flex justify-between items-center mb-4">
                             <span className="text-gray-500 font-medium text-sm">Shipping</span>
@@ -1567,7 +1567,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="font-black  tracking-widest text-lg">Total</span>
-                            <span className="text-2xl font-black text-purple-600 font-mono tracking-tighter">
+                            <span className="text-2xl font-black text-purple-600 tracking-tighter">
                               {formatPrice((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price.toString().replace(/[^\d.]/g, ''))) * (productQuantities[selectedProduct.id] || 1))}
                             </span>
                           </div>
