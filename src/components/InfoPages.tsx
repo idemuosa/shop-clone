@@ -35,8 +35,8 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       a: "Yes, absolutely! We use industry-standard SSL encryption and partner with trusted payment processors to ensure your data is always protected. We never store your full credit card information on our servers."
     },
     {
-      q: "How do I become a seller on Vivo?",
-      a: "We're always looking for great brands! Click the 'Sell on Vivo' link in the footer or visit the 'Brands' page to submit your application. Our team will review your profile and get back to you within 48 hours."
+      q: "How do I become a seller on Vivi?",
+      a: "We're always looking for great brands! Click the 'Sell on Vivi' link in the footer or visit the 'Brands' page to submit your application. Our team will review your profile and get back to you within 48 hours."
     }
   ];
 
@@ -75,7 +75,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                 <div className="bg-white/20 w-fit p-3 rounded-2xl mb-6 backdrop-blur-md">
                    <Zap className="h-10 w-10 text-yellow-400 fill-yellow-400" />
                 </div>
-                <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-4">The Vivo <span className="text-yellow-400">Flash Sale</span></h2>
+                <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-4">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
                 <p className="text-purple-100 text-lg max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
               </div>
               <Zap className="absolute right-[-20px] bottom-[-20px] h-64 w-64 text-white/10 rotate-12" />
@@ -111,7 +111,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
           <div className="max-w-3xl mx-auto space-y-12">
             <div className="text-center space-y-4">
               <h2 className="text-4xl font-black uppercase italic tracking-tighter">How can we <span className="text-purple-600">help?</span></h2>
-              <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Support is available 24/7 for the Vivo community</p>
+              <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Support is available 24/7 for the Vivi community</p>
             </div>
 
             <div className="space-y-4">
@@ -285,7 +285,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
              </div>
 
              <div className="bg-purple-50 p-12 rounded-[40px] text-center border-2 border-purple-100">
-                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Sell your brand on <span className="text-purple-600 italic">Vivo</span></h3>
+                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Sell your brand on <span className="text-purple-600 italic">Vivi</span></h3>
                 <p className="text-gray-500 font-medium mb-8 max-w-xl mx-auto">Join thousands of successful brands reaching millions of customers worldwide through our high-velocity sales platform.</p>
                 <Button className="bg-purple-600 text-white font-black rounded-2xl px-12 h-16 shadow-xl shadow-purple-200 text-lg uppercase tracking-tighter">
                   Apply to Sell

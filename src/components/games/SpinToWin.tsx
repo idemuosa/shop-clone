@@ -21,7 +21,7 @@ const rewards = [
   { text: 'FREE SHIPPING', color: '#9333ea', value: 'FREESHIP' },
   { text: 'NO LUCK', color: '#71717a', value: null },
   { text: '20% OFF', color: '#9333ea', value: 'SAVE20' },
-  { text: 'SURPRISE', color: '#18181b', value: 'VIVO2026' },
+  { text: 'SURPRISE', color: '#18181b', value: 'VIVI2026' },
   { text: '$5 CREDIT', color: '#9333ea', value: 'CASH5' },
   { text: 'TRY AGAIN', color: '#71717a', value: null },
 ];
@@ -106,7 +106,7 @@ export default function SpinToWin() {
               <div className="mb-4">
                 <BadgeCheck className="h-8 w-8 text-purple-600 mx-auto mb-2" />
                 <h2 className="text-xl font-black uppercase tracking-tighter italic">Lucky <span className="text-purple-600">Spin</span></h2>
-                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Win exclusive Vivo rewards</p>
+                <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Win exclusive Vivi rewards</p>
               </div>
 
               {/* Wheel Container */}

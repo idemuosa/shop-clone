@@ -538,7 +538,7 @@ export default function App() {
     <AuthProvider>
       <CurrencyProvider>
         <CartProvider>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivo...</div>}>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivi...</div>}>
             <MainContent />
           </Suspense>
           <Toaster position="top-center" richColors />

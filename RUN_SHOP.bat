@@ -1,5 +1,5 @@
 @echo off
-echo Starting Vivo Shop - Hybrid Architecture...
+echo Starting Vivi Shop - Hybrid Architecture...
 
 :: Check if backend venv exists, if not, warn user
 if not exist backend\venv\Scripts\python.exe (
@@ -10,7 +10,7 @@ if not exist backend\venv\Scripts\python.exe (
 )
 
 :: Start Backend in a new window
-start "Vivo Backend" cmd /c "cd backend && venv\Scripts\python.exe run.py"
+start "Vivi Backend" cmd /c "cd backend && venv\Scripts\python.exe run.py"
 
 :: Start Frontend in current window
 echo Starting Frontend...

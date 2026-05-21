@@ -14,7 +14,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-16">
           {/* About Us */}
           <div className="space-y-6">
-            <h3 className="text-sm font-black  tracking-widest text-white italic">About Vivo</h3>
+            <h3 className="text-sm font-black  tracking-widest text-white italic">About Vivi</h3>
             <p className="text-xs font-bold text-gray-400 leading-relaxed italic">
               Vivi.co is Africa's fastest-growing e-commerce destination. Our mission is to bridge the gap between quality and affordability, bringing world-class products to your doorstep with unmatched speed and security.
             </p>
@@ -26,7 +26,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
 
           {/* Brand & Newsletter */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-black tracking-tighter  italic">Vivo<span className="text-purple-600">.co</span></h2>
+            <h2 className="text-2xl font-black tracking-tighter  italic">Vivi<span className="text-purple-600">.co</span></h2>
             <p className="text-gray-400 text-sm leading-relaxed font-medium">
               Join the Vivi.co community and stay updated with our latest offers!
             </p>
@@ -56,7 +56,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
               </li>
               <li className="flex items-center gap-3" onClick={() => onOpenInfoPage?.('Help')}>
                 <Mail className="h-5 w-5 text-purple-600 shrink-0" />
-                <span className="cursor-pointer hover:text-purple-600 transition-colors">support@vivo.co</span>
+                <span className="cursor-pointer hover:text-purple-600 transition-colors">support@vivi.co</span>
               </li>
             </ul>
           </div>

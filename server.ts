@@ -96,12 +96,12 @@ app.post("/api/send-otp", async (req, res) => {
 
     try {
       const { data, error } = await resendClient.emails.send({
-        from: "Vivo Shop <onboarding@resend.dev>",
+        from: "Vivi Shop <onboarding@resend.dev>",
         to: [email],
-        subject: `${otp} is your Vivo verification code`,
+        subject: `${otp} is your Vivi verification code`,
         html: `
           <div style="font-family: sans-serif; padding: 20px; color: #333; text-align: center; border: 1px solid #eee; border-radius: 20px; max-width: 400px; margin: auto;">
-            <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivo</h1>
+            <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivi</h1>
             <p style="font-size: 16px; color: #666;">Your verification code is below:</p>
             <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 20px auto; width: fit-content;">
               <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">${otp}</span>
@@ -195,14 +195,14 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   if (resendClient && email) {
     try {
       const userEmail = resendClient.emails.send({
-        from: "Vivo Shop <onboarding@resend.dev>",
+        from: "Vivi Shop <onboarding@resend.dev>",
         to: [email],
         subject: `Order Confirmation #${orderId.slice(-8).toUpperCase()}`,
         html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
       });
 
       const adminNotif = resendClient.emails.send({
-        from: "Vivo Shop <onboarding@resend.dev>",
+        from: "Vivi Shop <onboarding@resend.dev>",
         to: [adminEmail || 'idemudiawisdom27@gmail.com'],
         subject: `NEW ORDER: #${orderId.slice(-8).toUpperCase()}`,
         html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,

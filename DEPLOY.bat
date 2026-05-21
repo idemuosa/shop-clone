@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo Deploying Vivo Shop to Firebase...
+echo Deploying Vivi Shop to Firebase...
 echo ==========================================
 
 :: 1. Check for Firebase CLI

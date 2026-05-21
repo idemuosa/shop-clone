@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 echo ==========================================
-echo Fixing Vivo Backend Requirements...
+echo Fixing Vivi Backend Requirements...
 echo ==========================================
 cd backend
 

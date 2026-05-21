@@ -233,7 +233,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                            <Truck className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
                         </div>
                         <div>
-                          <h4 className="font-black italic tracking-tighter text-green-900 text-sm md:text-base leading-none mb-1">Vivo Express Delivery</h4>
+                          <h4 className="font-black italic tracking-tighter text-green-900 text-sm md:text-base leading-none mb-1">Vivi Express Delivery</h4>
                           <p className="text-[9px] md:xs text-green-700 font-bold leading-relaxed">
                             Eligible for FREE same-day delivery!
                           </p>
@@ -441,7 +441,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                    <div className="w-px h-4 bg-gray-200"></div>
                    <div className="flex items-center gap-2">
                       <Package className="h-5 w-5 text-purple-600" />
-                      <span className="text-[10px] font-black  tracking-widest text-gray-500">Vivo Guarantee</span>
+                      <span className="text-[10px] font-black  tracking-widest text-gray-500">Vivi Guarantee</span>
                    </div>
                    <div className="w-px h-4 bg-gray-200"></div>
                    <div className="flex items-center gap-2">

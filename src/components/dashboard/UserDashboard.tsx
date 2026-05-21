@@ -230,7 +230,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                   <Badge className="bg-purple-600 text-white font-black mb-3 md:mb-4 h-5 md:h-6 text-[9px] md:text-xs">Member special</Badge>
                   <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tighter leading-none italic mb-3 md:mb-4">Get 20% off <br /> your next <span className="text-purple-600">tech purchase</span></h3>
                   <p className="text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed mb-5 md:mb-6">
-                    Valid for all members with over 100 Vivo Coins. Use code <span className="text-white font-black italic">Techsavvy</span>
+                    Valid for all members with over 100 Vivi Coins. Use code <span className="text-white font-black italic">Techsavvy</span>
                   </p>
                   <Button className="bg-white text-black font-black rounded-xl md:rounded-2xl h-10 md:h-12 px-6 md:px-8 text-[10px] md:text-xs hover:bg-green-100 transition-all active:scale-95">
                     Claim voucher
@@ -382,12 +382,12 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
           <div className="space-y-6 pt-4">
              <div className="bg-gradient-to-br from-purple-600 to-indigo-600 p-8 rounded-[32px] text-white relative overflow-hidden shadow-xl shadow-purple-100">
                 <div className="relative z-10">
-                   <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2">Vivo Balance</p>
+                   <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mb-2">Vivi Balance</p>
                    <h3 className="text-4xl font-black italic tracking-tighter mb-8">🪙 {profile?.points || 0} Coins</h3>
                    <div className="flex justify-between items-end">
                       <div>
                          <p className="text-[8px] font-black uppercase opacity-60">Verified Member</p>
-                         <p className="text-xs font-bold">{profile?.displayName || user?.displayName || "Vivo Explorer"}</p>
+                         <p className="text-xs font-bold">{profile?.displayName || user?.displayName || "Vivi Explorer"}</p>
                       </div>
                       <Wallet className="h-8 w-8 opacity-40" />
                    </div>
@@ -466,7 +466,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
       <Dialog open={activeModal === 'sell'} onOpenChange={() => setActiveModal('none')}>
         <DialogContent className="sm:max-w-md rounded-[32px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Sell on <span className="text-purple-600">Vivo</span></DialogTitle>
+            <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Sell on <span className="text-purple-600">Vivi</span></DialogTitle>
             <DialogDescription className="font-bold text-gray-400 uppercase text-[10px] tracking-widest">Start making money today</DialogDescription>
           </DialogHeader>
           <form onSubmit={(e) => {

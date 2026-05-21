@@ -21,7 +21,7 @@ interface Message {
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Hi! I'm your Vivo AI Assistant. I can help you find products, track orders, or answer questions about our policies. How can I help you today?" }
+    { role: 'model', text: "Hi! I'm your Vivi AI Assistant. I can help you find products, track orders, or answer questions about our policies. How can I help you today?" }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -49,16 +49,16 @@ export default function AIAssistant() {
         productCatalog = await pRes.json();
       }
 
-      // 2. Prepare the prompt with Vivo Help Knowledge
+      // 2. Prepare the prompt with Vivi Help Knowledge
       const systemInstruction = `
-        You are "Vivo Assistant", a helpful e-commerce expert for Vivo Shop.
+        You are "Vivi Assistant", a helpful e-commerce expert for Vivi Shop.
         
         VIVO HELP DESK KNOWLEDGE:
         - Order Tracking: Users can track orders in their Account Dashboard or via the confirmation email link.
         - Return Policy: 30-day money-back guarantee. Items must be in original condition.
         - Coupons: Apply codes at the checkout page in the 'Coupon Code' field.
         - Security: We use SSL encryption and secure payment partners.
-        - Selling on Vivo: Users can apply via the 'Brands' page or 'Sell on Vivo' footer link.
+        - Selling on Vivi: Users can apply via the 'Brands' page or 'Sell on Vivi' footer link.
         - Shipping: Free delivery on orders over $140. Same-day delivery available in some areas.
 
         PRODUCT CATALOG:
@@ -143,7 +143,7 @@ export default function AIAssistant() {
                   <Bot className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-black uppercase tracking-tight italic text-sm">Vivo <span className="text-yellow-400">Assistant</span></h3>
+                  <h3 className="font-black uppercase tracking-tight italic text-sm">Vivi <span className="text-yellow-400">Assistant</span></h3>
                   <div className="flex items-center gap-1">
                     <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
                     <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">AI Support Online</span>
@@ -218,7 +218,7 @@ export default function AIAssistant() {
                 </Button>
               </form>
               <p className="text-[9px] text-gray-400 text-center mt-3 font-black uppercase tracking-tighter">
-                Vivo AI Intelligence • Powered by Gemini
+                Vivi AI Intelligence • Powered by Gemini
               </p>
             </div>
           </motion.div>

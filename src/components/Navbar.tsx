@@ -87,7 +87,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             onSearch?.("");
             setSearchTerm("");
           }}>
-            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">Vivo</span>
+            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">Vivi</span>
           </div>
 
           {/* Search Bar - Desktop */}
@@ -281,7 +281,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
               <Zap className="h-3 w-3 fill-purple-600" />
               Top deals
             </span>
-            <span className="flex items-center gap-1 cursor-pointer hover:underline">Sell on Vivo</span>
+            <span className="flex items-center gap-1 cursor-pointer hover:underline">Sell on Vivi</span>
           </div>
         </nav>
       </div>

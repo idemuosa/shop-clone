@@ -365,7 +365,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
         <div className="flex flex-col gap-1">
           <p className="font-bold">Order Placed Successfully!</p>
           <p className="text-[10px]  font-black tracking-widest text-purple-600">
-            Vivo Reward: You saved ${(unitPrice * quantity * 0.9).toFixed(2)} today!
+            Vivi Reward: You saved ${(unitPrice * quantity * 0.9).toFixed(2)} today!
           </p>
           <Button variant="link" className="p-0 h-auto text-[10px] text-blue-600 font-bold  tracking-tighter">
             Share with friends for a $20 Coupon 🎁
@@ -913,7 +913,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                           <div className="grid grid-cols-2 gap-4 mb-8">
                             <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
                               <p className="text-[10px] font-black text-gray-400  tracking-widest mb-1 flex items-center gap-2">
-                                <ShieldCheck className="h-3 w-3 text-green-500" /> Vivo Assurance
+                                <ShieldCheck className="h-3 w-3 text-green-500" /> Vivi Assurance
                               </p>
                               <p className="text-xs font-bold">100% Original Guaranteed</p>
                             </div>

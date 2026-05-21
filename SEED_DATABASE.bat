@@ -1,6 +1,6 @@
 @echo off
 echo ==========================================
-echo Seeding Vivo Shop Database...
+echo Seeding Vivi Shop Database...
 echo ==========================================
 cd backend
 

@@ -209,7 +209,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       <DialogContent className="sm:max-w-[400px] w-[95vw] rounded-3xl border-none p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl font-black text-center italic tracking-tighter">
-            Welcome to <span className="text-purple-600">Vivo</span>
+            Welcome to <span className="text-purple-600">Vivi</span>
           </DialogTitle>
           <DialogDescription className="text-center font-medium text-xs sm:text-sm">
             Sign in to your account or create a new one.
@@ -260,7 +260,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                   <div className="bg-green-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border-2 border-green-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[9px] font-black text-purple-600  tracking-widest uppercase">Vivo Status</p>
+                      <p className="text-[9px] font-black text-purple-600  tracking-widest uppercase">Vivi Status</p>
                       <h4 className="text-base sm:text-lg font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
                     </div>
                     <div className="bg-purple-600 p-1.5 sm:p-2 rounded-xl text-white">

@@ -36,7 +36,7 @@ def send_email(to_email, subject, html_content):
             return False
 
         params = {
-            "from": "Vivo Shop <onboarding@resend.dev>",
+            "from": "Vivi Shop <onboarding@resend.dev>",
             "to": [to_email],
             "subject": subject,
             "html": html_content,
@@ -158,11 +158,11 @@ async def send_otp(payload: dict = Body(...)):
         if not resend or not resend.api_key:
              print("ERROR: Resend not configured in Python backend")
         else:
-            subject = f"{otp} is your Vivo Verification Code"
+            subject = f"{otp} is your Vivi Verification Code"
             html = f"""
             <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #9333ea; text-transform: uppercase; font-style: italic;">Verification Code</h2>
-                <p>Welcome to Vivo! Use the code below to complete your login or registration:</p>
+                <p>Welcome to Vivi! Use the code below to complete your login or registration:</p>
                 <div style="background: #f3f4f6; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0;">
                     <h1 style="letter-spacing: 10px; font-size: 32px; margin: 0;">{otp}</h1>
                 </div>
@@ -227,7 +227,7 @@ async def send_welcome(payload: dict = Body(...)):
     email = payload.get("email")
     name = payload.get("name")
 
-    subject = "Welcome to Vivo Shop!"
+    subject = "Welcome to Vivi Shop!"
     html = f"""
     <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;">
         <h1 style="color: #9333ea;">Welcome, {name}!</h1>
@@ -236,7 +236,7 @@ async def send_welcome(payload: dict = Body(...)):
     </div>
     """
     send_email(email, subject, html)
-    send_email(ADMIN_EMAIL, "New User Registered", f"<p>New user <b>{name}</b> ({email}) joined Vivo!</p>")
+    send_email(ADMIN_EMAIL, "New User Registered", f"<p>New user <b>{name}</b> ({email}) joined Vivi!</p>")
 
     return {"success": True}
 
