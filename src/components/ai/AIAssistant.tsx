@@ -20,9 +20,17 @@ interface Message {
 
 export default function AIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     { role: 'model', text: "Hi! I'm your Vivi AI Assistant. I can help you find products, track orders, or answer questions about our policies. How can I help you today?" }
   ]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isOpen) setShowTooltip(true);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -113,20 +121,44 @@ export default function AIAssistant() {
     <div className="fixed bottom-6 right-6 z-[100]">
       <AnimatePresence>
         {!isOpen && (
-          <motion.div
-            initial={{ scale: 0, rotate: -45 }}
-            animate={{ scale: 1, rotate: 0 }}
-            exit={{ scale: 0, rotate: 45 }}
-            whileHover={{ scale: 1.1 }}
-          >
-            <Button
-              onClick={() => setIsOpen(true)}
-              className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 shadow-2xl shadow-purple-200 flex flex-col items-center justify-center p-0 border-4 border-white"
+          <>
+            {showTooltip && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.8, x: 20 }}
+                className="absolute bottom-20 right-0 bg-white p-4 rounded-2xl shadow-2xl border border-purple-100 w-48 mb-2"
+              >
+                <button
+                  onClick={() => setShowTooltip(false)}
+                  className="absolute -top-2 -right-2 bg-gray-100 rounded-full p-1 hover:bg-gray-200"
+                >
+                  <X className="h-3 w-3 text-gray-500" />
+                </button>
+                <p className="text-xs font-bold text-gray-800 leading-tight">
+                  👋 Need help finding the perfect <span className="text-purple-600">Flash Deal</span>? Ask me!
+                </p>
+                <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white rotate-45 border-r border-b border-purple-100" />
+              </motion.div>
+            )}
+            <motion.div
+              initial={{ scale: 0, rotate: -45 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 45 }}
+              whileHover={{ scale: 1.1 }}
             >
-              <Sparkles className="h-4 w-4 text-yellow-400 absolute top-3 right-3 animate-pulse" />
-              <Bot className="h-8 w-8 text-white" />
-            </Button>
-          </motion.div>
+              <Button
+                onClick={() => {
+                  setIsOpen(true);
+                  setShowTooltip(false);
+                }}
+                className="w-16 h-16 rounded-full bg-purple-600 hover:bg-purple-700 shadow-2xl shadow-purple-200 flex flex-col items-center justify-center p-0 border-4 border-white"
+              >
+                <Sparkles className="h-4 w-4 text-yellow-400 absolute top-3 right-3 animate-pulse" />
+                <Bot className="h-8 w-8 text-white" />
+              </Button>
+            </motion.div>
+          </>
         )}
 
         {isOpen && (

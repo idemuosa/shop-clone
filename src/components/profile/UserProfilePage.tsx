@@ -69,11 +69,16 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
   const { formatPrice } = useCurrency();
   const [orders, setOrders] = useState<any[]>([]);
   const [addresses, setAddresses] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('orders');
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(profile?.displayName || user?.displayName || '');
   const [loading, setLoading] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<any>(null);
+
+  // Preferences state
+  const [notifications, setNotifications] = useState(true);
+  const [twoFactor, setTwoFactor] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -186,12 +191,12 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
       <div className="bg-white border-b border-gray-100 pt-10 pb-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
-            <div className="relative group">
+            <div className="relative group cursor-pointer" onClick={() => setActiveTab('details')}>
               <div className="w-32 h-32 bg-purple-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-purple-100 group-hover:scale-105 transition-transform">
                 {profile?.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
               </div>
-              <div className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100">
-                <Settings className="h-5 w-5 text-gray-400" />
+              <div className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 group-hover:bg-purple-50 transition-colors">
+                <Settings className="h-5 w-5 text-purple-600" />
               </div>
             </div>
             
@@ -244,7 +249,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10">
-        <Tabs defaultValue="orders" className="space-y-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="bg-white p-1.5 rounded-2xl shadow-xl shadow-gray-200/50 flex-wrap h-auto gap-1 border border-gray-50">
             <TabsTrigger value="orders" className="rounded-xl font-black uppercase tracking-tighter px-8 h-12 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               <Package className="h-4 w-4 mr-2" /> Order History
@@ -405,26 +410,44 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                          <div className="flex items-center gap-4">
                             <div className="bg-white p-3 rounded-xl shadow-sm">
-                               <Bell className="h-5 w-5 text-gray-400" />
+                               <Bell className={`h-5 w-5 ${notifications ? 'text-purple-600' : 'text-gray-400'}`} />
                             </div>
                             <div>
                                <p className="text-sm font-black uppercase tracking-tight">Email Notifications</p>
                                <p className="text-[10px] font-bold text-gray-400">Receive weekly deals and news</p>
                             </div>
                          </div>
-                         <Button variant="outline" className="rounded-lg h-8 text-[10px] font-black">ACTIVE</Button>
+                         <Button
+                            variant={notifications ? "default" : "outline"}
+                            onClick={() => {
+                               setNotifications(!notifications);
+                               toast.success(`Notifications ${!notifications ? 'enabled' : 'disabled'}`);
+                            }}
+                            className={`rounded-lg h-8 text-[10px] font-black ${notifications ? 'bg-purple-600' : ''}`}
+                         >
+                            {notifications ? 'ACTIVE' : 'INACTIVE'}
+                         </Button>
                       </div>
                       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
                          <div className="flex items-center gap-4">
                             <div className="bg-white p-3 rounded-xl shadow-sm">
-                               <ShieldCheck className="h-5 w-5 text-gray-400" />
+                               <ShieldCheck className={`h-5 w-5 ${twoFactor ? 'text-green-600' : 'text-gray-400'}`} />
                             </div>
                             <div>
                                <p className="text-sm font-black uppercase tracking-tight">Two-Factor Auth</p>
                                <p className="text-[10px] font-bold text-gray-400">Secure your account</p>
                             </div>
                          </div>
-                         <Button variant="outline" className="rounded-lg h-8 text-[10px] font-black">DISABLE</Button>
+                         <Button
+                            variant={twoFactor ? "default" : "outline"}
+                            onClick={() => {
+                               setTwoFactor(!twoFactor);
+                               toast.info(`2FA ${!twoFactor ? 'enabled' : 'disabled'} successfully`);
+                            }}
+                            className={`rounded-lg h-8 text-[10px] font-black ${twoFactor ? 'bg-green-600' : ''}`}
+                         >
+                            {twoFactor ? 'ENABLED' : 'DISABLED'}
+                         </Button>
                       </div>
                    </div>
                 </Card>
@@ -602,36 +625,68 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                </div>
 
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[
-                    { code: 'WELCOME10', offer: '10% OFF', type: 'Platform Wide', date: 'Dec 31, 2024' },
-                    { code: 'VIVO90', offer: '90% OFF', type: 'Flash Sale Only', date: 'Expiring Soon' },
-                  ].map((v) => (
-                    <div key={v.code} className="p-1 rounded-3xl bg-gradient-to-r from-purple-600/20 to-purple-400/20 shadow-sm overflow-hidden group">
-                       <div className="bg-white rounded-[22px] p-6 flex items-center gap-6 relative">
-                          <div className="w-16 h-16 bg-purple-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-purple-100">
-                             <Ticket className="h-6 w-6 mb-1" />
-                             <span className="text-[8px] font-black">{v.offer}</span>
-                          </div>
-                          <div className="flex-1">
-                             <p className="text-[8px] font-black text-purple-600 uppercase tracking-widest mb-1 italic">{v.type}</p>
-                             <h4 className="font-black text-xl tracking-tighter uppercase">{v.code}</h4>
-                             <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-1">Expires: {v.date}</p>
-                          </div>
-                          <Button 
-                            className="bg-black hover:bg-zinc-800 text-white font-black text-[9px] px-4 h-8 rounded-lg uppercase tracking-widest"
-                            onClick={() => {
-                              navigator.clipboard.writeText(v.code);
-                              toast.success('Code copied to clipboard!');
-                            }}
-                          >
-                             COPY
-                          </Button>
-                          <div className="absolute top-[-10px] right-[-10px] opacity-5 group-hover:scale-110 transition-transform">
-                             <Zap className="h-24 w-24 text-purple-600 rotate-12" />
-                          </div>
-                       </div>
-                    </div>
-                  ))}
+                  {profile?.vouchers?.length > 0 ? (
+                    profile.vouchers.map((v: any, idx: number) => (
+                      <div key={idx} className="p-1 rounded-3xl bg-gradient-to-r from-purple-600/20 to-purple-400/20 shadow-sm overflow-hidden group">
+                         <div className="bg-white rounded-[22px] p-6 flex items-center gap-6 relative">
+                            <div className="w-16 h-16 bg-purple-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-purple-100">
+                               <Ticket className="h-6 w-6 mb-1" />
+                               <span className="text-[8px] font-black">{v.offer}</span>
+                            </div>
+                            <div className="flex-1">
+                               <p className="text-[8px] font-black text-purple-600 uppercase tracking-widest mb-1 italic">{v.type || 'Platform Wide'}</p>
+                               <h4 className="font-black text-xl tracking-tighter uppercase">{v.code}</h4>
+                               <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-1">Expires: {v.date}</p>
+                            </div>
+                            <Button
+                              className="bg-black hover:bg-zinc-800 text-white font-black text-[9px] px-4 h-8 rounded-lg uppercase tracking-widest"
+                              onClick={() => {
+                                navigator.clipboard.writeText(v.code);
+                                toast.success('Code copied to clipboard!');
+                              }}
+                            >
+                               COPY
+                            </Button>
+                            <div className="absolute top-[-10px] right-[-10px] opacity-5 group-hover:scale-110 transition-transform">
+                               <Zap className="h-24 w-24 text-purple-600 rotate-12" />
+                            </div>
+                         </div>
+                      </div>
+                    ))
+                  ) : (
+                    <>
+                      {[
+                        { code: 'WELCOME10', offer: '10% OFF', type: 'Platform Wide', date: 'Dec 31, 2024' },
+                        { code: 'VIVO90', offer: '90% OFF', type: 'Flash Sale Only', date: 'Expiring Soon' },
+                      ].map((v) => (
+                        <div key={v.code} className="p-1 rounded-3xl bg-gradient-to-r from-purple-600/20 to-purple-400/20 shadow-sm overflow-hidden group">
+                           <div className="bg-white rounded-[22px] p-6 flex items-center gap-6 relative">
+                              <div className="w-16 h-16 bg-purple-600 rounded-2xl flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-purple-100">
+                                 <Ticket className="h-6 w-6 mb-1" />
+                                 <span className="text-[8px] font-black">{v.offer}</span>
+                              </div>
+                              <div className="flex-1">
+                                 <p className="text-[8px] font-black text-purple-600 uppercase tracking-widest mb-1 italic">{v.type}</p>
+                                 <h4 className="font-black text-xl tracking-tighter uppercase">{v.code}</h4>
+                                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter mt-1">Expires: {v.date}</p>
+                              </div>
+                              <Button
+                                className="bg-black hover:bg-zinc-800 text-white font-black text-[9px] px-4 h-8 rounded-lg uppercase tracking-widest"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(v.code);
+                                  toast.success('Code copied to clipboard!');
+                                }}
+                              >
+                                 COPY
+                              </Button>
+                              <div className="absolute top-[-10px] right-[-10px] opacity-5 group-hover:scale-110 transition-transform">
+                                 <Zap className="h-24 w-24 text-purple-600 rotate-12" />
+                              </div>
+                           </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
                </div>
              </Card>
           </TabsContent>

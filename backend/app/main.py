@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 import random
 import os
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
 from . import models, schemas, database, auth
@@ -30,9 +33,36 @@ app = FastAPI(title="My Shop API")
 demo_otps = {}
 
 def send_email(to_email, subject, html_content):
+    # Try SMTP first if configured
+    smtp_host = os.getenv("SMTP_HOST")
+    smtp_port = os.getenv("SMTP_PORT")
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    smtp_from = os.getenv("SMTP_FROM_EMAIL", smtp_user)
+
+    if smtp_host and smtp_user and smtp_password:
+        try:
+            msg = MIMEMultipart()
+            msg['From'] = smtp_from
+            msg['To'] = to_email
+            msg['Subject'] = subject
+            msg.attach(MIMEText(html_content, 'html'))
+
+            with smtplib.SMTP(smtp_host, int(smtp_port)) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.send_message(msg)
+
+            print(f"EMAIL SENT (via SMTP): To {to_email}, Sub: {subject}")
+            return True
+        except Exception as e:
+            print(f"SMTP EMAIL ERROR: {e}")
+            # Fall through to Resend if SMTP fails
+
+    # Fallback to Resend
     try:
         if not resend or not resend.api_key:
-            print(f"SKIPPING EMAIL (Resend not configured): To {to_email}, Sub: {subject}")
+            print(f"SKIPPING EMAIL (No SMTP or Resend): To {to_email}, Sub: {subject}")
             return False
 
         params = {
@@ -42,10 +72,10 @@ def send_email(to_email, subject, html_content):
             "html": html_content,
         }
         resend.Emails.send(params)
-        print(f"EMAIL SENT: To {to_email}, Sub: {subject}")
+        print(f"EMAIL SENT (via Resend): To {to_email}, Sub: {subject}")
         return True
     except Exception as e:
-        print(f"EMAIL ERROR: {e}")
+        print(f"RESEND EMAIL ERROR: {e}")
         return False
 
 # Configure CORS

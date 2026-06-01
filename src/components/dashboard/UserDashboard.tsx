@@ -41,6 +41,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { API_URL } from '@/lib/api';
+import { getOptimizedImageUrl } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface UserDashboardProps {
@@ -52,61 +53,85 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
   const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Modals state
+  const [isSearching, setIsSearching] = useState(false);
   const [activeModal, setActiveModal] = useState<'none' | 'track' | 'wallets' | 'alerts' | 'sell'>('none');
 
+  const DJANGO_API = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
-    const fetchDashboardProducts = async () => {
-      try {
-        const response = await fetch(`${API_URL}/products/`);
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setProducts(data.slice(0, 8).map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            image: p.image,
-            price: p.price,
-            rating: p.rating || 4.5,
-            tag: p.tag
-          })));
-        }
-      } catch (error) {
-        console.error("Dashboard products fetch error:", error);
-      }
-    };
     fetchDashboardProducts();
   }, []);
+
+  const fetchDashboardProducts = async (search = "") => {
+    setIsSearching(true);
+    try {
+      const url = search
+        ? `${DJANGO_API}/api/products/?search=${encodeURIComponent(search)}`
+        : `${DJANGO_API}/api/products/`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setProducts(data.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          image: p.image,
+          price: parseFloat(p.price),
+          rating: p.rating || 4.5,
+          tag: p.tag
+        })));
+      }
+    } catch (error) {
+      console.error("Dashboard products fetch error:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
 
-    const q = query(
-      collection(db, 'orders'),
-      where('userId', '==', user.uid),
-      limit(20)
-    );
+    const fetchOrders = async () => {
+      try {
+        const token = await user.getIdToken();
+        const response = await fetch(`${DJANGO_API}/api/orders/`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setRecentOrders(data.slice(0, 5));
+        }
+      } catch (error) {
+        console.error("Dashboard orders fetch error:", error);
+      }
+    };
 
+    fetchOrders();
+    // Refresh orders every minute or on certain events
+    const interval = setInterval(fetchOrders, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', user.uid),
+      orderBy('createdAt', 'desc'),
+      limit(5)
+    );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      const sortedOrders = orders.sort((a: any, b: any) => {
-        const dateA = a.createdAt?.toDate?.() || new Date(a.createdAt);
-        const dateB = b.createdAt?.toDate?.() || new Date(b.createdAt);
-        return dateB.getTime() - dateA.getTime();
-      });
-      setRecentOrders(sortedOrders.slice(0, 5));
-    }, (error) => {
-      console.warn("Dashboard orders error:", error);
+      setNotifications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
   }, [user]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-       toast.info(`Searching for "${searchQuery}"...`);
-    }
+    fetchDashboardProducts(searchQuery);
   };
 
   return (
@@ -185,7 +210,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                   >
                     <div className="relative aspect-[4/3] rounded-xl md:rounded-[18px] overflow-hidden bg-gray-50 mb-2 md:mb-3">
                       <img 
-                        src={product.image} 
+                        src={getOptimizedImageUrl(product.image, 400)}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         referrerPolicy="no-referrer"
@@ -260,7 +285,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                     <div key={order.id} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50/50 hover:bg-gray-50 transition-colors cursor-pointer group">
                       <div className="w-10 h-10 bg-white rounded-lg overflow-hidden shrink-0 border border-gray-100">
                          <img
-                           src={order.productImage || (order.items?.[0]?.image)}
+                           src={getOptimizedImageUrl(order.productImage || (order.items?.[0]?.image), 100)}
                            className="w-full h-full object-cover"
                            referrerPolicy="no-referrer"
                            onError={(e) => {
@@ -351,7 +376,12 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                           </div>
                           <div className="flex-1 min-w-0">
                              <p className="text-sm font-bold truncate">{order.productName || (order.items?.[0]?.name) || "Package"}</p>
-                             <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">Estimated arrival: Tomorrow</p>
+                             <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">
+                                {order.status === 'delivered' ? 'Package delivered' :
+                                 order.status === 'shipped' ? 'In transit to your location' :
+                                 order.status === 'processing' ? 'Being prepared for shipping' :
+                                 'Order being verified'}
+                             </p>
                           </div>
                        </div>
                     </div>
@@ -393,19 +423,36 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
                 <div className="absolute bottom-[-10px] left-[-10px] w-20 h-20 bg-purple-400 opacity-20 rounded-full blur-2xl" />
              </div>
 
-             <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
-                   <div className="flex items-center gap-3">
-                      <div className="p-2 bg-white rounded-lg">
-                         <TrendingUp className="h-4 w-4 text-green-500" />
+             <div className="space-y-4 max-h-[250px] overflow-y-auto no-scrollbar">
+                {recentOrders.map(order => (
+                  <div key={order.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+                     <div className="flex items-center gap-3">
+                        <div className="p-2 bg-white rounded-lg">
+                           <TrendingUp className="h-4 w-4 text-green-500" />
+                        </div>
+                        <div>
+                           <p className="text-xs font-bold">Purchase Reward</p>
+                           <p className="text-[10px] text-gray-400 font-medium">Order #{order.id.slice(-6).toUpperCase()}</p>
+                        </div>
+                     </div>
+                     <p className="font-black text-sm text-green-600">+{Math.floor(order.totalAmount || 0)}</p>
+                  </div>
+                ))}
+
+                {recentOrders.length === 0 && (
+                   <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                         <div className="p-2 bg-white rounded-lg">
+                            <TrendingUp className="h-4 w-4 text-green-500" />
+                         </div>
+                         <div>
+                            <p className="text-xs font-bold">Loyalty Points</p>
+                            <p className="text-[10px] text-gray-400 font-medium">Earned from purchases</p>
+                         </div>
                       </div>
-                      <div>
-                         <p className="text-xs font-bold">Loyalty Points</p>
-                         <p className="text-[10px] text-gray-400 font-medium">Earned from purchases</p>
-                      </div>
+                      <p className="font-black text-sm">+{profile?.points || 0}</p>
                    </div>
-                   <p className="font-black text-sm">+{profile?.points || 0}</p>
-                </div>
+                )}
              </div>
 
              <div className="grid grid-cols-2 gap-4">
@@ -422,39 +469,49 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
           <DialogHeader>
             <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Recent <span className="text-purple-600">Alerts</span></DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
-             <div className="p-4 bg-green-50 border border-green-100 rounded-2xl flex gap-3">
-                <div className="bg-white p-2 rounded-xl h-fit">
-                   <Zap className="h-4 w-4 text-purple-600 fill-purple-600" />
-                </div>
-                <div>
-                   <p className="text-xs font-black uppercase tracking-tight mb-1 text-green-900">Welcome to VIP!</p>
-                   <p className="text-[10px] text-green-700 font-medium leading-relaxed">You've successfully accessed the premium dashboard. Enjoy exclusive deals and zero-fee transactions.</p>
-                </div>
-             </div>
-             <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex gap-3 opacity-60">
-                <div className="bg-white p-2 rounded-xl h-fit">
-                   <Bell className="h-4 w-4 text-gray-400" />
-                </div>
-                <div>
-                   <p className="text-xs font-black uppercase tracking-tight mb-1 text-gray-700">Security Update</p>
-                   <p className="text-[10px] text-gray-500 font-medium leading-relaxed">Your 2FA has been successfully verified for secure shopping across all devices.</p>
-                </div>
-             </div>
-             {recentOrders.length > 0 && (
-                <div className="p-4 bg-purple-50 border border-purple-100 rounded-2xl flex gap-3">
-                   <div className="bg-white p-2 rounded-xl h-fit">
-                      <ShoppingBag className="h-4 w-4 text-purple-600" />
-                   </div>
-                   <div>
-                      <p className="text-xs font-black uppercase tracking-tight mb-1 text-purple-900">New Order Alert</p>
-                      <p className="text-[10px] text-purple-700 font-medium leading-relaxed">Your latest order #{recentOrders[0].id.slice(-6).toUpperCase()} is now processing.</p>
-                   </div>
-                </div>
+          <div className="space-y-4 pt-4 max-h-[400px] overflow-y-auto no-scrollbar">
+             {notifications.length > 0 ? (
+                notifications.map((n) => (
+                  <div key={n.id} className="p-4 bg-purple-50 border border-purple-100 rounded-2xl flex gap-3">
+                    <div className="bg-white p-2 rounded-xl h-fit">
+                       <Zap className="h-4 w-4 text-purple-600 fill-purple-600" />
+                    </div>
+                    <div>
+                       <p className="text-xs font-black uppercase tracking-tight mb-1 text-purple-900">{n.type?.replace('_', ' ')}</p>
+                       <p className="text-[10px] text-purple-700 font-medium leading-relaxed">
+                          {n.message || `Your ${n.type} is being processed.`}
+                       </p>
+                       <p className="text-[8px] text-purple-400 font-bold mt-1 uppercase">
+                          {n.createdAt?.toDate().toLocaleString()}
+                       </p>
+                    </div>
+                  </div>
+                ))
+             ) : (
+                <>
+                 <div className="p-4 bg-green-50 border border-green-100 rounded-2xl flex gap-3">
+                    <div className="bg-white p-2 rounded-xl h-fit">
+                       <Zap className="h-4 w-4 text-purple-600 fill-purple-600" />
+                    </div>
+                    <div>
+                       <p className="text-xs font-black uppercase tracking-tight mb-1 text-green-900">Welcome to VIP!</p>
+                       <p className="text-[10px] text-green-700 font-medium leading-relaxed">You've successfully accessed the premium dashboard. Enjoy exclusive deals and zero-fee transactions.</p>
+                    </div>
+                 </div>
+                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex gap-3 opacity-60">
+                    <div className="bg-white p-2 rounded-xl h-fit">
+                       <Bell className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <div>
+                       <p className="text-xs font-black uppercase tracking-tight mb-1 text-gray-700">Security Update</p>
+                       <p className="text-[10px] text-gray-500 font-medium leading-relaxed">Your 2FA has been successfully verified for secure shopping across all devices.</p>
+                    </div>
+                 </div>
+                </>
              )}
           </div>
           <DialogFooter className="mt-4">
-             <Button variant="ghost" onClick={() => setActiveModal('none')} className="w-full text-gray-400 font-bold uppercase text-[9px] tracking-widest">Clear all alerts</Button>
+             <Button variant="ghost" onClick={() => setActiveModal('none')} className="w-full text-gray-400 font-bold uppercase text-[9px] tracking-widest">Close Alerts</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -466,10 +523,28 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
             <DialogTitle className="text-2xl font-black uppercase tracking-tighter italic">Sell on <span className="text-purple-600">Vivi</span></DialogTitle>
             <DialogDescription className="font-bold text-gray-400 uppercase text-[10px] tracking-widest">Start making money today</DialogDescription>
           </DialogHeader>
-          <form onSubmit={(e) => {
+          <form onSubmit={async (e) => {
              e.preventDefault();
-             toast.success("Merchant application submitted! We will contact you soon.");
-             setActiveModal('none');
+             const formData = new FormData(e.currentTarget);
+             const businessName = formData.get('businessName') as string;
+             const category = formData.get('category') as string;
+
+             if (!user) return;
+
+             try {
+                await addDoc(collection(db, 'merchant_applications'), {
+                   userId: user.uid,
+                   userEmail: user.email,
+                   businessName,
+                   category,
+                   status: 'pending',
+                   createdAt: serverTimestamp()
+                });
+                toast.success("Merchant application submitted! We will contact you soon.");
+                setActiveModal('none');
+             } catch (err) {
+                toast.error("Failed to submit application.");
+             }
           }} className="space-y-6 pt-4">
              <div className="bg-zinc-900 p-8 rounded-[32px] text-white text-center relative overflow-hidden group">
                 <Smartphone className="h-12 w-12 text-purple-600 mx-auto mb-4 relative z-10 group-hover:scale-110 transition-transform" />
@@ -484,11 +559,11 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
              <div className="space-y-4">
                 <div className="space-y-2">
                    <Label className="text-[10px] font-black uppercase text-gray-400 ml-1">Business Name</Label>
-                   <Input placeholder="e.g. Wizzy Fashion Hub" required className="rounded-xl h-12 border-2 border-gray-100 focus:border-purple-500 font-bold" />
+                   <Input name="businessName" placeholder="e.g. Wizzy Fashion Hub" required className="rounded-xl h-12 border-2 border-gray-100 focus:border-purple-500 font-bold" />
                 </div>
                 <div className="space-y-2">
                    <Label className="text-[10px] font-black uppercase text-gray-400 ml-1">Category</Label>
-                   <Input placeholder="e.g. Electronics, Fashion" required className="rounded-xl h-12 border-2 border-gray-100 focus:border-purple-500 font-bold" />
+                   <Input name="category" placeholder="e.g. Electronics, Fashion" required className="rounded-xl h-12 border-2 border-gray-100 focus:border-purple-500 font-bold" />
                 </div>
                 <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-14 shadow-lg shadow-purple-100 uppercase tracking-widest text-xs transition-all active:scale-95">
                    Apply for Merchant Account

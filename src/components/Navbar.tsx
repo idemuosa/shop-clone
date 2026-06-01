@@ -6,7 +6,8 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { API_URL } from "@/lib/api";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { collection, query, onSnapshot } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,15 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   const { totalItems } = useCart();
   const { currency, setCurrency } = useCurrency();
   const [categories, setCategories] = useState<any[]>([]);
+  const [storeSettings, setStoreSettings] = useState<any>(null);
+
+  useEffect(() => {
+    const q = query(collection(db, 'settings'));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      if (!snap.empty) setStoreSettings(snap.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -59,11 +69,15 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   };
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const trendingSearches = ["Wireless Earbuds", "Smart Watch", "Summer T-shirt", "Running Shoes"];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch?.(searchTerm);
+    setShowSuggestions(false);
   };
 
   return (
@@ -72,7 +86,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
       <div className="bg-purple-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
         <span className="flex items-center justify-center gap-2">
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          Vivi Style Flash Sale: Up to 90% Off!
+          {storeSettings?.bannerMessage || 'Vivi Style Flash Sale: Up to 90% Off!'}
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
         </span>
@@ -87,25 +101,62 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             onSearch?.("");
             setSearchTerm("");
           }}>
-            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">Vivi</span>
+            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">
+               {storeSettings?.logoUrl || 'Vivi'}
+            </span>
           </div>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <Input 
-              type="text" 
-              placeholder="Search for items, brands and categories..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 bg-gray-100 border-2 border-transparent focus:border-purple-500 rounded-full h-12 text-base transition-all"
-            />
-            <Button type="submit" className="absolute right-1 top-1 bottom-1 px-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold">
-              Search
-            </Button>
-          </form>
+          <div className="hidden md:flex flex-1 max-w-xl relative">
+            <form onSubmit={handleSearch} className="w-full relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Search for items, brands and categories..."
+                value={searchTerm}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 bg-gray-100 border-2 border-transparent focus:border-purple-500 rounded-full h-12 text-base transition-all w-full"
+              />
+              <Button type="submit" className="absolute right-1 top-1 bottom-1 px-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold">
+                Search
+              </Button>
+            </form>
+
+            {/* Search Suggestions Dropdown */}
+            {showSuggestions && (
+              <div className="absolute top-14 left-0 right-0 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[60] animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="p-4 border-b border-gray-50 bg-gray-50/50">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Trending Searches</h4>
+                </div>
+                <div className="p-2">
+                  {trendingSearches.map((term) => (
+                    <button
+                      key={term}
+                      onClick={() => {
+                        setSearchTerm(term);
+                        onSearch?.(term);
+                        setShowSuggestions(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all text-left"
+                    >
+                      <Search className="h-4 w-4 text-gray-400" />
+                      {term}
+                    </button>
+                  ))}
+                </div>
+                {searchTerm && (
+                  <div className="p-4 border-t border-gray-50 flex justify-between items-center bg-green-50/30">
+                    <p className="text-[10px] font-bold text-gray-500 italic">Press enter to search for <span className="text-purple-600">"{searchTerm}"</span></p>
+                    <Zap className="h-4 w-4 text-purple-600 animate-pulse" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* User Actions */}
           <div className="flex items-center gap-1.5 sm:gap-6">

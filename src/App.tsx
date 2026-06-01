@@ -4,6 +4,7 @@ import Hero from "./components/Hero";
 import CategorySection from "./components/CategorySection";
 import ProductSection from "./components/ProductSection";
 import PromoBanner from "./components/PromoBanner";
+import FlashSaleTimer from "./components/FlashSaleTimer";
 import Footer from "./components/Footer";
 import AuthModal from "./components/auth/AuthModal";
 
@@ -18,6 +19,7 @@ const SpinToWin = lazy(() => import("./components/games/SpinToWin"));
 
 import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
+import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
@@ -28,6 +30,7 @@ import { Truck, Headset, ShieldCheck, Zap, Search, X, Package } from "lucide-rea
 import { motion } from "motion/react";
 import { Toaster, toast } from "sonner";
 import { Button } from "./components/ui/button";
+import { getOptimizedImageUrl } from "./lib/utils";
 
 function MainContent() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -38,8 +41,8 @@ function MainContent() {
   const [showProfile, setShowProfile] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [products, setProducts] = useState<any[]>([]);
+  const [isProductsLoading, setIsProductsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [wishlistCount, setWishlistCount] = useState(0);
   const [lastViewedCategory, setLastViewedCategory] = useState<string>(() => {
     return localStorage.getItem('lastViewedCategory') || '';
   });
@@ -138,6 +141,8 @@ function MainContent() {
         setProducts(prods);
       } catch (error) {
         console.error("App products fetch error:", error);
+      } finally {
+        setIsProductsLoading(false);
       }
     };
 
@@ -372,6 +377,7 @@ function MainContent() {
               title="Matched" 
               subtitle="Items" 
               products={filteredProducts} 
+              isLoading={isProductsLoading}
               onAddToWishlist={addToWishlist}
               onProductView={handleProductView}
             />
@@ -396,39 +402,13 @@ function MainContent() {
             <Hero />
             <CategorySection onSelectCategory={(cat) => handleSearch(cat === "all" ? "" : cat)} />
             
-            {/* Flash Sale Timer Section */}
-            <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-green-100 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="bg-purple-600 p-3 rounded-lg text-white">
-                    <Zap className="h-6 w-6 fill-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-purple-600  italic tracking-tighter">Flash Sale</h2>
-                    <p className="text-sm text-gray-500 font-medium">Ending in: <span className="text-black font-bold">02:45:12</span></p>
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="text-center">
-                    <div className="bg-gray-100 w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold">02</div>
-                    <span className="text-[10px]  font-bold text-gray-400">Hours</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-gray-100 w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold">45</div>
-                    <span className="text-[10px]  font-bold text-gray-400">Mins</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-gray-100 w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold">12</div>
-                    <span className="text-[10px]  font-bold text-gray-400">Secs</span>
-                  </div>
-                </div>
-              </div>
-            </section>
+            <FlashSaleTimer />
 
             <ProductSection 
               title="Flash" 
               subtitle="Deals" 
               products={products.length > 0 ? products : []} 
+              isLoading={isProductsLoading}
               onAddToWishlist={addToWishlist}
               onProductView={handleProductView}
             />
@@ -443,7 +423,7 @@ function MainContent() {
                     <button className="bg-white text-purple-600 px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
-                    src="https://images.unsplash.com/photo-1508685096489-723f0119762e?q=80&w=1000&auto=format&fit=crop" 
+                    src={getOptimizedImageUrl("https://images.unsplash.com/photo-1508685096489-723f0119762e", 1000)}
                     alt="Smart Watch" 
                     className="absolute right-[-10%] bottom-[-10%] h-[120%] object-contain group-hover:scale-110 transition-transform duration-500 mix-blend-overlay opacity-40"
                     referrerPolicy="no-referrer"
@@ -459,7 +439,7 @@ function MainContent() {
                     <button className="bg-purple-500 text-white px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
-                    src="https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=1000&auto=format&fit=crop" 
+                    src={getOptimizedImageUrl("https://images.unsplash.com/photo-1567016432779-094069958ea5", 1000)}
                     alt="Furniture" 
                     className="absolute right-[-10%] bottom-[-10%] h-[120%] object-contain group-hover:scale-110 transition-transform duration-500 opacity-50"
                     referrerPolicy="no-referrer"
@@ -475,6 +455,7 @@ function MainContent() {
               title="Best" 
               subtitle="Sellers" 
               products={products.filter(p => p.tag === 'Best Seller')} 
+              isLoading={isProductsLoading}
               onAddToWishlist={addToWishlist}
               onProductView={handleProductView}
             />
@@ -484,6 +465,7 @@ function MainContent() {
                 title="Recommended" 
                 subtitle="For You" 
                 products={recommendedProducts} 
+                isLoading={isProductsLoading}
                 onAddToWishlist={addToWishlist}
                 onProductView={handleProductView}
               />
@@ -522,6 +504,7 @@ function MainContent() {
       </main>
       <Footer />
       <AIAssistant />
+      <ScrollToTop />
       <SpinToWin />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <CartDrawer 

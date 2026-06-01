@@ -110,6 +110,8 @@ export default function AdminDashboard() {
 
   const [chartData, setChartData] = useState<any[]>([]);
 
+  const [applications, setApplications] = useState<any[]>([]);
+
   useEffect(() => {
     fetchData();
     fetchSettings();
@@ -126,8 +128,19 @@ export default function AdminDashboard() {
         const defaultSettings = {
           bankAccountNumber: "0123456789",
           bankName: "Wema Bank / Alat",
+          bankHolder: "VIVO PREMIUM STORE",
           momoNumber: "+2348000000000",
-          expenses: 500, // Hardcoded default for demo
+          expenses: 500,
+          storeName: "Vivi.co",
+          storeEmail: "support@vivi.co",
+          storePhone: "+2348000000000",
+          storeAddress: "123 Fashion Street, Lagos, Nigeria",
+          instagramUrl: "https://instagram.com/vivi",
+          facebookUrl: "https://facebook.com/vivi",
+          twitterUrl: "https://twitter.com/vivi",
+          whatsappNumber: "+2348000000000",
+          bannerMessage: "Vivi Style Flash Sale: Up to 90% Off!",
+          logoUrl: "Vivi"
         };
         const ref = await addDoc(collection(db, 'settings'), defaultSettings);
         setSettings({ id: ref.id, ...defaultSettings });
@@ -189,6 +202,14 @@ export default function AdminDashboard() {
       } catch (e: any) {
         console.warn("Users fetch permission error:", e);
         setUsers([]);
+      }
+
+      // Fetch Merchant Applications
+      try {
+        const aSnap = await getDocs(query(collection(db, 'merchant_applications'), orderBy('createdAt', 'desc')));
+        setApplications(aSnap.docs.map(d => ({ id: d.id, ...d.data() } as any)));
+      } catch (e: any) {
+        console.warn("Applications fetch error:", e);
       }
 
       // Fetch Expenses from settings (or calculated)
@@ -290,6 +311,16 @@ export default function AdminDashboard() {
       bankHolder: formData.get('bankHolder') as string,
       momoNumber: formData.get('momoNumber') as string,
       expenses: parseFloat(formData.get('expenses') as string) || 0,
+      storeName: formData.get('storeName') as string,
+      storeEmail: formData.get('storeEmail') as string,
+      storePhone: formData.get('storePhone') as string,
+      storeAddress: formData.get('storeAddress') as string,
+      instagramUrl: formData.get('instagramUrl') as string,
+      facebookUrl: formData.get('facebookUrl') as string,
+      twitterUrl: formData.get('twitterUrl') as string,
+      whatsappNumber: formData.get('whatsappNumber') as string,
+      bannerMessage: formData.get('bannerMessage') as string,
+      logoUrl: formData.get('logoUrl') as string,
     };
 
     try {
@@ -674,6 +705,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Admins
+            </TabsTrigger>
+            <TabsTrigger value="merchants" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+              Merchants
             </TabsTrigger>
             <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Logs
@@ -1244,6 +1278,76 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="merchants">
+            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
+              <CardHeader>
+                <CardTitle className="text-xl font-black tracking-tighter">Merchant Applications</CardTitle>
+                <CardDescription>Review and approve new sellers</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader className="bg-gray-50">
+                    <TableRow>
+                      <TableHead className="font-black text-[10px] tracking-widest uppercase">Business</TableHead>
+                      <TableHead className="font-black text-[10px] tracking-widest uppercase">Category</TableHead>
+                      <TableHead className="font-black text-[10px] tracking-widest uppercase">Applicant</TableHead>
+                      <TableHead className="font-black text-[10px] tracking-widest uppercase">Status</TableHead>
+                      <TableHead className="font-black text-[10px] tracking-widest uppercase text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {applications.map((app) => (
+                      <TableRow key={app.id}>
+                        <TableCell className="font-black">{app.businessName}</TableCell>
+                        <TableCell className="text-xs font-bold text-purple-600">{app.category}</TableCell>
+                        <TableCell className="text-xs font-medium">{app.userEmail}</TableCell>
+                        <TableCell>
+                          <Badge className={app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
+                            {app.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                             {app.status === 'pending' && (
+                                <Button
+                                  size="sm"
+                                  className="h-8 bg-purple-600 text-white font-bold text-[10px]"
+                                  onClick={async () => {
+                                     await updateDoc(doc(db, 'merchant_applications', app.id), { status: 'approved' });
+                                     toast.success("Merchant approved!");
+                                     fetchData();
+                                  }}
+                                >
+                                  Approve
+                                </Button>
+                             )}
+                             <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 text-red-500 font-bold text-[10px]"
+                                onClick={async () => {
+                                   await deleteDoc(doc(db, 'merchant_applications', app.id));
+                                   toast.info("Application rejected/removed");
+                                   fetchData();
+                                }}
+                             >
+                               Reject
+                             </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {applications.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-10 text-gray-400 font-bold italic">No pending applications</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="emails">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
               <CardHeader>
@@ -1285,59 +1389,109 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
           <TabsContent value="settings">
-            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-8">
-               <div className="flex items-center gap-3 mb-8">
+            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-4 md:p-8">
+               <div className="flex items-center gap-3 mb-6 md:mb-8">
                   <div className="bg-purple-600 p-2 rounded-lg">
                     <Wallet className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-black  tracking-tighter "> <span className="text-purple-600">settings</span></h3>
+                  <h3 className="text-xl font-black tracking-tighter uppercase">Store <span className="text-purple-600">Settings</span></h3>
                </div>
 
-               <form onSubmit={handleUpdateSettings} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-sm font-black  tracking-widest text-gray-400 mb-4">Payment information</h4>
+               <form onSubmit={handleUpdateSettings} className="space-y-8 md:space-y-12">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    {/* General Store Info */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 mb-2">
+                         <LayoutDashboard className="h-4 w-4 text-purple-600" />
+                         <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">General Info</h4>
+                      </div>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Bank account number</Label>
-                          <Input name="bankAccountNumber" defaultValue={settings?.bankAccountNumber} className="rounded-xl h-12" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Store Name</Label>
+                          <Input name="storeName" defaultValue={settings?.storeName} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
-                          <Label>Bank name</Label>
-                          <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-12" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Logo Text/URL</Label>
+                          <Input name="logoUrl" defaultValue={settings?.logoUrl} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
-                          <Label>Account Name</Label>
-                          <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-12" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Banner Message</Label>
+                          <Input name="bannerMessage" defaultValue={settings?.bannerMessage} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
-                          <Label>Airtime / phone number</Label>
-                          <Input name="momoNumber" defaultValue={settings?.momoNumber} className="rounded-xl h-12" />
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Store Address</Label>
+                          <Textarea name="storeAddress" defaultValue={settings?.storeAddress} className="rounded-xl min-h-[100px] border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 mb-2">
+                         <Mail className="h-4 w-4 text-purple-600" />
+                         <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">Contact & Support</h4>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Email</Label>
+                          <Input name="storeEmail" defaultValue={settings?.storeEmail} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Phone</Label>
+                          <Input name="storePhone" defaultValue={settings?.storePhone} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">WhatsApp Number</Label>
+                          <Input name="whatsappNumber" defaultValue={settings?.whatsappNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">MoMo Number</Label>
+                          <Input name="momoNumber" defaultValue={settings?.momoNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Instagram URL</Label>
+                          <Input name="instagramUrl" defaultValue={settings?.instagramUrl} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Info */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 mb-2">
+                         <Wallet className="h-4 w-4 text-purple-600" />
+                         <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">Payment Info</h4>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Bank Name</Label>
+                          <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Number</Label>
+                          <Input name="bankAccountNumber" defaultValue={settings?.bankAccountNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Name</Label>
+                          <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Monthly Expenses ($)</Label>
+                          <Input name="expenses" type="number" step="0.01" defaultValue={settings?.expenses} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-sm font-black  tracking-widest text-gray-400 mb-4">Financial management</h4>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Monthly expenses ($)</Label>
-                          <Input name="expenses" type="number" step="0.01" defaultValue={settings?.expenses} className="rounded-xl h-12" />
-                          <p className="text-[10px] text-gray-400 font-bold  mt-1 italic">Costs like hosting, staff, and shipping logistics.</p>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="flex flex-col md:flex-row gap-6 items-start">
+                     <div className="flex-1 w-full">
+                        <Button type="submit" disabled={isLoading} className="w-full bg-black text-white font-black rounded-2xl h-16 shadow-xl hover:bg-zinc-800 transition-all uppercase tracking-widest">
+                          {isLoading ? 'Updating...' : 'Save All Store Settings'}
+                        </Button>
+                     </div>
 
-                    <div className="pt-8 space-y-4">
-                      <Button type="submit" disabled={isLoading} className="w-full bg-black text-white font-black rounded-xl h-14 shadow-xl hover:bg-zinc-800 transition-all">
-                        {isLoading ? 'Updating...' : 'Save store settings'}
-                      </Button>
-
-                      <div className="p-6 bg-red-50 rounded-[32px] border-2 border-red-100 mt-10">
-                         <h4 className="text-sm font-black text-red-900 mb-2">Database maintenance</h4>
-                         <p className="text-[10px] text-red-700 font-bold mb-4 italic">Use this to fill your shop with demo products and images if it's empty.</p>
+                     <div className="w-full md:w-80 p-6 bg-red-50 rounded-[32px] border-2 border-red-100">
+                         <h4 className="text-sm font-black text-red-900 mb-2 uppercase tracking-tighter">System Tools</h4>
+                         <p className="text-[10px] text-red-700 font-bold mb-4 italic leading-tight">Fill empty shop with demo data.</p>
                          <Button
                             type="button"
                             onClick={async () => {
@@ -1355,12 +1509,11 @@ export default function AdminDashboard() {
                             }}
                             disabled={isLoading}
                             variant="destructive"
-                            className="w-full h-12 rounded-xl font-black text-xs uppercase tracking-widest"
+                            className="w-full h-11 rounded-xl font-black text-[10px] uppercase tracking-widest"
                          >
-                            {isLoading ? 'Processing...' : 'Repair database & images'}
+                            {isLoading ? 'Processing...' : 'Seed Database'}
                          </Button>
                       </div>
-                    </div>
                   </div>
                </form>
             </Card>

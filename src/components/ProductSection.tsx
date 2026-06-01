@@ -44,7 +44,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { API_URL } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { cn, getOptimizedImageUrl } from "@/lib/utils";
 import AIReviewSummarizer from "./ai/AIReviewSummarizer";
 
 interface Product {
@@ -66,18 +66,24 @@ interface ProductSectionProps {
   title: string;
   subtitle: string;
   products: Product[];
+  isLoading?: boolean;
   onAddToWishlist?: () => void;
   onProductView?: (product: Product) => void;
 }
 
-export default function ProductSection({ title, subtitle, products, onAddToWishlist, onProductView }: ProductSectionProps) {
+export default function ProductSection({ title, subtitle, products, isLoading, onAddToWishlist, onProductView }: ProductSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
   const [minRating, setMinRating] = useState<string>("0");
   const [selectedProduct, setInternalSelectedProduct] = useState<Product | null>(null);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
 
   const setSelectedProduct = (product: Product | null) => {
     setInternalSelectedProduct(product);
+    if (product) {
+      setIsDetailLoading(true);
+      setTimeout(() => setIsDetailLoading(false), 600);
+    }
     if (product && onProductView) {
       onProductView(product);
     }
@@ -101,9 +107,18 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [storeSettings, setStoreSettings] = useState<any>(null);
   const { user, profile } = useAuth();
   const { addToCart, setIsOpen } = useCart();
   const { formatPrice } = useCurrency();
+
+  useEffect(() => {
+    const q = query(collection(db, 'settings'));
+    const unsubscribe = onSnapshot(q, (snap) => {
+      if (!snap.empty) setStoreSettings(snap.docs[0].data());
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleAddToCart = (product: Product, quantity: number = 1) => {
     addToCart({
@@ -646,7 +661,23 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
         )}
 
         {/* Product Grid */}
-        {filteredProducts.length > 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm border border-transparent animate-pulse">
+                <div className="aspect-square bg-gray-200" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="flex justify-between">
+                    <div className="h-2 bg-gray-200 rounded w-1/4" />
+                    <div className="h-2 bg-gray-200 rounded w-1/4" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
             <AnimatePresence mode="popLayout">
               {filteredProducts.map((product) => (
@@ -731,7 +762,7 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                     </div>
 
                     <img 
-                      src={product.image} 
+                      src={getOptimizedImageUrl(product.image, 400)}
                       alt={product.name} 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                       loading="lazy"
@@ -833,18 +864,42 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
           <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl border-none">
             {selectedProduct && (
               <div className="flex flex-col md:flex-row min-h-[500px]">
-                <div className="md:w-2/5 bg-gray-50 relative">
-                  <img 
-                    src={selectedProduct.image} 
-                    alt={selectedProduct.name} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                </div>
-                <div className="md:w-3/5 p-8 flex flex-col">
+                {isDetailLoading ? (
+                  <div className="flex flex-col md:flex-row w-full animate-pulse">
+                    <div className="md:w-2/5 bg-gray-200" />
+                    <div className="md:w-3/5 p-8 space-y-6">
+                      <div className="flex gap-2">
+                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                      </div>
+                      <div className="h-10 w-3/4 bg-gray-200 rounded-xl" />
+                      <div className="h-4 w-1/2 bg-gray-200 rounded-lg" />
+                      <div className="h-12 w-1/3 bg-gray-200 rounded-xl mt-8" />
+                      <div className="space-y-3 mt-10">
+                        <div className="h-3 w-full bg-gray-100 rounded" />
+                        <div className="h-3 w-full bg-gray-100 rounded" />
+                        <div className="h-3 w-2/3 bg-gray-100 rounded" />
+                      </div>
+                      <div className="flex gap-4 mt-auto pt-10">
+                        <div className="h-14 flex-1 bg-gray-200 rounded-2xl" />
+                        <div className="h-14 flex-1 bg-gray-200 rounded-2xl" />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="md:w-2/5 bg-gray-50 relative">
+                      <img
+                        src={getOptimizedImageUrl(selectedProduct.image, 800)}
+                        alt={selectedProduct.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                    </div>
+                    <div className="md:w-3/5 p-8 flex flex-col">
                   {checkoutStep === 'details' ? (
                     <Tabs defaultValue="overview" className="flex flex-col h-full">
                       <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100/50 rounded-2xl p-1">
@@ -1414,11 +1469,11 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                                   <div className="space-y-4 bg-zinc-800/50 p-4 rounded-2xl border border-zinc-700/50">
                                     <div className="flex justify-between items-center">
                                       <span className="text-[10px]  font-black text-zinc-500">Bank Name</span>
-                                      <span className="text-sm font-bold">WEMA BANK / ALAT</span>
+                                      <span className="text-sm font-bold">{storeSettings?.bankName || 'WEMA BANK / ALAT'}</span>
                                     </div>
                                     <div className="flex justify-between items-center">
                                       <span className="text-[10px]  font-black text-zinc-500">Account No.</span>
-                                      <span className="text-lg font-black tracking-widest text-purple-400">0123456789</span>
+                                      <span className="text-lg font-black tracking-widest text-purple-400">{storeSettings?.bankAccountNumber || '0123456789'}</span>
                                     </div>
                                   </div>
                                   <p className="text-[9px] text-zinc-500 font-bold  text-center">Transfer AND CLICK "PAY NOW"</p>
@@ -1598,8 +1653,8 @@ export default function ProductSection({ title, subtitle, products, onAddToWishl
                         {selectedProduct.sold} SOLD ALREADY
                       </div>
                     </div>
-                  )}
-                </div>
+                  </>
+                )}
               </div>
             )}
           </DialogContent>

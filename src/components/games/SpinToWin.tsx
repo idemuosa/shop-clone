@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
+import { db } from '@/lib/firebase';
+import { doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 
 const rewards = [
   { text: '5% OFF', color: '#9333ea', value: 'SAVE5' },
@@ -27,6 +30,7 @@ const rewards = [
 ];
 
 export default function SpinToWin() {
+  const { user, profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState<string | null>(null);
@@ -35,6 +39,19 @@ export default function SpinToWin() {
 
   const spinWheel = async () => {
     if (isSpinning) return;
+
+    if (!user) {
+      toast.error("Please login to spin the wheel!");
+      return;
+    }
+
+    // Check if user has already spun today
+    const lastSpin = profile?.lastSpin?.toDate ? profile.lastSpin.toDate() : (profile?.lastSpin ? new Date(profile.lastSpin) : null);
+    if (lastSpin && new Date().toDateString() === lastSpin.toDateString()) {
+      toast.error("You've already used your free spin today!");
+      return;
+    }
+
     setIsSpinning(true);
     setResult(null);
 
@@ -57,14 +74,35 @@ export default function SpinToWin() {
     setIsSpinning(false);
     
     const reward = rewards[winningIndex];
-    if (reward.value) {
-      setResult(reward.text);
-      toast.success(`Congratulations! You won ${reward.text}!`, {
-        description: `Use code: ${reward.value}`,
-        icon: <Trophy className="h-4 w-4 text-purple-600" />
-      });
-    } else {
-      toast.error("Better luck next time!");
+
+    // Save to Firestore
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      const updateData: any = {
+        lastSpin: serverTimestamp(),
+      };
+
+      if (reward.value) {
+        setResult(reward.text);
+        updateData.vouchers = arrayUnion({
+          code: reward.value,
+          offer: reward.text,
+          type: 'Spin Win',
+          date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(), // 7 days from now
+          addedAt: new Date().toISOString()
+        });
+
+        toast.success(`Congratulations! You won ${reward.text}!`, {
+          description: `Code: ${reward.value} added to your profile.`,
+          icon: <Trophy className="h-4 w-4 text-purple-600" />
+        });
+      } else {
+        toast.error("Better luck next time!");
+      }
+
+      await updateDoc(userRef, updateData);
+    } catch (e) {
+      console.error("Spin error:", e);
     }
   };
 

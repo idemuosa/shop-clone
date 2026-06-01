@@ -48,6 +48,10 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [city, setCity] = useState('');
   const [zip, setZip] = useState('');
 
+  // Discount/Voucher State
+  const [discount, setDiscount] = useState(0);
+  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+
   // Payment State
   const [paymentType, setPaymentType] = useState<'card' | 'momo' | 'bank' | 'pod'>('card');
   const [selectedCard, setSelectedCard] = useState<any>(null);
@@ -78,9 +82,62 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         toast.error("Please login to place an order");
         return;
     }
-    setIsProcessing(true);
 
+    if (paymentType === 'card') {
+      // Paystack Integration
+      const handler = (window as any).PaystackPop.setup({
+        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_key_here',
+        email: user.email,
+        amount: Math.round((totalPrice - discount) * 100), // in kobo
+        currency: 'NGN',
+        callback: async function(response: any) {
+          toast.success("Payment successful! Verifying...");
+          await verifyAndCreateOrder(response.reference);
+        },
+        onClose: function() {
+          toast.error("Payment cancelled");
+        }
+      });
+      handler.openIframe();
+    } else {
+      toast.error("Manual payment methods are not yet secure. Please use Card.");
+    }
+  };
+
+  const verifyAndCreateOrder = async (reference: string) => {
+    setIsProcessing(true);
     try {
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000'}/api/orders/verify_payment/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          reference: reference,
+          order_details: {
+            full_name: user.displayName || profile?.displayName || user.email,
+            address: address,
+            city: city
+          }
+        })
+      });
+
+      if (response.ok) {
+        setStep('success');
+        clearCart();
+        toast.success("Order confirmed!");
+      } else {
+        const errData = await response.json();
+        toast.error("Verification failed: " + (errData.error || "Unknown error"));
+      }
+    } catch (error: any) {
+      toast.error("Network error during verification");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
       const orderData = {
         userId: user.uid,
         customerEmail: user.email,
@@ -90,13 +147,22 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
            price: item.price,
            quantity: item.quantity
         })),
-        totalAmount: totalPrice,
+        totalAmount: finalPrice,
+        discount: discount,
         shippingAddress: { address, city, zipCode: zip },
         status: 'pending',
         createdAt: serverTimestamp(),
       };
 
       const orderRef = await addDoc(collection(db, 'orders'), orderData);
+
+      // Create notification for dashboard
+      await addDoc(collection(db, 'notifications'), {
+        userId: user.uid,
+        type: 'ORDER_PLACED',
+        message: `Your order #${orderRef.id.slice(-6).toUpperCase()} has been successfully placed.`,
+        createdAt: serverTimestamp()
+      });
 
       // Send confirmation via API (Optional/Simulated)
       try {
@@ -116,6 +182,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
       setStep('success');
       clearCart();
+
+      // If a voucher was used, remove it from user profile
+      if (selectedVoucher && user) {
+        const userRef = doc(db, 'users', user.uid);
+        const updatedVouchers = profile?.vouchers?.filter((v: any) => v.code !== selectedVoucher.code) || [];
+        await updateDoc(userRef, { vouchers: updatedVouchers });
+      }
+
       toast.success("Order placed successfully!");
     } catch (error: any) {
       toast.error("Order failed: " + error.message);
@@ -480,18 +554,67 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       <span className="text-[10px] font-black  text-gray-400 tracking-widest">Subtotal</span>
                       <span className="text-sm font-bold">{formatPrice(totalPrice)}</span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-black text-purple-600 tracking-widest">Discount ({selectedVoucher?.offer})</span>
+                        <span className="text-sm font-bold text-purple-600">-{formatPrice(discount)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] font-black  text-gray-400 tracking-widest">Shipping</span>
                       <span className="text-xs font-black text-green-600  tracking-tighter">FREE</span>
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-gray-50">
                       <span className="text-base font-black  tracking-tighter">Total Amount</span>
-                      <span className="text-2xl font-black text-purple-600 tracking-tighter">{formatPrice(totalPrice)}</span>
+                      <span className="text-2xl font-black text-purple-600 tracking-tighter">{formatPrice(totalPrice - discount)}</span>
                     </div>
                   </div>
 
+                  {profile?.vouchers?.length > 0 && (
+                    <div className="mt-8 pt-6 border-t border-gray-50">
+                       <p className="text-[10px] font-black text-gray-400 tracking-widest uppercase mb-4">Apply Voucher</p>
+                       <div className="space-y-2">
+                          {profile.vouchers.map((v: any, idx: number) => (
+                             <div
+                                key={idx}
+                                onClick={() => {
+                                   if (selectedVoucher?.code === v.code) {
+                                      setSelectedVoucher(null);
+                                      setDiscount(0);
+                                   } else {
+                                      setSelectedVoucher(v);
+                                      // Calculate discount (assuming offer format like "10% OFF" or "$5 CREDIT")
+                                      if (v.offer.includes('%')) {
+                                         const percentage = parseFloat(v.offer.split('%')[0]) / 100;
+                                         setDiscount(totalPrice * percentage);
+                                      } else if (v.offer.includes('$')) {
+                                         const amount = parseFloat(v.offer.split('$')[1]);
+                                         setDiscount(Math.min(amount, totalPrice));
+                                      }
+                                      toast.success(`Voucher ${v.code} applied!`);
+                                   }
+                                }}
+                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${selectedVoucher?.code === v.code ? 'border-purple-600 bg-purple-50' : 'border-gray-50 bg-gray-50/30 hover:border-purple-200'}`}
+                             >
+                                <div>
+                                   <p className="font-black text-xs uppercase tracking-tight">{v.code}</p>
+                                   <p className="text-[9px] font-bold text-purple-600 uppercase">{v.offer}</p>
+                                </div>
+                                {selectedVoucher?.code === v.code ? (
+                                   <div className="h-5 w-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                      <CheckCircle2 className="h-3 w-3 text-white" />
+                                   </div>
+                                ) : (
+                                   <ArrowRight className="h-4 w-4 text-gray-300" />
+                                )}
+                             </div>
+                          ))}
+                       </div>
+                    </div>
+                  )}
+
                   <div className="mt-8 p-4 bg-purple-50 rounded-2xl border border-purple-100 text-center">
-                     <p className="text-[10px] font-black text-purple-600  tracking-widest">Points Earned: {Math.floor(totalPrice)}</p>
+                     <p className="text-[10px] font-black text-purple-600  tracking-widest">Points Earned: {Math.floor(totalPrice - discount)}</p>
                   </div>
                 </div>
               </div>

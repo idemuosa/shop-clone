@@ -1,0 +1,20 @@
+{
+  "short_name": "Vivi",
+  "name": "Vivi Shop - Premium AI E-commerce",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=192&h=192&auto=format&fit=crop",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=512&h=512&auto=format&fit=crop",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#9333ea",
+  "background_color": "#ffffff"
+}

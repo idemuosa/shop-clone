@@ -1,9 +1,14 @@
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { Zap, Clock, ArrowRight } from "lucide-react";
+import { Zap, Clock, ArrowRight, Gift } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/lib/AuthContext";
+import { db } from "@/lib/firebase";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
+import { toast } from "sonner";
 
 export default function PromoBanner() {
+  const { user } = useAuth();
   const [timeLeft, setTimeLeft] = useState({
     hours: 12,
     minutes: 45,
@@ -21,6 +26,33 @@ export default function PromoBanner() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  const handleGetCoupon = async () => {
+    if (!user) {
+      toast.info("Please login to claim your coupon!");
+      return;
+    }
+
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        vouchers: arrayUnion({
+          code: 'FIRST20',
+          offer: '20% OFF',
+          type: 'First Order',
+          date: 'Dec 31, 2024',
+          addedAt: new Date().toISOString()
+        })
+      });
+      toast.success("Coupon added to your profile!", {
+        description: "Use code FIRST20 at checkout.",
+        icon: <Gift className="h-4 w-4 text-purple-600" />
+      });
+    } catch (e) {
+      console.error("Coupon error:", e);
+      toast.error("Failed to add coupon. It might already be in your profile.");
+    }
+  };
 
   return (
     <section className="py-12 bg-white">
@@ -67,7 +99,10 @@ export default function PromoBanner() {
                 </div>
               </div>
 
-              <Button className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-12 py-8 rounded-2xl text-xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
+              <Button
+                onClick={handleGetCoupon}
+                className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-12 py-8 rounded-2xl text-xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter"
+              >
                 Get My Coupon <ArrowRight className="ml-2 h-6 w-6" />
               </Button>
             </div>
