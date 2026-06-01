@@ -26,24 +26,39 @@ app.use((req, res, next) => {
 });
 
 // Initialize Firebase Admin safely
-const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY || path.join(process.cwd(), "backend", "service-account.json");
+const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 let isFirebaseAdminInitialized = false;
 
-if (fs.existsSync(serviceAccountPath)) {
+if (serviceAccountPath) {
   try {
-    const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-    if (!admin.apps || admin.apps.length === 0) {
+    let serviceAccount;
+    // Check if the value is a JSON string or a file path
+    if (serviceAccountPath.trim().startsWith('{')) {
+      serviceAccount = JSON.parse(serviceAccountPath);
+    } else {
+      const resolvedPath = path.isAbsolute(serviceAccountPath)
+        ? serviceAccountPath
+        : path.join(process.cwd(), serviceAccountPath);
+
+      if (fs.existsSync(resolvedPath)) {
+        serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+      }
+    }
+
+    if (serviceAccount && (!admin.apps || admin.apps.length === 0)) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
       });
+      isFirebaseAdminInitialized = true;
+      console.log("Firebase Admin initialized successfully");
     }
-    isFirebaseAdminInitialized = true;
-    console.log("Firebase Admin initialized successfully");
   } catch (err: any) {
     console.error("Firebase Admin initialization error:", err.message);
   }
-} else {
-  console.warn("Firebase Service Account key not found. Custom tokens will not be generated.");
+}
+
+if (!isFirebaseAdminInitialized) {
+  console.warn("Firebase Service Account key not found or invalid. Custom tokens will not be generated.");
 }
 
 // Initialize Resend lazily
@@ -67,12 +82,72 @@ const getResend = () => {
 };
 
 const adminEmail = process.env.ADMIN_EMAIL;
+const fromEmail = process.env.FROM_EMAIL || "Vivi Shop <onboarding@resend.dev>";
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
 
 // API routes
+app.post("/api/paystack/initialize", async (req, res) => {
+  const { email, amount } = req.body;
+
+  if (!PAYSTACK_SECRET_KEY) {
+    return res.status(500).json({ status: false, message: "Paystack secret key not configured" });
+  }
+
+  try {
+    const response = await fetch("https://api.paystack.co/transaction/initialize", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        amount: Math.round(amount * 100),
+        callback_url: `${process.env.APP_URL || 'http://localhost:5173'}/checkout/verify`,
+      }),
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+app.post("/api/paystack/verify", async (req, res) => {
+  const { reference } = req.body;
+
+  if (!PAYSTACK_SECRET_KEY) {
+    return res.status(500).json({ status: false, message: "Paystack secret key not configured" });
+  }
+
+  try {
+    const response = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+      },
+    });
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error: any) {
+    res.status(500).json({ status: false, message: error.message });
+  }
+});
+
+app.post("/api/paystack/webhook", async (req, res) => {
+  const event = req.body;
+  if (event.event === 'charge.success') {
+    console.log(`[PAYSTACK WEBHOOK] Payment Successful for ${event.data.customer.email}`);
+  }
+  res.sendStatus(200);
+});
+
 app.post("/api/send-otp", async (req, res) => {
   const { email, phone, type } = req.body;
   const resendClient = getResend();
@@ -96,7 +171,7 @@ app.post("/api/send-otp", async (req, res) => {
 
     try {
       const { data, error } = await resendClient.emails.send({
-        from: "Vivi Shop <onboarding@resend.dev>",
+        from: fromEmail,
         to: [email],
         subject: `${otp} is your Vivi verification code`,
         html: `
@@ -195,14 +270,14 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   if (resendClient && email) {
     try {
       const userEmail = resendClient.emails.send({
-        from: "Vivi Shop <onboarding@resend.dev>",
+        from: fromEmail,
         to: [email],
         subject: `Order Confirmation #${orderId.slice(-8).toUpperCase()}`,
         html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
       });
 
       const adminNotif = resendClient.emails.send({
-        from: "Vivi Shop <onboarding@resend.dev>",
+        from: fromEmail,
         to: [adminEmail || 'idemudiawisdom27@gmail.com'],
         subject: `NEW ORDER: #${orderId.slice(-8).toUpperCase()}`,
         html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,

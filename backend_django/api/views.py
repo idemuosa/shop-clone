@@ -5,6 +5,9 @@ from .models import Category, Product, Cart, CartItem, Order, OrderItem
 from .serializers import CategorySerializer, ProductSerializer, CartSerializer, CartItemSerializer
 import requests
 import os
+from django.db.models import Sum, Count
+from django.utils import timezone
+from datetime import timedelta
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
@@ -44,6 +47,33 @@ class CartViewSet(viewsets.GenericViewSet):
         serializer = CartSerializer(cart)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def analytics(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=6)
+
+        chart_data = []
+        current_date = start_date
+        while current_date <= end_date:
+            day_orders = Order.objects.filter(
+                created_at__date=current_date.date()
+            )
+            chart_data.append({
+                'name': current_date.strftime('%a'),
+                'sales': float(day_orders.aggregate(total=Sum('total_amount'))['total'] or 0),
+                'orders': day_orders.count()
+            })
+            current_date += timedelta(days=1)
+
+        total_sales = float(Order.objects.aggregate(total=Sum('total_amount'))['total'] or 0)
+        total_orders = Order.objects.count()
+
+        return Response({
+            'chartData': chart_data,
+            'totalSales': total_sales,
+            'totalOrders': total_orders
+        })
+
     @action(detail=False, methods=['post'])
     def sync(self, request):
         cart, created = Cart.objects.get_or_create(user=request.user)
@@ -66,6 +96,33 @@ class CartViewSet(viewsets.GenericViewSet):
 
         serializer = CartSerializer(cart)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def analytics(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=6)
+
+        chart_data = []
+        current_date = start_date
+        while current_date <= end_date:
+            day_orders = Order.objects.filter(
+                created_at__date=current_date.date()
+            )
+            chart_data.append({
+                'name': current_date.strftime('%a'),
+                'sales': float(day_orders.aggregate(total=Sum('total_amount'))['total'] or 0),
+                'orders': day_orders.count()
+            })
+            current_date += timedelta(days=1)
+
+        total_sales = float(Order.objects.aggregate(total=Sum('total_amount'))['total'] or 0)
+        total_orders = Order.objects.count()
+
+        return Response({
+            'chartData': chart_data,
+            'totalSales': total_sales,
+            'totalOrders': total_orders
+        })
 
     @action(detail=False, methods=['post'])
     def add_item(self, request):
@@ -98,6 +155,33 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def analytics(self, request):
+        end_date = timezone.now()
+        start_date = end_date - timedelta(days=6)
+
+        chart_data = []
+        current_date = start_date
+        while current_date <= end_date:
+            day_orders = Order.objects.filter(
+                created_at__date=current_date.date()
+            )
+            chart_data.append({
+                'name': current_date.strftime('%a'),
+                'sales': float(day_orders.aggregate(total=Sum('total_amount'))['total'] or 0),
+                'orders': day_orders.count()
+            })
+            current_date += timedelta(days=1)
+
+        total_sales = float(Order.objects.aggregate(total=Sum('total_amount'))['total'] or 0)
+        total_orders = Order.objects.count()
+
+        return Response({
+            'chartData': chart_data,
+            'totalSales': total_sales,
+            'totalOrders': total_orders
+        })
 
     @action(detail=False, methods=['post'])
     def verify_payment(self, request):

@@ -195,6 +195,23 @@ export default function AdminDashboard() {
         setNotifications([]);
       }
 
+      // Fetch Real Analytics from Python/Django API
+      try {
+        const aRes = await fetch(`${API_URL}/api/orders/analytics/`);
+        if (aRes.ok) {
+           const aData = await aRes.json();
+           setChartData(aData.chartData);
+           setStats(prev => ({
+              ...prev,
+              totalSales: aData.totalSales,
+              totalOrders: aData.totalOrders,
+              profit: aData.totalSales - (settings?.expenses || 0)
+           }));
+        }
+      } catch (e) {
+        console.warn("Real analytics fetch failed, falling back to local calculation");
+      }
+
       // Fetch Users
       try {
         const uSnap = await getDocs(query(collection(db, 'users')));

@@ -8,3 +8,4 @@ paystack-python
 python-dotenv
 whitenoise
 requests
+dj-database-url
