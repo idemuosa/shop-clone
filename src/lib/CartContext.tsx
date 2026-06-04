@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
+import { PYTHON_API_URL } from './api';
 
 export interface CartItem {
   id: string;
@@ -25,9 +26,6 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Using Django backend for the clone
-const API_BASE_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
-
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [items, setItems] = useState<CartItem[]>(() => {
@@ -45,13 +43,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         try {
           const token = await user.getIdToken();
-          await fetch(`${API_BASE_URL}/api/cart/sync/`, {
+          await fetch(`${PYTHON_API_URL}/api/cart/sync`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ items })
+            body: JSON.stringify(items)
           });
         } catch (e) {
           console.error("Auto-sync failed", e);
@@ -74,7 +72,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = await user.getIdToken();
 
-      const response = await fetch(`${API_BASE_URL}/api/cart/my_cart/`, {
+      // 1. Fetch backend cart
+      const response = await fetch(`${PYTHON_API_URL}/api/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -86,7 +85,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           id: item.product_id,
           name: item.name,
           price: item.price,
-          priceValue: parseFloat(item.price_value),
+          priceValue: item.price_value,
           image: item.image,
           quantity: item.quantity
         }));
@@ -106,13 +105,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           setItems(mergedItems);
 
-          await fetch(`${API_BASE_URL}/api/cart/sync/`, {
+          await fetch(`${PYTHON_API_URL}/api/cart/sync`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ items: mergedItems })
+            body: JSON.stringify(mergedItems)
           });
         } else if (backendItems.length > 0) {
           setItems(backendItems);

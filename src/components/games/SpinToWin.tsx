@@ -75,21 +75,29 @@ export default function SpinToWin() {
     
     const reward = rewards[winningIndex];
 
-    // Save to Firestore
+    // Save to Backend
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const token = await user.getIdToken();
+      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+
       const updateData: any = {
-        lastSpin: serverTimestamp(),
+        last_spin: new Date().toISOString(),
       };
 
       if (reward.value) {
         setResult(reward.text);
-        updateData.vouchers = arrayUnion({
-          code: reward.value,
-          offer: reward.text,
-          type: 'Spin Win',
-          date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString(), // 7 days from now
-          addedAt: new Date().toISOString()
+
+        // Add voucher via Django API
+        await fetch(`${API_URL}/api/profile/add_voucher/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code: reward.value,
+            offer: reward.text
+          })
         });
 
         toast.success(`Congratulations! You won ${reward.text}!`, {
@@ -100,7 +108,17 @@ export default function SpinToWin() {
         toast.error("Better luck next time!");
       }
 
-      await updateDoc(userRef, updateData);
+      // Update last spin date in profile
+      await fetch(`${API_URL}/api/profile/me/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          last_spin: new Date().toISOString()
+        })
+      });
     } catch (e) {
       console.error("Spin error:", e);
     }

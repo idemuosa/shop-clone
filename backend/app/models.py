@@ -35,3 +35,27 @@ class Product(Base):
     @property
     def category_name(self):
         return self.category.name if self.category else None
+
+class Cart(Base):
+    __tablename__ = "carts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_uid = Column(String, unique=True, index=True) # Firebase UID
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+
+    items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    cart_id = Column(Integer, ForeignKey("carts.id"))
+    product_id = Column(String)
+    name = Column(String)
+    price = Column(String)
+    price_value = Column(Float)
+    image = Column(String)
+    quantity = Column(Integer, default=1)
+
+    cart = relationship("Cart", back_populates="items")

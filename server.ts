@@ -106,7 +106,7 @@ app.post("/api/paystack/initialize", async (req, res) => {
       },
       body: JSON.stringify({
         email,
-        amount: Math.round(amount * 100),
+        amount: Math.round(amount * 100), // Convert to kobo/cents
         callback_url: `${process.env.APP_URL || 'http://localhost:5173'}/checkout/verify`,
       }),
     });
@@ -143,9 +143,63 @@ app.post("/api/paystack/verify", async (req, res) => {
 app.post("/api/paystack/webhook", async (req, res) => {
   const event = req.body;
   if (event.event === 'charge.success') {
-    console.log(`[PAYSTACK WEBHOOK] Payment Successful for ${event.data.customer.email}`);
+    const { reference, customer, amount, metadata } = event.data;
+    console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer.email}, Amount ${amount}`);
+
+    try {
+      if (isFirebaseAdminInitialized) {
+        const ordersRef = admin.firestore().collection('orders');
+        const q = ordersRef.where('paymentReference', '==', reference).limit(1);
+        const snapshot = await q.get();
+
+        if (!snapshot.empty) {
+          await snapshot.docs[0].ref.update({ status: 'paid' });
+        }
+      }
+    } catch (e) {
+      console.error("Webhook processing error:", e);
+    }
   }
+
   res.sendStatus(200);
+});
+
+app.get("/api/admin/analytics", async (req, res) => {
+  if (!isFirebaseAdminInitialized) {
+    return res.status(500).json({ error: "Firebase Admin not initialized" });
+  }
+
+  try {
+    const ordersSnapshot = await admin.firestore().collection('orders').get();
+    const orders = ordersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    // Calculate last 7 days sales
+    const last7Days: any[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateString = date.toLocaleDateString(undefined, { weekday: 'short' });
+
+      const dayOrders = orders.filter((o: any) => {
+        const orderDate = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+        return orderDate.toLocaleDateString(undefined, { weekday: 'short' }) === dateString;
+      });
+
+      last7Days.push({
+        name: dateString,
+        sales: dayOrders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0),
+        orders: dayOrders.length
+      });
+    }
+
+    res.json({
+      chartData: last7Days,
+      totalSales: orders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0),
+      totalOrders: orders.length
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.post("/api/send-otp", async (req, res) => {
@@ -294,7 +348,7 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   res.json({ success: true });
 });
 
-app.all(["/products", "/products/", "/products/*", "/categories", "/categories/", "/categories/*"], async (req, res) => {
+app.all(["/products", "/products/", "/products/*", "/categories", "/categories/", "/categories/*", "/api/cart", "/api/cart/*"], async (req, res) => {
   // Ensure the path ends with a slash for FastAPI compatibility, but preserve query params
   const pathPart = req.path.endsWith('/') ? req.path : `${req.path}/`;
   const queryString = req.url.includes('?') ? `?${req.url.split('?')[1]}` : '';
@@ -345,8 +399,6 @@ async function startServer() {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } else {
-    // In production (like on Vercel), we don't use app.listen
-    // but we might still want to serve static files if not using Vercel's static hosting
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
@@ -355,7 +407,6 @@ async function startServer() {
   }
 }
 
-// Export the app for Vercel
 export default app;
 
 if (process.env.NODE_ENV !== "production") {

@@ -16,6 +16,7 @@ const AIAssistant = lazy(() => import("./components/ai/AIAssistant"));
 const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const InfoPage = lazy(() => import("./components/InfoPages"));
 const SpinToWin = lazy(() => import("./components/games/SpinToWin"));
+const SellerDashboard = lazy(() => import("./components/seller/SellerDashboard"));
 
 import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
@@ -23,6 +24,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
+import { SocketProvider, useSocket } from "./lib/SocketContext";
 import { API_URL } from "./lib/api";
 import { db } from "./lib/firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
@@ -43,10 +45,47 @@ function MainContent() {
   const [products, setProducts] = useState<any[]>([]);
   const [isProductsLoading, setIsProductsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState(false);
   const [lastViewedCategory, setLastViewedCategory] = useState<string>(() => {
     return localStorage.getItem('lastViewedCategory') || '';
   });
   const { user, profile, isAdmin, loading } = useAuth();
+
+  // Check for Paystack reference on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+    if (reference && !isVerifyingPayment) {
+      handleVerifyPayment(reference);
+    }
+  }, []);
+
+  const handleVerifyPayment = async (reference: string) => {
+    setIsVerifyingPayment(true);
+    toast.loading("Verifying your payment...");
+    try {
+      const res = await fetch(`${API_URL}/api/paystack/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference })
+      });
+      const data = await res.json();
+      if (data.status && data.data.status === 'success') {
+        toast.dismiss();
+        toast.success("Payment verified! Your order is being processed.");
+        window.history.replaceState({}, document.title, "/");
+      } else {
+        toast.dismiss();
+        toast.error("Payment verification failed.");
+      }
+    } catch (e) {
+      toast.dismiss();
+      toast.error("Error verifying payment.");
+    } finally {
+      setIsVerifyingPayment(false);
+    }
+  };
 
   const handleProductView = (product: any) => {
     if (product.category) {
@@ -61,7 +100,6 @@ function MainContent() {
     }
     const categoryMatches = products.filter(p => p.category === lastViewedCategory);
     if (categoryMatches.length < 4) {
-      // Complement with high rated products if not enough in category
       const others = products
         .filter(p => p.category !== lastViewedCategory && p.rating >= 4)
         .slice(0, 12 - categoryMatches.length);
@@ -100,7 +138,6 @@ function MainContent() {
     setShowCheckout(true);
   };
 
-  // Add keyboard navigation (ArrowLeft to go back)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
@@ -147,7 +184,6 @@ function MainContent() {
     };
 
     fetchProducts();
-    // Poll for updates every 30 seconds since we're not using WebSockets/onSnapshot for the Python API
     const interval = setInterval(fetchProducts, 30000);
     return () => clearInterval(interval);
   }, []);
@@ -228,11 +264,9 @@ function MainContent() {
 
   if (showAdmin) {
     if (!isAdmin && !loading) {
-      // Only reset if we are sure the user is NOT admin
       setShowAdmin(false);
       return null;
     }
-    // If loading, show a loader or just wait
     if (loading) return <div className="min-h-screen flex items-center justify-center font-black  italic tracking-tighter">Authenticating...</div>;
 
     return (
@@ -413,7 +447,6 @@ function MainContent() {
               onProductView={handleProductView}
             />
             
-            {/* Secondary Promo Banners */}
             <section className="py-10">
               <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="relative bg-purple-500 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
@@ -519,14 +552,16 @@ function MainContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <CurrencyProvider>
-        <CartProvider>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivi...</div>}>
-            <MainContent />
-          </Suspense>
-          <Toaster position="top-center" richColors />
-        </CartProvider>
-      </CurrencyProvider>
+      <SocketProvider>
+        <CurrencyProvider>
+          <CartProvider>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivi...</div>}>
+              <MainContent />
+            </Suspense>
+            <Toaster position="top-center" richColors />
+          </CartProvider>
+        </CurrencyProvider>
+      </SocketProvider>
     </AuthProvider>
   );
 }

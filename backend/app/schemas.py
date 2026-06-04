@@ -40,3 +40,28 @@ class Category(CategoryBase):
 
     class Config:
         from_attributes = True
+
+class CartItemBase(BaseModel):
+    product_id: str
+    name: str
+    price: str
+    price_value: float
+    image: str
+    quantity: int
+
+class CartItem(CartItemBase):
+    id: int
+    cart_id: int
+
+    class Config:
+        from_attributes = True
+
+class Cart(BaseModel):
+    id: int
+    user_uid: str
+    items: List[CartItem] = []
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

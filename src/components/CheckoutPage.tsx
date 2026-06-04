@@ -154,41 +154,59 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         createdAt: serverTimestamp(),
       };
 
-      const orderRef = await addDoc(collection(db, 'orders'), orderData);
+      // Create order via Django API
+      const token = await user.getIdToken();
+      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
 
-      // Create notification for dashboard
-      await addDoc(collection(db, 'notifications'), {
-        userId: user.uid,
-        type: 'ORDER_PLACED',
-        message: `Your order #${orderRef.id.slice(-6).toUpperCase()} has been successfully placed.`,
-        createdAt: serverTimestamp()
+      const response = await fetch(`${API_URL}/api/orders/verify_payment/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          reference: paymentReference,
+          order_details: {
+            full_name: user.displayName || profile?.displayName || user.email,
+            address: address,
+            city: city
+          }
+        })
       });
 
-      // Send confirmation via API (Optional/Simulated)
-      try {
-        await fetch(`${API_URL}/api/send-order-confirmation`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: user.email,
-            orderId: orderRef.id,
-            productName: items[0].name + (items.length > 1 ? ` and ${items.length - 1} more` : ''),
-            totalAmount: totalPrice.toFixed(2),
-            shippingAddress: { address, city, zipCode: zip },
-            name: user.displayName || profile?.displayName
-          }),
-        });
-      } catch (e) { console.error("Order confirmation email failed", e); }
+      if (!response.ok) {
+        throw new Error("Failed to verify payment with backend");
+      }
+
+      const orderResult = await response.json();
 
       setStep('success');
       clearCart();
 
-      // If a voucher was used, remove it from user profile
+      // If a voucher was used, mark it as used in Django
       if (selectedVoucher && user) {
-        const userRef = doc(db, 'users', user.uid);
-        const updatedVouchers = profile?.vouchers?.filter((v: any) => v.code !== selectedVoucher.code) || [];
-        await updateDoc(userRef, { vouchers: updatedVouchers });
+         await fetch(`${API_URL}/api/profile/use_voucher/`, {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'Authorization': `Bearer ${token}`
+           },
+           body: JSON.stringify({ voucher_id: selectedVoucher.id })
+         });
       }
+
+      // Add Shopsy Coins via Django Profile update
+      const pointsToEarn = Math.floor(finalPrice);
+      await fetch(`${API_URL}/api/profile/me/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          points: (profile?.points || 0) + pointsToEarn
+        })
+      });
 
       toast.success("Order placed successfully!");
     } catch (error: any) {

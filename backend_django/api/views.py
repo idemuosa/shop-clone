@@ -13,11 +13,22 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def perform_create(self, serializer):
+        if self.request.user.is_authenticated:
+            serializer.save(seller=self.request.user)
+        else:
+            serializer.save()
+
     def get_queryset(self):
         queryset = Product.objects.all()
         category = self.request.query_params.get('category')
         search = self.request.query_params.get('search')
         tag = self.request.query_params.get('tag')
+        ordering = self.request.query_params.get('ordering')
+        seller_only = self.request.query_params.get('seller_only')
+
+        if seller_only == 'true' and self.request.user.is_authenticated:
+            queryset = queryset.filter(seller=self.request.user)
 
         if category:
             queryset = queryset.filter(category__name__icontains=category)
@@ -28,6 +39,9 @@ class ProductViewSet(viewsets.ModelViewSet):
             )
         if tag:
             queryset = queryset.filter(tag__icontains=tag)
+
+        if ordering:
+            queryset = queryset.order_by(ordering)
 
         return queryset
 
@@ -225,6 +239,15 @@ class OrderViewSet(viewsets.ModelViewSet):
                 )
 
                 for item in cart.items.all():
+                    # Update Stock
+                    try:
+                        product = Product.objects.get(id=int(item.product_id))
+                        product.stock = max(0, product.stock - item.quantity)
+                        product.sold += item.quantity
+                        product.save()
+                    except (Product.DoesNotExist, ValueError):
+                        pass
+
                     OrderItem.objects.create(
                         order=order,
                         product_name=item.name,
@@ -241,3 +264,153 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({"error": "Payment verification failed", "details": res_data.get('message')}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        product_id = self.request.query_params.get('product_id')
+        if product_id:
+            return Review.objects.filter(product_id=product_id).order_by('-created_at')
+        return Review.objects.all().order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, user_name=self.request.user.username)
+
+class WishlistViewSet(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WishlistSerializer
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def my_wishlist(self, request):
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        serializer = self.get_serializer(wishlist)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def add_to_wishlist(self, request):
+        product_id = request.data.get('product_id')
+        if not product_id:
+            return Response({"error": "product_id is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+        try:
+            product = Product.objects.get(id=product_id)
+            wishlist.products.add(product)
+            return Response({"message": "Product added to wishlist"}, status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['post'])
+    def remove_from_wishlist(self, request):
+        product_id = request.data.get('product_id')
+        wishlist = Wishlist.objects.filter(user=request.user).first()
+        if wishlist and product_id:
+            wishlist.products.remove(product_id)
+            return Response({"message": "Product removed from wishlist"}, status=status.HTTP_200_OK)
+        return Response({"error": "Not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class ProfileViewSet(viewsets.GenericViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserProfileSerializer
+
+    @action(detail=False, methods=['get', 'post', 'put'])
+    def me(self, request):
+        profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+        if request.method in ['POST', 'PUT']:
+            data = request.data
+            profile.display_name = data.get('display_name', profile.display_name)
+            profile.uid = data.get('uid', profile.uid)
+            if 'points' in data:
+                profile.points = data.get('points')
+            if 'last_spin' in data:
+                profile.last_spin = data.get('last_spin')
+            profile.save()
+
+        serializer = self.get_serializer(profile)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def add_voucher(self, request):
+        code = request.data.get('code')
+        offer = request.data.get('offer')
+        if not code or not offer:
+            return Response({"error": "Code and offer required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        Voucher.objects.create(user=request.user, code=code, offer=offer)
+        return Response({"message": "Voucher added"}, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get', 'post'])
+    def addresses(self, request):
+        if request.method == 'GET':
+            addresses = Address.objects.filter(user=request.user)
+            return Response(AddressSerializer(addresses, many=True).data)
+
+        serializer = AddressSerializer(data=request.data)
+        if serializer.is_valid():
+            if serializer.validated_data.get('is_default'):
+                Address.objects.filter(user=request.user).update(is_default=False)
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['put', 'delete'], url_path='addresses/(?P<address_id>[^/.]+)')
+    def manage_address(self, request, pk=None, address_id=None):
+        # The 'pk' here is dummy since we use detail=False for 'addresses' action usually,
+        # but DRF routers can be tricky with nested.
+        # Let's just create a separate ViewSet for Address for better REST practice.
+        pass
+
+class AddressViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        if serializer.validated_data.get('is_default'):
+            Address.objects.filter(user=self.request.user).update(is_default=False)
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        if serializer.validated_data.get('is_default'):
+            Address.objects.filter(user=self.request.user).update(is_default=False)
+        serializer.save()
+
+    @action(detail=False, methods=['post'])
+    def use_voucher(self, request):
+        voucher_id = request.data.get('voucher_id')
+        try:
+            voucher = Voucher.objects.get(id=voucher_id, user=request.user)
+            voucher.is_used = True
+            voucher.save()
+            return Response({"message": "Voucher marked as used"})
+        except Voucher.DoesNotExist:
+            return Response({"error": "Voucher not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class MerchantApplicationViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = MerchantApplicationSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return MerchantApplication.objects.all()
+        return MerchantApplication.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def approve(self, request, pk=None):
+        application = self.get_object()
+        application.status = 'approved'
+        application.save()
+
+        # Grant merchant role to user
+        profile, created = 

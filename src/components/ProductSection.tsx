@@ -75,6 +75,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
   const [minRating, setMinRating] = useState<string>("0");
+  const [sortBy, setSortBy] = useState<string>("newest");
   const [selectedProduct, setInternalSelectedProduct] = useState<Product | null>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
 
@@ -165,19 +166,25 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       return;
     }
 
-    const q = query(
-      collection(db, 'products', selectedProduct.id.toString(), 'reviews'),
-      orderBy('createdAt', 'desc')
-    );
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000'}/api/reviews/?product_id=${selectedProduct.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setReviews(data.map((r: any) => ({
+            id: r.id,
+            userName: r.user_name,
+            rating: r.rating,
+            comment: r.comment,
+            createdAt: { toDate: () => new Date(r.created_at) }
+          })));
+        }
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const revs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setReviews(revs);
-    }, (error) => {
-      console.error("Product reviews snapshot error:", error);
-    });
-
-    return () => unsubscribe();
+    fetchReviews();
   }, [selectedProduct]);
 
   const handleSubmitReview = async () => {
@@ -193,21 +200,64 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
     setIsSubmittingReview(true);
     try {
-      await addDoc(collection(db, 'products', selectedProduct!.id.toString(), 'reviews'), {
-        productId: selectedProduct!.id.toString(),
-        userId: user.uid,
-        userName: user.displayName || user.email?.split('@')[0] || "Anonymous",
-        rating: newReviewRating,
-        comment: newReviewComment,
-        createdAt: serverTimestamp(),
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000'}/api/reviews/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product: selectedProduct!.id,
+          rating: newReviewRating,
+          comment: newReviewComment,
+        }),
       });
-      setNewReviewComment("");
-      setNewReviewRating(5);
-      toast.success("Review submitted!");
+
+      if (response.ok) {
+        setNewReviewComment("");
+        setNewReviewRating(5);
+        toast.success("Review submitted!");
+        // Trigger a re-fetch of reviews by resetting state or just calling fetchReviews again
+        // Here we just reload the selected product to trigger the useEffect
+        const temp = selectedProduct;
+        setInternalSelectedProduct(null);
+        setTimeout(() => setInternalSelectedProduct(temp), 10);
+      } else {
+        toast.error("Failed to submit review.");
+      }
     } catch (error: any) {
       toast.error("Failed to submit review: " + error.message);
     } finally {
       setIsSubmittingReview(false);
+    }
+  };
+
+  const handleAddToWishlistAction = async (product: Product) => {
+    if (!user) {
+      toast.error("Please login to save items");
+      return;
+    }
+
+    try {
+      const token = await user.getIdToken();
+      const response = await fetch(`${import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000'}/api/wishlist/add_to_wishlist/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ product_id: product.id })
+      });
+
+      if (response.ok) {
+        onAddToWishlist?.();
+        toast.success("Added to Wishlist");
+      } else {
+        toast.error("Failed to add to wishlist");
+      }
+    } catch (e) {
+      toast.error("Error adding to wishlist");
     }
   };
 
@@ -265,7 +315,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   };
 
   const filteredProducts = useMemo(() => {
-    return products.filter(product => {
+    let result = products.filter(product => {
       const priceStr = String(product.price || "0").replace(/[^\d.]/g, '');
       const price = parseFloat(priceStr) || 0;
 
@@ -275,7 +325,26 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       
       return matchesCategory && matchesPrice && matchesRating;
     });
-  }, [products, selectedCategory, priceRange, minRating]);
+
+    // Apply Sorting
+    return result.sort((a, b) => {
+      const priceA = parseFloat(String(a.price).replace(/[^\d.]/g, '')) || 0;
+      const priceB = parseFloat(String(b.price).replace(/[^\d.]/g, '')) || 0;
+
+      switch (sortBy) {
+        case "price-low":
+          return priceA - priceB;
+        case "price-high":
+          return priceB - priceA;
+        case "rating":
+          return (b.rating || 0) - (a.rating || 0);
+        case "newest":
+        default:
+          // Assuming higher ID means newer, or use a date if available
+          return Number(b.id) - Number(a.id);
+      }
+    });
+  }, [products, selectedCategory, priceRange, minRating, sortBy]);
 
   const resetFilters = () => {
     setSelectedCategory("all");
@@ -496,6 +565,19 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Sorting Dropdown */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[140px] md:w-[180px] bg-white border-2 border-gray-100 rounded-xl h-11 font-bold text-xs">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-2">
+                <SelectItem value="newest" className="font-medium">Newest First</SelectItem>
+                <SelectItem value="price-low" className="font-medium">Price: Low to High</SelectItem>
+                <SelectItem value="price-high" className="font-medium">Price: High to Low</SelectItem>
+                <SelectItem value="rating" className="font-medium">Top Rated</SelectItem>
+              </SelectContent>
+            </Select>
+
             {/* Collapsible Filter Panel (Sheet) */}
             <Sheet>
               <SheetTrigger
@@ -717,8 +799,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-purple-600 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
-                          onAddToWishlist?.();
-                          toast.success("Added to Wishlist");
+                          handleAddToWishlistAction(product);
                         }}
                       >
                         <Heart className="h-4 w-4" />
@@ -1167,10 +1248,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           <Button 
                             variant="outline" 
                             className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-purple-600 transition-all text-gray-700"
-                            onClick={() => {
-                              onAddToWishlist?.();
-                              toast.success("Added to Wishlist");
-                            }}
+                            onClick={() => handleAddToWishlistAction(selectedProduct)}
                           >
                             <Heart className="h-5 w-5 mr-2" /> Wishlist
                           </Button>

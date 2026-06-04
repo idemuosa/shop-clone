@@ -71,7 +71,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
   const [addresses, setAddresses] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('orders');
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(profile?.displayName || user?.displayName || '');
+  const [name, setName] = useState(profile?.displayName || profile?.display_name || user?.displayName || '');
   const [loading, setLoading] = useState(false);
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [currentAddress, setCurrentAddress] = useState<any>(null);
@@ -83,34 +83,41 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
   useEffect(() => {
     if (!user) return;
 
-    const q = query(
-      collection(db, 'orders'),
-      where('userId', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    );
+    const fetchOrders = async () => {
+      try {
+        const token = await user.getIdToken();
+        const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${API_URL}/api/orders/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setOrders(data);
+        }
+      } catch (e) { console.error("Fetch orders failed", e); }
+    };
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }, (error) => {
-      console.error("UserProfilePage orders error:", error);
-    });
-
-    return () => unsubscribe();
+    fetchOrders();
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
-    const q = query(
-      collection(db, 'users', user.uid, 'addresses'),
-      orderBy('createdAt', 'desc')
-    );
+    const fetchAddresses = async () => {
+      try {
+        const token = await user.getIdToken();
+        const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+        const response = await fetch(`${API_URL}/api/profile/addresses/`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setAddresses(data);
+        }
+      } catch (e) { console.error("Fetch addresses failed", e); }
+    };
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setAddresses(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
-
-    return () => unsubscribe();
+    fetchAddresses();
   }, [user]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -119,12 +126,21 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     setLoading(true);
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), {
-        displayName: name,
-        updatedAt: serverTimestamp(),
+      const token = await user.getIdToken();
+      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${API_URL}/api/profile/me/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ display_name: name })
       });
-      toast.success('Profile updated successfully!');
-      setIsEditing(false);
+
+      if (response.ok) {
+        toast.success('Profile updated successfully!');
+        setIsEditing(false);
+      }
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -137,26 +153,43 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     if (!user) return;
     setLoading(true);
     const formData = new FormData(e.currentTarget);
+    const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+    const token = await user.getIdToken();
+
     const addressData = {
       street: formData.get('street') as string,
       city: formData.get('city') as string,
-      zipCode: formData.get('zipCode') as string,
+      zip_code: formData.get('zipCode') as string,
       country: formData.get('country') as string,
-      type: formData.get('type') as string,
-      isDefault: formData.get('isDefault') === 'on',
-      createdAt: serverTimestamp(),
+      address_type: formData.get('type') as string,
+      is_default: formData.get('isDefault') === 'on',
     };
 
     try {
-      if (currentAddress) {
-        await updateDoc(doc(db, 'users', user.uid, 'addresses', currentAddress.id), addressData);
-        toast.success('Address updated successfully!');
-      } else {
-        await addDoc(collection(db, 'users', user.uid, 'addresses'), addressData);
-        toast.success('Address added successfully!');
+      const method = currentAddress ? 'PUT' : 'POST';
+      const url = currentAddress
+        ? `${API_URL}/api/profile/addresses/${currentAddress.id}/`
+        : `${API_URL}/api/profile/addresses/`;
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(addressData)
+      });
+
+      if (response.ok) {
+        toast.success(currentAddress ? 'Address updated!' : 'Address added!');
+        setIsAddressModalOpen(false);
+        setCurrentAddress(null);
+        // Refresh addresses
+        const res = await fetch(`${API_URL}/api/profile/addresses/`, {
+           headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setAddresses(await res.json());
       }
-      setIsAddressModalOpen(false);
-      setCurrentAddress(null);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -167,8 +200,14 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
   const handleDeleteAddress = async (id: string) => {
     if (!user || !window.confirm('Are you sure you want to delete this address?')) return;
     try {
-      await deleteDoc(doc(db, 'users', user.uid, 'addresses', id));
+      const token = await user.getIdToken();
+      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+      await fetch(`${API_URL}/api/profile/addresses/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       toast.success('Address deleted');
+      setAddresses(prev => prev.filter(a => a.id !== id));
     } catch (error: any) {
       toast.error(error.message);
     }
@@ -193,7 +232,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group cursor-pointer" onClick={() => setActiveTab('details')}>
               <div className="w-32 h-32 bg-purple-600 rounded-full flex items-center justify-center text-5xl font-black text-white shadow-2xl shadow-purple-100 group-hover:scale-105 transition-transform">
-                {profile?.displayName?.charAt(0) || user.email?.charAt(0).toUpperCase()}
+                {(profile?.displayName || profile?.display_name || user.email)?.charAt(0).toUpperCase()}
               </div>
               <div className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 group-hover:bg-purple-50 transition-colors">
                 <Settings className="h-5 w-5 text-purple-600" />
@@ -203,7 +242,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
             <div className="flex-1 text-center md:text-left">
               <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
                 <h1 className="text-4xl font-black text-black uppercase tracking-tighter italic">
-                  {profile?.displayName || 'Welcome Back!'}
+                  {profile?.displayName || profile?.display_name || 'Welcome Back!'}
                 </h1>
                 <Badge className="w-fit mx-auto md:mx-0 bg-zinc-900 text-white font-black uppercase tracking-widest text-[10px]">
                   {profile?.role || 'Member'}
@@ -337,10 +376,10 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                               ))}
                            </div>
                         </div>
-                        <div className="flex justify-between items-center bg-gray-50/50 -mx-6 -mb-6 p-6 border-t border-gray-100 mt-6">
+                          <div className="flex justify-between items-center bg-gray-50/50 -mx-6 -mb-6 p-6 border-t border-gray-100 mt-6">
                           <div className="flex items-center gap-2 text-gray-400">
                             <Clock className="h-4 w-4" />
-                            <span className="text-[10px] font-bold uppercase tracking-wider">{order.createdAt?.toDate().toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider">{new Date(order.created_at).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
                           </div>
                           <div className="flex gap-4">
                             {order.status === 'delivered' && (

@@ -297,6 +297,46 @@ async def send_order_confirmation(payload: dict = Body(...)):
 
     return {"success": True}
 
+@app.get("/api/cart", response_model=schemas.Cart)
+async def get_cart(db: Session = Depends(get_db), current_user: dict = Depends(auth.verify_token)):
+    user_uid = current_user['uid']
+    cart = db.query(models.Cart).filter(models.Cart.user_uid == user_uid).first()
+    if not cart:
+        # Create an empty cart if not found
+        cart = models.Cart(user_uid=user_uid)
+        db.add(cart)
+        db.commit()
+        db.refresh(cart)
+    return cart
+
+@app.post("/api/cart/sync")
+async def sync_cart(items: List[dict] = Body(...), db: Session = Depends(get_db), current_user: dict = Depends(auth.verify_token)):
+    user_uid = current_user['uid']
+    cart = db.query(models.Cart).filter(models.Cart.user_uid == user_uid).first()
+    if not cart:
+        cart = models.Cart(user_uid=user_uid)
+        db.add(cart)
+        db.commit()
+        db.refresh(cart)
+
+    # Delete existing items and replace with new ones
+    db.query(models.CartItem).filter(models.CartItem.cart_id == cart.id).delete()
+
+    for item in items:
+        new_item = models.CartItem(
+            cart_id=cart.id,
+            product_id=str(item.get('id')),
+            name=item.get('name'),
+            price=item.get('price'),
+            price_value=item.get('priceValue'),
+            image=item.get('image'),
+            quantity=item.get('quantity', 1)
+        )
+        db.add(new_item)
+
+    db.commit()
+    return {"status": "success"}
+
 @app.get("/products/", response_model=List[schemas.Product])
 def get_products(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return db.query(models.Product).offset(skip).limit(limit).all()

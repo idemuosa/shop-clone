@@ -11,6 +11,7 @@ interface UserProfile {
   displayName?: string;
   points?: number;
   tier?: 'Bronze' | 'Silver' | 'Gold' | 'Diamond';
+  vouchers?: Array<{ code: string; offer: string; type?: string; date?: string }>;
 }
 
 interface AuthContextType {
@@ -45,7 +46,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Listen to profile changes in real-time
         const docRef = doc(db, 'users', firebaseUser.uid);
 
-        // Clean up previous profile listener if it exists
         if (profileUnsubscribe) {
           profileUnsubscribe();
         }
@@ -64,6 +64,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               role: isAdminEmail ? 'admin' : 'user',
               points: 100,
               tier: 'Bronze',
+              vouchers: [
+                { code: 'WELCOME10', offer: '10% OFF', type: 'Platform Wide', date: 'Dec 31, 2024' }
+              ]
             };
             setDoc(docRef, newProfile).catch(err => console.error("Error creating profile:", err));
             setProfile(newProfile);
@@ -71,16 +74,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setLoading(false);
         }, (error) => {
           console.error("Profile snapshot error:", error);
-          if (error.code === 'permission-denied') {
-             // Fallback for immediate access if rules are being updated
-             const isAdminEmail = firebaseUser.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com';
-             setProfile({
-                uid: firebaseUser.uid,
-                email: firebaseUser.email || '',
-                role: isAdminEmail ? 'admin' : 'user',
-                points: 0
-             });
-          }
           setLoading(false);
         });
       } else {

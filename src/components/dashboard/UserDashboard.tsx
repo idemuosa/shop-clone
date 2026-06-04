@@ -532,16 +532,25 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
              if (!user) return;
 
              try {
-                await addDoc(collection(db, 'merchant_applications'), {
-                   userId: user.uid,
-                   userEmail: user.email,
-                   businessName,
-                   category,
-                   status: 'pending',
-                   createdAt: serverTimestamp()
+                const token = await user.getIdToken();
+                const response = await fetch(`${DJANGO_API}/api/merchants/`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                  },
+                  body: JSON.stringify({
+                    business_name: businessName,
+                    category: category
+                  })
                 });
-                toast.success("Merchant application submitted! We will contact you soon.");
-                setActiveModal('none');
+
+                if (response.ok) {
+                   toast.success("Merchant application submitted! We will contact you soon.");
+                   setActiveModal('none');
+                } else {
+                   toast.error("Failed to submit application.");
+                }
              } catch (err) {
                 toast.error("Failed to submit application.");
              }

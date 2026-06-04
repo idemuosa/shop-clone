@@ -1,7 +1,4 @@
 export const getApiUrl = () => {
-  if (import.meta.env.VITE_DJANGO_API_URL) {
-    return import.meta.env.VITE_DJANGO_API_URL;
-  }
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
@@ -17,3 +14,6 @@ export const getApiUrl = () => {
 };
 
 export const API_URL = getApiUrl();
+
+// Direct access to Python/Django backend if needed
+export const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL || import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
