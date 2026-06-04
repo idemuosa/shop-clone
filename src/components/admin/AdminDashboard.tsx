@@ -76,7 +76,7 @@ import {
 } from 'lucide-react';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { API_URL } from '@/lib/api';
-import { cn } from '@/lib/utils';
+import { cn, uploadToCloudinary } from '@/lib/utils';
 
 export default function AdminDashboard() {
   const { formatPrice } = useCurrency();
@@ -293,10 +293,17 @@ export default function AdminDashboard() {
     setIsLoading(true);
 
     try {
+      let imageUrl = newCategoryImage;
+      if (newCategoryImage.startsWith('data:')) {
+        toast.loading("Uploading category image...");
+        imageUrl = await uploadToCloudinary(newCategoryImage);
+        toast.dismiss();
+      }
+
       const response = await fetch(`${API_URL}/categories/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newCategoryName, image: newCategoryImage }),
+        body: JSON.stringify({ name: newCategoryName, image: imageUrl }),
       });
 
       if (!response.ok) {
@@ -404,20 +411,27 @@ export default function AdminDashboard() {
     const stockStr = formData.get('stock') as string;
     const soldStr = formData.get('sold') as string;
 
-    const updatedProduct = {
-      name: formData.get('name') as string,
-      price: parseFloat(formData.get('price') as string),
-      old_price: oldPriceStr && oldPriceStr.trim() !== "" ? parseFloat(oldPriceStr) : null,
-      stock: stockStr ? parseInt(stockStr) : 0,
-      sold: soldStr ? parseInt(soldStr.replace(/[^0-9]/g, '')) : 0,
-      image: editProductImage || editingProduct.image,
-      tag: formData.get('tag') as string,
-      description: formData.get('description') as string,
-      category_id: parseInt(editCategoryId),
-    };
-
     try {
-       const response = await fetch(`${API_URL}/products/${editingProduct.id}`, {
+      let imageUrl = editingProduct.image;
+      if (editProductImage) {
+        toast.loading("Uploading new image...");
+        imageUrl = await uploadToCloudinary(editProductImage);
+        toast.dismiss();
+      }
+
+      const updatedProduct = {
+        name: formData.get('name') as string,
+        price: parseFloat(formData.get('price') as string),
+        old_price: oldPriceStr && oldPriceStr.trim() !== "" ? parseFloat(oldPriceStr) : null,
+        stock: stockStr ? parseInt(stockStr) : 0,
+        sold: soldStr ? parseInt(soldStr.replace(/[^0-9]/g, '')) : 0,
+        image: imageUrl,
+        tag: formData.get('tag') as string,
+        description: formData.get('description') as string,
+        category_id: parseInt(editCategoryId),
+      };
+
+      const response = await fetch(`${API_URL}/products/${editingProduct.id}`, {
          method: 'PUT',
          headers: { 'Content-Type': 'application/json' },
          body: JSON.stringify(updatedProduct),
@@ -508,19 +522,6 @@ export default function AdminDashboard() {
     const stockStr = formData.get('stock') as string;
     const soldStr = formData.get('sold') as string;
 
-    const newProduct = {
-      name: formData.get('name') as string,
-      description: formData.get('description') as string,
-      price: parseFloat(formData.get('price') as string) || 0,
-      old_price: oldPriceStr && oldPriceStr.trim() !== "" ? parseFloat(oldPriceStr) : null,
-      image: newProductImage,
-      category_id: categoryId,
-      tag: formData.get('tag') as string,
-      stock: stockStr ? parseInt(stockStr) : 0,
-      sold: soldStr ? parseInt(soldStr.replace(/[^0-9]/g, '')) : 0,
-      is_available: true
-    };
-
     if (!newProductImage) {
       toast.error("Please select a product image");
       setIsLoading(false);
@@ -528,6 +529,23 @@ export default function AdminDashboard() {
     }
 
     try {
+      toast.loading("Uploading image to cloud...");
+      const imageUrl = await uploadToCloudinary(newProductImage);
+      toast.dismiss();
+
+      const newProduct = {
+        name: formData.get('name') as string,
+        description: formData.get('description') as string,
+        price: parseFloat(formData.get('price') as string) || 0,
+        old_price: oldPriceStr && oldPriceStr.trim() !== "" ? parseFloat(oldPriceStr) : null,
+        image: imageUrl,
+        category_id: categoryId,
+        tag: formData.get('tag') as string,
+        stock: stockStr ? parseInt(stockStr) : 0,
+        sold: soldStr ? parseInt(soldStr.replace(/[^0-9]/g, '')) : 0,
+        is_available: true
+      };
+
       const response = await fetch(`${API_URL}/products/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -624,15 +642,30 @@ export default function AdminDashboard() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="cat-image" className="text-[10px]">Image URL</Label>
-                    <Input
-                      id="cat-image"
-                      value={newCategoryImage}
-                      onChange={(e) => setNewCategoryImage(e.target.value)}
-                      required
-                      className="rounded-xl h-10"
-                      placeholder="https://..."
-                    />
+                    <Label htmlFor="cat-image" className="text-[10px]">Image</Label>
+                    <div className="flex flex-col gap-2">
+                      <Input
+                        id="cat-image-file"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewCategoryImage(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-purple-50 file:text-purple-700"
+                      />
+                      {newCategoryImage && (
+                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                           <img src={newCategoryImage} className="w-full h-full object-cover" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
                     {isLoading ? 'Creating...' : 'Create category'}
