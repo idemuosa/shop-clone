@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Zap, Smartphone, Laptop, Watch, ShoppingBag, BookOpen, Footprints, Headphones, Box } from "lucide-react";
-import { useState, useEffect } from "react";
 import { API_URL } from "@/lib/api";
 
 interface Category {

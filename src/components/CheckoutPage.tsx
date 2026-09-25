@@ -26,7 +26,7 @@ import {
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL } from '@/lib/api';
+import { API_URL, PYTHON_API_URL } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -108,7 +108,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     setIsProcessing(true);
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000'}/api/orders/verify_payment/`, {
+      const response = await fetch(`${PYTHON_API_URL}/api/orders/verify_payment/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,83 +134,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       }
     } catch (error: any) {
       toast.error("Network error during verification");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-      const orderData = {
-        userId: user.uid,
-        customerEmail: user.email,
-        items: items.map(item => ({
-           id: item.id,
-           name: item.name,
-           price: item.price,
-           quantity: item.quantity
-        })),
-        totalAmount: finalPrice,
-        discount: discount,
-        shippingAddress: { address, city, zipCode: zip },
-        status: 'pending',
-        createdAt: serverTimestamp(),
-      };
-
-      // Create order via Django API
-      const token = await user.getIdToken();
-      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
-
-      const response = await fetch(`${API_URL}/api/orders/verify_payment/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          reference: paymentReference,
-          order_details: {
-            full_name: user.displayName || profile?.displayName || user.email,
-            address: address,
-            city: city
-          }
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to verify payment with backend");
-      }
-
-      const orderResult = await response.json();
-
-      setStep('success');
-      clearCart();
-
-      // If a voucher was used, mark it as used in Django
-      if (selectedVoucher && user) {
-         await fetch(`${API_URL}/api/profile/use_voucher/`, {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${token}`
-           },
-           body: JSON.stringify({ voucher_id: selectedVoucher.id })
-         });
-      }
-
-      // Add Shopsy Coins via Django Profile update
-      const pointsToEarn = Math.floor(finalPrice);
-      await fetch(`${API_URL}/api/profile/me/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          points: (profile?.points || 0) + pointsToEarn
-        })
-      });
-
-      toast.success("Order placed successfully!");
-    } catch (error: any) {
-      toast.error("Order failed: " + error.message);
     } finally {
       setIsProcessing(false);
     }
