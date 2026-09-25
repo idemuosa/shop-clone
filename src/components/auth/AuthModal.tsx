@@ -26,7 +26,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { API_URL } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
-import { ShieldCheck, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface AuthModalProps {
@@ -41,6 +41,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   const [otpCode, setOtpCode] = useState('');
   const [tempData, setTempData] = useState<any>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const { user } = useAuth();
 
   const handleGoogleSignIn = async () => {
@@ -369,8 +371,23 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           <div className="space-y-1.5">
                              <Label className="text-[9px] font-black  tracking-widest text-gray-400 ml-1">Secure Password</Label>
                              <div className="relative">
-                               <Input name="password" type="password" placeholder="••••••••" required autoComplete="current-password" className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm" />
+                               <Input
+                                 name="password"
+                                 type={showPassword ? "text" : "password"}
+                                 placeholder="••••••••"
+                                 required
+                                 autoComplete="current-password"
+                                 className="pl-10 pr-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm"
+                               />
                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                               <button
+                                 type="button"
+                                 onClick={() => setShowPassword(!showPassword)}
+                                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                                 aria-label={showPassword ? "Hide password" : "Show password"}
+                               >
+                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                               </button>
                              </div>
                           </div>
                         </div>
@@ -463,14 +480,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         </div>
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Create Password</Label>
-                           <Input
-                             name="password"
-                             type="password"
-                             placeholder="Min. 8 characters"
-                             required
-                             autoComplete="new-password"
-                             className="h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
-                           />
+                           <div className="relative">
+                             <Input
+                               name="password"
+                               type={showRegisterPassword ? "text" : "password"}
+                               placeholder="Min. 8 characters"
+                               required
+                               autoComplete="new-password"
+                               className="pl-10 pr-10 h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
+                             />
+                             <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                             <button
+                               type="button"
+                               onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                               aria-label={showRegisterPassword ? "Hide password" : "Show password"}
+                             >
+                               {showRegisterPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                             </button>
+                           </div>
                         </div>
                       </div>
 
