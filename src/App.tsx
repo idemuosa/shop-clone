@@ -24,6 +24,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
+import { ThemeProvider } from "./lib/ThemeContext";
 import { SocketProvider, useSocket } from "./lib/SocketContext";
 import { API_URL } from "./lib/api";
 import { db } from "./lib/firebase";
@@ -557,16 +558,18 @@ function MainContent() {
 export default function App() {
   return (
     <AuthProvider>
-      <SocketProvider>
-        <CurrencyProvider>
-          <CartProvider>
-            <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivi...</div>}>
-              <MainContent />
-            </Suspense>
-            <Toaster position="top-center" richColors />
-          </CartProvider>
-        </CurrencyProvider>
-      </SocketProvider>
+      <ThemeProvider>
+        <SocketProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <Suspense fallback={<div className="min-h-screen flex items-center justify-center font-black italic tracking-tighter">Loading Vivi...</div>}>
+                <MainContent />
+              </Suspense>
+              <Toaster position="top-center" richColors />
+            </CartProvider>
+          </CurrencyProvider>
+        </SocketProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Search, ShoppingCart, Heart, User, ChevronDown, Menu, Zap, LogOut, LayoutDashboard, Box, X } from "lucide-react";
+import { Search, ShoppingCart, Heart, User, ChevronDown, Menu, Zap, LogOut, LayoutDashboard, Box, X, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/lib/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/AuthContext";
@@ -33,6 +34,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   const { user, profile, isAdmin, loading } = useAuth();
   const { totalItems } = useCart();
   const { currency, setCurrency } = useCurrency();
+  const { theme, toggleTheme } = useTheme();
   const [categories, setCategories] = useState<any[]>([]);
   const [storeSettings, setStoreSettings] = useState<any>(null);
 
@@ -162,6 +164,14 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
 
           {/* User Actions */}
           <div className="flex items-center gap-1.5 sm:gap-6">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center p-2 bg-gray-50 dark:bg-zinc-800 rounded-full border border-gray-100 dark:border-zinc-700 hover:border-purple-200 transition-all cursor-pointer text-gray-700 dark:text-gray-200"
+              title="Toggle Dark/Light Mode"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4 text-yellow-400" /> : <Moon className="h-4 w-4 text-purple-600" />}
+            </button>
+
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={(props) => (
