@@ -4,7 +4,6 @@ import Hero from "./components/Hero";
 import CategorySection from "./components/CategorySection";
 import ProductSection from "./components/ProductSection";
 import PromoBanner from "./components/PromoBanner";
-import FlashSaleTimer from "./components/FlashSaleTimer";
 import Footer from "./components/Footer";
 import AuthModal from "./components/auth/AuthModal";
 
@@ -378,19 +377,6 @@ function MainContent() {
         wishlistCount={wishlistCount}
       />
       <main>
-        {/* Flash Sale Banner */}
-        <div className="bg-purple-600 text-white py-2 overflow-hidden whitespace-nowrap">
-          <motion.div 
-            animate={{ x: ["100%", "-100%"] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="flex items-center gap-8 font-bold  text-sm"
-          >
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Flash Sale: Up to 90% Off!</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Limited Time Only</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Free Shipping on First Order</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Flash Sale: Up to 90% Off!</span>
-          </motion.div>
-        </div>
 
         {searchQuery ? (
           <div className="py-12 bg-white">
@@ -441,10 +427,8 @@ function MainContent() {
             <Hero />
             <CategorySection onSelectCategory={(cat) => handleSearch(cat === "all" ? "" : cat)} />
             
-            <FlashSaleTimer />
-
             <ProductSection 
-              title="Flash" 
+              title="Hot"
               subtitle="Deals" 
               products={products.length > 0 ? products : []} 
               isLoading={isProductsLoading}

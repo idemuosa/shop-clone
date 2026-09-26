@@ -67,7 +67,7 @@ export default function PromoBanner() {
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-yellow-400 text-black px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-6">
                 <Zap className="h-4 w-4 fill-black" />
-                Flash Sale Ending Soon
+                Big Sale Ending Soon
               </div>
               
               <h2 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6 uppercase italic tracking-tighter">

@@ -136,7 +136,7 @@ export default function AIAssistant() {
                   <X className="h-3 w-3 text-gray-500" />
                 </button>
                 <p className="text-xs font-bold text-gray-800 leading-tight">
-                  👋 Need help finding the perfect <span className="text-purple-600">Flash Deal</span>? Ask me!
+                  👋 Need help finding the perfect <span className="text-purple-600">Deal</span>? Ask me!
                 </p>
                 <div className="absolute -bottom-2 right-8 w-4 h-4 bg-white rotate-45 border-r border-b border-purple-100" />
               </motion.div>

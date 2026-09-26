@@ -59,14 +59,15 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       // Sort by sold descending
       return [...products].sort((a, b) => (b.sold || 0) - (a.sold || 0)).slice(0, 12);
     }
-    if (normalizedTitle === 'flash sales' || normalizedTitle === 'clearance') {
-      return products.filter(p => p.tag === 'Flash Sale' || p.tag === 'Clearance' || (p.oldPrice && parseFloat(p.price) < parseFloat(p.oldPrice) * 0.7));
+    if (normalizedTitle === 'super sales' || normalizedTitle === 'clearance') {
+      return products.filter(p => p.tag === 'Super Sale' || p.tag === 'Clearance' || (p.oldPrice && parseFloat(p.price) < parseFloat(p.oldPrice) * 0.7));
     }
     return [];
   }, [products, normalizedTitle]);
 
   const renderContent = () => {
     switch (normalizedTitle) {
+      case 'super sales':
       case 'flash sales':
         return (
           <div className="space-y-8">
@@ -75,15 +76,15 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                 <div className="bg-white/20 w-fit p-3 rounded-2xl mb-6 backdrop-blur-md">
                    <Zap className="h-10 w-10 text-yellow-400 fill-yellow-400" />
                 </div>
-                <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-4">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
-                <p className="text-purple-100 text-lg max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
+                <h2 className="text-5xl font-black uppercase italic tracking-tighter mb-4">The Vivi <span className="text-yellow-400">Super Sale</span></h2>
+                <p className="text-purple-100 text-lg max-w-xl">Every day, we drop prices by up to 90% on top-tier items, fashion, and home decor.</p>
               </div>
               <Zap className="absolute right-[-20px] bottom-[-20px] h-64 w-64 text-white/10 rotate-12" />
             </div>
 
             <ProductSection
-              title="Live"
-              subtitle="Flash Deals"
+              title="Super"
+              subtitle="Deals"
               products={filteredDisplayProducts}
               onAddToWishlist={onAddToWishlist}
               onProductView={onProductView}
@@ -91,9 +92,9 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { icon: <Clock />, title: "Limited Time", desc: "Deals expire every midnight. Act fast or miss out." },
+                { icon: <Clock />, title: "Limited Time", desc: "Deals updated daily. Act fast or miss out." },
                 { icon: <Zap />, title: "Huge Discounts", desc: "Prices slashed up to 90% off retail value." },
-                { icon: <Star />, title: "Top Quality", desc: "Only highly-rated products make it to flash sales." }
+                { icon: <Star />, title: "Top Quality", desc: "Only highly-rated products make it to super sales." }
               ].map((item, i) => (
                 <div key={i} className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
                   <div className="bg-purple-50 w-12 h-12 rounded-2xl flex items-center justify-center text-purple-600 mb-6">
@@ -260,33 +261,13 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
         return (
           <div className="space-y-12">
              <div className="text-center space-y-4">
-                <h2 className="text-5xl font-black uppercase italic tracking-tighter">Our Global <span className="text-purple-600">Partners</span></h2>
-                <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Authorized retailers and manufacturers</p>
-             </div>
-
-             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
-                {[
-                  { name: "Apple", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
-                  { name: "Samsung", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" },
-                  { name: "Nike", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" },
-                  { name: "LG", logo: "https://upload.wikimedia.org/wikipedia/commons/b/bf/LG_logo_%282015%29.svg" },
-                  { name: "Sony", logo: "https://upload.wikimedia.org/wikipedia/commons/c/ca/Sony_logo.svg" },
-                  { name: "Adidas", logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg" },
-                ].map((brand, i) => (
-                   <div key={i} className="aspect-video bg-white rounded-3xl border-2 border-gray-50 flex items-center justify-center p-8 grayscale hover:grayscale-0 transition-all hover:border-purple-100 hover:shadow-xl hover:shadow-purple-100/20 group">
-                      <img
-                        src={brand.logo}
-                        alt={brand.name}
-                        className="w-full h-auto object-contain max-h-12 group-hover:scale-110 transition-transform"
-                        referrerPolicy="no-referrer"
-                      />
-                   </div>
-                ))}
+                <h2 className="text-5xl font-black uppercase italic tracking-tighter">Verified <span className="text-purple-600">Sellers</span></h2>
+                <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Independent merchants and creators</p>
              </div>
 
              <div className="bg-purple-50 p-12 rounded-[40px] text-center border-2 border-purple-100">
-                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Sell your brand on <span className="text-purple-600 italic">Vivi</span></h3>
-                <p className="text-gray-500 font-medium mb-8 max-w-xl mx-auto">Join thousands of successful brands reaching millions of customers worldwide through our high-velocity sales platform.</p>
+                <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Sell on <span className="text-purple-600 italic">Vivi</span></h3>
+                <p className="text-gray-500 font-medium mb-8 max-w-xl mx-auto">Join thousands of successful merchants reaching customers worldwide through our high-velocity sales platform.</p>
                 <Button className="bg-purple-600 text-white font-black rounded-2xl px-12 h-16 shadow-xl shadow-purple-200 text-lg uppercase tracking-tighter">
                   Apply to Sell
                 </Button>

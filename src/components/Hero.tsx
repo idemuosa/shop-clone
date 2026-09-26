@@ -62,7 +62,7 @@ export default function Hero() {
               className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
             >
               <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              Vivi Flash Sales
+              Vivi Mega Deals
             </div>
             
             <div className="flex items-center gap-2">

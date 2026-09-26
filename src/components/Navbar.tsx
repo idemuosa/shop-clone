@@ -90,7 +90,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
       <div className="bg-purple-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
         <span className="flex items-center justify-center gap-2">
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          {storeSettings?.bannerMessage || 'Vivi Style Flash Sale: Up to 90% Off!'}
+          {storeSettings?.bannerMessage || 'Vivi Style Big Sale: Up to 90% Off!'}
           <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
         </span>
@@ -261,7 +261,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                />
             </form>
             <div className="flex flex-col gap-1 px-2">
-               {["Flash sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+               {["Super sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
                  <button
                    key={link}
                    onClick={() => {
@@ -324,7 +324,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
           </DropdownMenu>
 
           <div className="flex items-center gap-8">
-            {["Flash sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+            {["Super sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
               <a 
                 key={link} 
                 href="#" 

@@ -697,7 +697,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                     <>
                       {[
                         { code: 'WELCOME10', offer: '10% OFF', type: 'Platform Wide', date: 'Dec 31, 2024' },
-                        { code: 'VIVO90', offer: '90% OFF', type: 'Flash Sale Only', date: 'Expiring Soon' },
+                        { code: 'VIVO90', offer: '90% OFF', type: 'Special Sale Only', date: 'Expiring Soon' },
                       ].map((v) => (
                         <div key={v.code} className="p-1 rounded-3xl bg-gradient-to-r from-purple-600/20 to-purple-400/20 shadow-sm overflow-hidden group">
                            <div className="bg-white rounded-[22px] p-6 flex items-center gap-6 relative">

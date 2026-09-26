@@ -139,7 +139,7 @@ export default function AdminDashboard() {
           facebookUrl: "https://facebook.com/vivi",
           twitterUrl: "https://twitter.com/vivi",
           whatsappNumber: "+2348000000000",
-          bannerMessage: "Vivi Style Flash Sale: Up to 90% Off!",
+          bannerMessage: "Vivi Style Big Sale: Up to 90% Off!",
           logoUrl: "Vivi"
         };
         const ref = await addDoc(collection(db, 'settings'), defaultSettings);

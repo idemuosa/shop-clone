@@ -91,7 +91,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
               {[
                 { label: "New Arrival", target: "New Arrivals" },
                 { label: "Best Seller", target: "Best Sellers" },
-                { label: "Flash Sales", target: "Flash Sales" },
+                { label: "Super Sales", target: "Super Sales" },
                 { label: "Help Center", target: "Help" },
                 { label: "Privacy Policy", target: "Help" },
                 { label: "Terms of Use", target: "Help" }

@@ -1026,7 +1026,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           </div>
 
                           <DialogDescription className="text-gray-600 mb-6 leading-relaxed font-medium text-base">
-                            {selectedProduct.description || `Experience premium quality with our ${selectedProduct.name}. This top-rated product from our ${selectedProduct.category} collection is designed for performance and style. Limited stock available at this flash sale price!`}
+                            {selectedProduct.description || `Experience premium quality with our ${selectedProduct.name}. This top-rated product from our ${selectedProduct.category} collection is designed for performance and style. Limited stock available at this special price!`}
                           </DialogDescription>
 
                           {selectedProduct.prescription && (
