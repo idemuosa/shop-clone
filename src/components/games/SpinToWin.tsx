@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
+import { API_URL, getApiUrl } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { doc, updateDoc, arrayUnion, serverTimestamp } from 'firebase/firestore';
 
@@ -78,7 +79,7 @@ export default function SpinToWin() {
     // Save to Backend
     try {
       const token = await user.getIdToken();
-      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+      const API_URL = getApiUrl();
 
       const updateData: any = {
         last_spin: new Date().toISOString(),

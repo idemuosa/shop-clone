@@ -15,5 +15,5 @@ export const getApiUrl = () => {
 
 export const API_URL = getApiUrl();
 
-// Direct access to Python/Django backend if needed
-export const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL || import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+// Direct access to Python/Django backend if needed, defaulting to API_URL so requests route through Express proxy if Python URL not specified
+export const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL || import.meta.env.VITE_DJANGO_API_URL || API_URL;
