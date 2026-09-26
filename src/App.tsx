@@ -18,7 +18,6 @@ const InfoPage = lazy(() => import("./components/InfoPages"));
 const SpinToWin = lazy(() => import("./components/games/SpinToWin"));
 const SellerDashboard = lazy(() => import("./components/seller/SellerDashboard"));
 
-import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
 import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
@@ -509,7 +508,6 @@ function MainContent() {
                 onProductView={handleProductView}
               />
             )}
-            <BrandPartners />
             <PromoBanner />
           </>
         )}
