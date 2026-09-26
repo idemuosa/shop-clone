@@ -57,6 +57,7 @@ import { toast } from 'sonner';
 import { signOut } from 'firebase/auth';
 import PaymentMethods from '@/components/auth/PaymentMethods';
 import { useCurrency } from '@/lib/CurrencyContext';
+import { API_URL, getApiUrl } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 interface UserProfilePageProps {
@@ -86,7 +87,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     const fetchOrders = async () => {
       try {
         const token = await user.getIdToken();
-        const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+        const API_URL = getApiUrl();
         const response = await fetch(`${API_URL}/api/orders/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -106,7 +107,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     const fetchAddresses = async () => {
       try {
         const token = await user.getIdToken();
-        const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+        const API_URL = getApiUrl();
         const response = await fetch(`${API_URL}/api/profile/addresses/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -127,7 +128,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
 
     try {
       const token = await user.getIdToken();
-      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+      const API_URL = getApiUrl();
       const response = await fetch(`${API_URL}/api/profile/me/`, {
         method: 'PUT',
         headers: {
@@ -153,7 +154,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     if (!user) return;
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+    const API_URL = getApiUrl();
     const token = await user.getIdToken();
 
     const addressData = {
@@ -201,7 +202,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
     if (!user || !window.confirm('Are you sure you want to delete this address?')) return;
     try {
       const token = await user.getIdToken();
-      const API_URL = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+      const API_URL = getApiUrl();
       await fetch(`${API_URL}/api/profile/addresses/${id}/`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

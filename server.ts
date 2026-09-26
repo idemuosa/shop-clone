@@ -348,7 +348,17 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   res.json({ success: true });
 });
 
-app.all(["/products", "/products/", "/products/*", "/categories", "/categories/", "/categories/*", "/api/cart", "/api/cart/*"], async (req, res) => {
+app.all([
+  "/products", "/products/", "/products/*",
+  "/categories", "/categories/", "/categories/*",
+  "/api/cart", "/api/cart/*",
+  "/api/products", "/api/products/*",
+  "/api/reviews", "/api/reviews/*",
+  "/api/wishlist/*",
+  "/api/orders", "/api/orders/*",
+  "/api/profile/*",
+  "/api/merchants", "/api/merchants/*"
+], async (req, res) => {
   // Ensure the path ends with a slash for FastAPI compatibility, but preserve query params
   const pathPart = req.path.endsWith('/') ? req.path : `${req.path}/`;
   const queryString = req.url.includes('?') ? `?${req.url.split('?')[1]}` : '';

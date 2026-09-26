@@ -40,7 +40,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL } from '@/lib/api';
+import { API_URL, getApiUrl } from '@/lib/api';
 import { getOptimizedImageUrl } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -58,7 +58,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [activeModal, setActiveModal] = useState<'none' | 'track' | 'wallets' | 'alerts' | 'sell'>('none');
 
-  const DJANGO_API = import.meta.env.VITE_DJANGO_API_URL || 'http://localhost:8000';
+  const DJANGO_API = API_URL;
 
   useEffect(() => {
     fetchDashboardProducts();
