@@ -6,7 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./sql_app.db")
+# Ensure postgresql+psycopg2 driver scheme is used for PostgreSQL connections
+default_db_url = os.getenv("DATABASE_URL", "postgresql+psycopg2://postgres:postgres@localhost:5432/vivi_shop")
+if default_db_url.startswith("postgres://"):
+    default_db_url = default_db_url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif default_db_url.startswith("postgresql://") and not default_db_url.startswith("postgresql+"):
+    default_db_url = default_db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+SQLALCHEMY_DATABASE_URL = default_db_url
 
 connect_args = {"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
 
