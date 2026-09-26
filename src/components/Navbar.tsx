@@ -50,10 +50,12 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
         const res = await fetch(`${API_URL}/categories/`);
         if (res.ok) {
           const data = await res.json();
-          setCategories(data);
+          if (Array.isArray(data)) {
+            setCategories(data);
+          }
         }
       } catch (e) {
-        console.error("Navbar category fetch failed");
+        console.error("Navbar category fetch failed", e);
       }
     };
     fetchCategories();

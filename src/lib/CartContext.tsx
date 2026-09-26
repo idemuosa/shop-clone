@@ -81,7 +81,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (response.ok) {
         const backendCart = await response.json();
-        const backendItems: CartItem[] = backendCart.items.map((item: any) => ({
+        const backendItems: CartItem[] = (backendCart?.items || []).map((item: any) => ({
           id: item.product_id,
           name: item.name,
           price: item.price,
