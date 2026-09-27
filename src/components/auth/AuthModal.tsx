@@ -89,33 +89,37 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     // Handle Login Mode with direct email/password
     if (authMode === 'login' && loginMethod === 'email' && password) {
       try {
-        console.log(`Attempting backend login for ${email}`);
-        const response = await fetch(`${API_URL}/api/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-          if (data.customToken) {
-            await signInWithCustomToken(auth, data.customToken);
-          } else {
-            await signInWithEmailAndPassword(auth, email, password);
-          }
-          toast.success("Welcome Back!");
-          onClose();
-          return;
-        } else {
-          // If backend login returns an error, fallback to client-side auth
+        console.log(`Attempting login for ${email}`);
+        // Try direct client-side Firebase login first
+        try {
           await signInWithEmailAndPassword(auth, email, password);
           toast.success("Welcome Back!");
           onClose();
           return;
+        } catch (firebaseErr: any) {
+          console.log("Firebase direct sign-in exception:", firebaseErr.code, firebaseErr.message);
+
+          // Try backend endpoint if available
+          const response = await fetch(`${API_URL}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          }).catch(() => null);
+
+          if (response && response.ok) {
+            const data = await response.json();
+            if (data.success && data.customToken) {
+              await signInWithCustomToken(auth, data.customToken);
+              toast.success("Welcome Back!");
+              onClose();
+              return;
+            }
+          }
+
+          // If auth failed because user doesn't exist or bad credentials, send OTP as seamless fallback
         }
       } catch (loginErr: any) {
-        console.warn("Backend login error, falling back to OTP:", loginErr.message);
+        console.warn("Login attempt failed, falling back to OTP:", loginErr.message);
       }
     }
 
