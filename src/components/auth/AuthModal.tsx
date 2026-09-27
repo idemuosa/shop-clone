@@ -54,8 +54,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
       // Check if user profile exists, if not create it
       const docRef = doc(db, 'users', user.uid);
-      const isAdminEmail = user.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
-                         user.email === import.meta.env.VITE_ADMIN_EMAIL;
+      const uEmail = user.email?.toLowerCase().trim();
+      const isAdminEmail = uEmail === 'idemudiawisdom7@gmail.com' ||
+                           uEmail === 'idemudiawisdom27@gmail.com' ||
+                           uEmail === import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
 
       await setDoc(docRef, {
         uid: user.uid,
@@ -155,8 +157,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         const userCredential = await createUserWithEmailAndPassword(auth, tempData.email, tempData.password);
         await updateProfile(userCredential.user, { displayName: tempData.name });
         
-        const isAdminEmail = tempData.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
-                           tempData.email === import.meta.env.VITE_ADMIN_EMAIL;
+        const tEmail = tempData.email?.toLowerCase().trim();
+        const isAdminEmail = tEmail === 'idemudiawisdom7@gmail.com' ||
+                             tEmail === 'idemudiawisdom27@gmail.com' ||
+                             tEmail === import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
 
         await setDoc(doc(db, 'users', userCredential.user.uid), {
           uid: userCredential.user.uid,

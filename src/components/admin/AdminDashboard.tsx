@@ -1310,7 +1310,7 @@ export default function AdminDashboard() {
                             size="sm"
                             onClick={() => handleToggleAdmin(u.id, u.role)}
                             className="rounded-lg font-bold text-[10px] "
-                            disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
+                            disabled={u.email === 'idemudiawisdom7@gmail.com' || u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
                           >
                             {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
                           </Button>

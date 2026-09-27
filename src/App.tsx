@@ -108,12 +108,18 @@ function MainContent() {
   }, [products, lastViewedCategory]);
 
   useEffect(() => {
-    if (user && !showAdmin && !showProfile) {
-      setShowDashboard(true);
+    if (user) {
+      if (isAdmin) {
+        setShowAdmin(true);
+        setShowDashboard(false);
+      } else if (!showAdmin && !showProfile) {
+        setShowDashboard(true);
+      }
     } else {
       setShowDashboard(false);
+      setShowAdmin(false);
     }
-  }, [user, showAdmin, showProfile]);
+  }, [user, isAdmin, showAdmin, showProfile]);
 
   const addToWishlist = () => {
     setWishlistCount(prev => prev + 1);

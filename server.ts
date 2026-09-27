@@ -332,7 +332,7 @@ app.post("/api/send-order-confirmation", async (req, res) => {
 
       const adminNotif = resendClient.emails.send({
         from: fromEmail,
-        to: [adminEmail || 'idemudiawisdom27@gmail.com'],
+        to: [adminEmail || 'idemudiawisdom7@gmail.com'],
         subject: `NEW ORDER: #${orderId.slice(-8).toUpperCase()}`,
         html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
       });

@@ -22,7 +22,7 @@ except (ImportError, AttributeError):
     resend = None
     print("Warning: 'resend' module not found or API key not set. Email features will be disabled.")
 
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "idemudiawisdom27@gmail.com")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "idemudiawisdom7@gmail.com")
 
 # Create the database tables
 models.Base.metadata.create_all(bind=engine)

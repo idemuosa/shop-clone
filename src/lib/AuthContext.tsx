@@ -55,8 +55,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setProfile(docSnap.data() as UserProfile);
           } else {
             // Create default profile if it doesn't exist
-            const isAdminEmail = firebaseUser.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
-                               firebaseUser.email === import.meta.env.VITE_ADMIN_EMAIL;
+            const userEmail = firebaseUser.email?.toLowerCase().trim();
+            const isAdminEmail = userEmail === 'idemudiawisdom7@gmail.com' ||
+                                 userEmail === 'idemudiawisdom27@gmail.com' ||
+                                 userEmail === import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
 
             const newProfile: UserProfile = {
               uid: firebaseUser.uid,
@@ -93,7 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const value = React.useMemo(() => {
-    const adminEmail = 'idemudiawisdom27@gmail.com';
+    const adminEmail = 'idemudiawisdom7@gmail.com';
     const envAdminEmail = import.meta.env.VITE_ADMIN_EMAIL?.toLowerCase().trim();
     const currentUserEmail = user?.email?.toLowerCase().trim();
     const profileEmail = profile?.email?.toLowerCase().trim();
