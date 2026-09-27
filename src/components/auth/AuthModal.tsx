@@ -75,7 +75,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
@@ -85,7 +85,41 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const password = formData.get('password') as string;
 
     const identifier = email || phone;
-    
+
+    // Handle Login Mode with direct email/password
+    if (authMode === 'login' && loginMethod === 'email' && password) {
+      try {
+        console.log(`Attempting backend login for ${email}`);
+        const response = await fetch(`${API_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          if (data.customToken) {
+            await signInWithCustomToken(auth, data.customToken);
+          } else {
+            await signInWithEmailAndPassword(auth, email, password);
+          }
+          toast.success("Welcome Back!");
+          onClose();
+          return;
+        } else {
+          // If backend login returns an error, fallback to client-side auth
+          await signInWithEmailAndPassword(auth, email, password);
+          toast.success("Welcome Back!");
+          onClose();
+          return;
+        }
+      } catch (loginErr: any) {
+        console.warn("Backend login error, falling back to OTP:", loginErr.message);
+      }
+    }
+
+    // Fallback or phone/OTP flow
     try {
       console.log(`Sending OTP to ${identifier} via ${API_URL}`);
       const response = await fetch(`${API_URL}/api/send-otp`, {
@@ -351,7 +385,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       </Button>
                     </div>
 
-                    <form onSubmit={handleSendOtp} className="space-y-5">
+                    <form onSubmit={handleAuthSubmit} className="space-y-5">
                       {loginMethod === 'email' ? (
                         <div className="space-y-4">
                           <div className="space-y-2">
@@ -455,7 +489,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </TabsContent>
 
                   <TabsContent value="register" className="mt-0">
-                    <form onSubmit={handleSendOtp} className="space-y-5">
+                    <form onSubmit={handleAuthSubmit} className="space-y-5">
                       <div className="space-y-4">
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Your Full Name</Label>
@@ -529,7 +563,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           </p>
                         </div>
                       </div>
-                      <form onSubmit={handleSendOtp} className="space-y-4">
+                      <form onSubmit={handleAuthSubmit} className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black  tracking-widest text-zinc-400">Merchant Email</Label>
                           <Input

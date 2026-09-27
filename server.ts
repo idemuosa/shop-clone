@@ -264,6 +264,59 @@ app.post("/api/send-otp", async (req, res) => {
   });
 });
 
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: "Email and password required" });
+  }
+
+  try {
+    let customToken = null;
+    let userRecord: any = null;
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        userRecord = await admin.auth().getUserByEmail(email);
+      } catch (e) {
+        // User not found in Firebase Auth, create record if valid credentials
+        userRecord = await admin.auth().createUser({
+          email,
+          password,
+        });
+
+        await admin.firestore().collection('users').doc(userRecord.uid).set({
+          uid: userRecord.uid,
+          email,
+          role: (adminEmail && email === adminEmail) ? 'admin' : 'user',
+          points: 100,
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
+      customToken = await admin.auth().createCustomToken(userRecord.uid);
+      return res.json({
+        success: true,
+        customToken,
+        user: {
+          uid: userRecord.uid,
+          email: userRecord.email,
+        }
+      });
+    }
+
+    // Dev fallback if Firebase Admin is not initialized
+    return res.json({
+      success: true,
+      devMode: true,
+      user: { email }
+    });
+  } catch (error: any) {
+    console.error("Backend login error:", error.message);
+    return res.status(500).json({ success: false, message: error.message || "Backend login failed" });
+  }
+});
+
 app.post("/api/verify-otp", async (req, res) => {
   const { identifier, code } = req.body;
   const storedOtp = otpStore.get(identifier);

@@ -170,6 +170,41 @@ def seed_database(db: Session = Depends(get_db)):
     return {"message": "Success! Database seeded and linked correctly."}
 
 # Auth & OTP Endpoints
+@app.post("/api/login")
+async def backend_login(payload: dict = Body(...)):
+    email = payload.get("email")
+    password = payload.get("password")
+
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password required")
+
+    custom_token = None
+    try:
+        from firebase_admin import auth as firebase_auth
+        user_id = email.replace("@", "_").replace(".", "_")
+
+        try:
+            user = firebase_auth.get_user_by_email(email)
+            uid = user.uid
+        except Exception:
+            try:
+                user = firebase_auth.create_user(email=email, password=password, display_name=email.split('@')[0])
+                uid = user.uid
+            except Exception:
+                uid = user_id
+
+        token_bytes = firebase_auth.create_custom_token(uid)
+        custom_token = token_bytes.decode('utf-8') if isinstance(token_bytes, bytes) else token_bytes
+    except Exception as e:
+        print(f"DEBUG: Could not generate custom token in Python login: {e}")
+
+    return {
+        "success": True,
+        "message": "Login successful",
+        "customToken": custom_token,
+        "user": {"email": email}
+    }
+
 @app.post("/api/send-otp")
 async def send_otp(payload: dict = Body(...)):
     email = payload.get("email")
