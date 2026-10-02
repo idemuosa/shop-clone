@@ -107,52 +107,33 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const verifyAndCreateOrder = async (reference: string) => {
     setIsProcessing(true);
     try {
-      const token = await user?.getIdToken().catch(() => null);
-      let isVerified = false;
-
-      if (token) {
-        try {
-          const response = await fetch(`${PYTHON_API_URL}/api/orders/verify_payment/`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              reference: reference,
-              order_details: {
-                full_name: user?.displayName || profile?.displayName || user?.email,
-                address: address,
-                city: city
-              }
-            })
-          });
-          if (response.ok) isVerified = true;
-        } catch (e) {
-          console.warn("Backend order verification endpoint warning:", e);
-        }
-      }
-
-      // Send order confirmation email via API
-      const itemsSummary = items.map(i => `${i.name} (x${i.quantity})`).join(', ');
-      await fetch(`${API_URL}/api/send-order-confirmation`, {
+      const token = await user.getIdToken();
+      const response = await fetch(`${PYTHON_API_URL}/api/orders/verify_payment/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
-          email: user?.email,
-          orderId: reference || `ORD-${Date.now()}`,
-          productName: itemsSummary || 'Vivi Shopping Cart',
-          totalAmount: totalPrice - discount,
-          shippingAddress: `${address}, ${city} ${zip}`,
-          name: user?.displayName || profile?.displayName || 'Valued Customer'
+          reference: reference,
+          order_details: {
+            full_name: user.displayName || profile?.displayName || user.email,
+            address: address,
+            city: city
+          }
         })
-      }).catch(console.error);
+      });
 
-      setStep('success');
-      clearCart();
-      toast.success("Order & Payment confirmed! Confirmation email sent.");
+      if (response.ok) {
+        setStep('success');
+        clearCart();
+        toast.success("Order confirmed!");
+      } else {
+        const errData = await response.json();
+        toast.error("Verification failed: " + (errData.error || "Unknown error"));
+      }
     } catch (error: any) {
-      toast.error("Network error during order completion");
+      toast.error("Network error during verification");
     } finally {
       setIsProcessing(false);
     }
