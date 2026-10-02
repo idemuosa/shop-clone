@@ -76,17 +76,17 @@ export default function SocialProofTicker() {
             exit={{ opacity: 0, x: -100, scale: 0.5 }}
             className="bg-white/80 backdrop-blur-xl border border-white shadow-[0_15px_40px_rgba(0,0,0,0.1)] p-4 rounded-[24px] flex items-center gap-4 max-w-[300px]"
           >
-            <div className="w-12 h-12 bg-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-100 flex-shrink-0">
+            <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-orange-100 flex-shrink-0">
               <ShoppingBag className="h-6 w-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1 italic">Recent Purchase</p>
+              <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1 italic">Recent Purchase</p>
               <h4 className="text-xs font-black text-black leading-tight uppercase tracking-tighter truncate">
                 {currentNotification.customerEmail} bought {currentNotification.productName}
               </h4>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex -space-x-1">
-                   {[1,2,3].map(i => <div key={i} className="w-3 h-3 rounded-full bg-purple-600 border border-white" />)}
+                   {[1,2,3].map(i => <div key={i} className="w-3 h-3 rounded-full bg-orange-600 border border-white" />)}
                 </div>
                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">{currentNotification.time}</p>
               </div>
@@ -96,7 +96,7 @@ export default function SocialProofTicker() {
                transition={{ repeat: Infinity, duration: 2 }}
                className="bg-green-50 p-1.5 rounded-lg"
             >
-               <Zap className="h-3 w-3 text-purple-600 fill-purple-600" />
+               <Zap className="h-3 w-3 text-orange-600 fill-orange-600" />
             </motion.div>
           </motion.div>
         )}

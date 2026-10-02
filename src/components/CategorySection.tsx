@@ -27,8 +27,8 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const colorMap = [
   { color: "bg-blue-50 text-blue-600", border: "border-blue-100" },
-  { color: "bg-purple-50 text-purple-600", border: "border-purple-100" },
-  { color: "bg-green-50 text-purple-600", border: "border-green-100" },
+  { color: "bg-orange-50 text-orange-600", border: "border-orange-100" },
+  { color: "bg-green-50 text-orange-600", border: "border-green-100" },
   { color: "bg-pink-50 text-pink-600", border: "border-pink-100" },
   { color: "bg-green-50 text-green-600", border: "border-green-100" },
   { color: "bg-red-50 text-red-600", border: "border-red-100" },
@@ -54,18 +54,18 @@ export default function CategorySection({ onSelectCategory }: CategorySectionPro
   }, []);
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-6 md:py-8 bg-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
-            <div className="bg-purple-600 p-2 rounded-lg">
+            <div className="bg-orange-600 p-2 rounded-lg">
               <Zap className="h-5 w-5 text-white fill-white" />
             </div>
-            <h2 className="text-xl font-black text-black uppercase tracking-tight">Shop By <span className="text-purple-600 italic">Category</span></h2>
+            <h2 className="text-xl font-black text-black uppercase tracking-tight">Shop By <span className="text-orange-600 italic">Category</span></h2>
           </div>
           <button 
             onClick={() => onSelectCategory?.("all")}
-            className="text-sm font-bold text-purple-600 hover:underline uppercase tracking-widest"
+            className="text-sm font-bold text-orange-600 hover:underline uppercase tracking-widest"
           >
             See All
           </button>

@@ -34,7 +34,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-white overflow-hidden border-b border-gray-100">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8 flex flex-col md:flex-row items-center gap-6">
         {/* Text Content */}
         <motion.div
           initial="hidden"
@@ -56,28 +56,12 @@ export default function Hero() {
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0 }
             }}
-            className="flex flex-col md:flex-row items-center gap-4 mb-6"
+            className="mb-3"
           >
-            <div
-              className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
-            >
-              <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              Vivi Flash Sales
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-purple-600" />
-              <div className="flex gap-1">
-                {[timeLeft.hours, timeLeft.minutes, timeLeft.seconds].map((unit, i) => (
-                  <div key={i} className="flex items-center">
-                    <div className="bg-black text-white px-2 py-1 rounded text-xs font-black min-w-[30px] text-center">
-                      {unit.toString().padStart(2, '0')}
-                    </div>
-                    {i < 2 && <span className="text-black font-black mx-0.5">:</span>}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
+              <Zap className="h-3.5 w-3.5 fill-orange-600 text-orange-600" />
+              Featured Collection
+            </span>
           </motion.div>
           
           <motion.h1 
@@ -85,10 +69,10 @@ export default function Hero() {
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 }
             }}
-            className="text-2xl md:text-4xl font-black text-black leading-tight mb-4 md:mb-6 uppercase italic tracking-tighter"
+            className="text-xl md:text-3xl font-bold text-zinc-900 leading-tight mb-3 tracking-tight"
           >
-            UP TO <span className="text-purple-600">90% OFF</span> <br />
-            ON ALL <span className="underline decoration-yellow-400 decoration-8 underline-offset-4">TRENDING</span> ITEMS
+            Upgrade Your Style & Tech <br />
+            With <span className="text-orange-600">Exclusive Deals</span>
           </motion.h1>
           
           <motion.p 
@@ -106,13 +90,13 @@ export default function Hero() {
               hidden: { opacity: 0, scale: 0.9 },
               visible: { opacity: 1, scale: 1 }
             }}
-            className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4"
+            className="flex flex-wrap justify-center md:justify-start gap-3"
           >
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black shadow-xl shadow-purple-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
-              <ShoppingBag className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Shop Deals Now
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95">
+              <ShoppingBag className="mr-2 h-4 w-4" /> Shop Deals Now
             </Button>
-            <Button variant="outline" className="border-2 border-gray-100 px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black transition-all hover:bg-gray-50 uppercase tracking-tighter">
-              <Gift className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Claim Coupon
+            <Button variant="outline" className="border border-gray-200 px-5 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-gray-50">
+              <Gift className="mr-2 h-4 w-4" /> Claim Coupon
             </Button>
           </motion.div>
 

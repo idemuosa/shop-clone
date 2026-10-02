@@ -53,11 +53,11 @@ export default function FlashSaleTimer() {
         className="bg-white rounded-xl p-6 shadow-sm border border-green-100 flex flex-col md:flex-row items-center justify-between gap-6"
       >
         <div className="flex items-center gap-4">
-          <div className="bg-purple-600 p-3 rounded-lg text-white">
+          <div className="bg-orange-600 p-3 rounded-lg text-white">
             <Zap className="h-6 w-6 fill-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-black text-purple-600 italic tracking-tighter">Flash Sale</h2>
+            <h2 className="text-2xl font-black text-orange-600 italic tracking-tighter">Flash Sale</h2>
             <p className="text-sm text-gray-500 font-medium">
               Ending in: <span className="text-black font-bold font-mono">{formatNumber(timeLeft.hours)}:{formatNumber(timeLeft.minutes)}:{formatNumber(timeLeft.seconds)}</span>
             </p>
