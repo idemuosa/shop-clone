@@ -83,17 +83,15 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       {/* Top bar */}
-      <div className="bg-purple-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
+      <div className="bg-orange-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
         <span className="flex items-center justify-center gap-2">
-          <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          {storeSettings?.bannerMessage || 'Vivi Style Flash Sale: Up to 90% Off!'}
-          <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+          {storeSettings?.bannerMessage || 'Welcome to Vivi - Enjoy Free Shipping on Orders Over $140!'}
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
         </span>
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20 gap-2 md:gap-4">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-1 md:gap-2 cursor-pointer" onClick={() => {
@@ -101,7 +99,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             onSearch?.("");
             setSearchTerm("");
           }}>
-            <span className="text-2xl md:text-3xl font-black tracking-tighter text-purple-600 italic ">
+            <span className="text-2xl md:text-3xl font-black tracking-tighter text-orange-600 italic ">
                {storeSettings?.logoUrl || 'Vivi'}
             </span>
           </div>
@@ -119,9 +117,9 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                 onFocus={() => setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 bg-gray-100 border-2 border-transparent focus:border-purple-500 rounded-full h-12 text-base transition-all w-full"
+                className="pl-12 bg-gray-100 border-2 border-transparent focus:border-orange-500 rounded-full h-12 text-base transition-all w-full"
               />
-              <Button type="submit" className="absolute right-1 top-1 bottom-1 px-8 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold">
+              <Button type="submit" className="absolute right-1 top-1 bottom-1 px-8 rounded-full bg-orange-600 hover:bg-orange-700 text-white font-bold">
                 Search
               </Button>
             </form>
@@ -141,7 +139,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                         onSearch?.(term);
                         setShowSuggestions(false);
                       }}
-                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all text-left"
+                      className="w-full flex items-center gap-3 px-4 py-3 text-sm font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all text-left"
                     >
                       <Search className="h-4 w-4 text-gray-400" />
                       {term}
@@ -150,8 +148,8 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                 </div>
                 {searchTerm && (
                   <div className="p-4 border-t border-gray-50 flex justify-between items-center bg-green-50/30">
-                    <p className="text-[10px] font-bold text-gray-500 italic">Press enter to search for <span className="text-purple-600">"{searchTerm}"</span></p>
-                    <Zap className="h-4 w-4 text-purple-600 animate-pulse" />
+                    <p className="text-[10px] font-bold text-gray-500 italic">Press enter to search for <span className="text-orange-600">"{searchTerm}"</span></p>
+                    <Zap className="h-4 w-4 text-orange-600 animate-pulse" />
                   </div>
                 )}
               </div>
@@ -165,10 +163,10 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                 render={(props) => (
                   <button
                     {...props}
-                    className="flex items-center gap-1 px-1.5 sm:px-3 py-1 bg-gray-50 rounded-full border border-gray-100 hover:border-purple-200 transition-all cursor-pointer group outline-none"
+                    className="flex items-center gap-1 px-1.5 sm:px-3 py-1 bg-gray-50 rounded-full border border-gray-100 hover:border-orange-200 transition-all cursor-pointer group outline-none"
                   >
-                    <span className="text-[8px] sm:text-[10px] font-black text-gray-400 group-hover:text-purple-600 transition-colors ">{currency}</span>
-                    <ChevronDown className="h-2.5 w-2.5 text-gray-400 group-hover:text-purple-600 transition-colors" />
+                    <span className="text-[8px] sm:text-[10px] font-black text-gray-400 group-hover:text-orange-600 transition-colors ">{currency}</span>
+                    <ChevronDown className="h-2.5 w-2.5 text-gray-400 group-hover:text-orange-600 transition-colors" />
                   </button>
                 )}
               />
@@ -187,17 +185,17 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             {isAdmin && (
               <div className="flex flex-col items-center cursor-pointer group" onClick={onToggleAdmin}>
                 <div className="relative">
-                  <LayoutDashboard className={`h-5 w-5 md:h-6 md:w-6 ${showAdmin ? 'text-purple-600' : 'text-gray-700'} group-hover:text-purple-600 transition-colors`} />
+                  <LayoutDashboard className={`h-5 w-5 md:h-6 md:w-6 ${showAdmin ? 'text-orange-600' : 'text-gray-700'} group-hover:text-orange-600 transition-colors`} />
                 </div>
-                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Admin</span>
+                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">Admin</span>
               </div>
             )}
 
             <div className="flex flex-col items-center cursor-pointer group" onClick={onOpenAuth}>
               <div className="relative">
-                <User className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                <User className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
               </div>
-              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">
                 {user ? (profile?.displayName || 'Account') : 'Login'}
               </span>
             </div>
@@ -205,26 +203,26 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             {user && (
               <div className="flex flex-col items-center cursor-pointer group" onClick={handleLogout}>
                 <div className="relative">
-                  <LogOut className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
+                  <LogOut className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
                 </div>
-                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Logout</span>
+                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">Logout</span>
               </div>
             )}
             
             <div className="flex flex-col items-center cursor-pointer group">
               <div className="relative">
-                <Heart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{wishlistCount}</span>
+                <Heart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{wishlistCount}</span>
               </div>
-              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Saved</span>
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">Saved</span>
             </div>
             
             <div className="flex flex-col items-center cursor-pointer group" onClick={onOpenCart}>
               <div className="relative">
-                <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-purple-600 transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{totalItems}</span>
+                <ShoppingCart className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
+                <span className="absolute -top-1 -right-1 bg-orange-600 text-white text-[8px] md:text-[10px] font-bold px-1 py-0.5 md:px-1.5 md:py-0.5 rounded-full border-2 border-white">{totalItems}</span>
               </div>
-              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-purple-600">Cart</span>
+              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">Cart</span>
             </div>
 
             <button
@@ -249,14 +247,14 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                />
             </form>
             <div className="flex flex-col gap-1 px-2">
-               {["Flash sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+               {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
                  <button
                    key={link}
                    onClick={() => {
                      onOpenInfoPage?.(link);
                      setIsMobileMenuOpen(false);
                    }}
-                   className="text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-all"
+                   className="text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all"
                  >
                    {link}
                  </button>
@@ -265,7 +263,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             <div className="px-4 pt-2">
                <Button
                  onClick={() => { onSearch?.(""); setIsMobileMenuOpen(false); }}
-                 className="w-full bg-purple-600 text-white rounded-xl font-bold h-11"
+                 className="w-full bg-orange-600 text-white rounded-xl font-bold h-11"
                >
                  View All Products
                </Button>
@@ -287,14 +285,14 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                 </button>
               )}
             />
-            <DropdownMenuContent className="w-56 rounded-2xl border-2 p-2 shadow-xl shadow-purple-100/50">
+            <DropdownMenuContent className="w-56 rounded-2xl border-2 p-2 shadow-xl shadow-orange-100/50">
                {Array.isArray(categories) && categories.length > 0 ? categories.map((cat) => (
                  <DropdownMenuItem
                     key={cat.id}
                     onClick={() => onSearch?.(cat.name || "")}
-                    className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer hover:bg-green-50 hover:text-purple-600 transition-all gap-3"
+                    className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer hover:bg-green-50 hover:text-orange-600 transition-all gap-3"
                  >
-                   <Box className="h-4 w-4 text-purple-600" />
+                   <Box className="h-4 w-4 text-orange-600" />
                    {cat.name}
                  </DropdownMenuItem>
                )) : (
@@ -303,7 +301,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                <div className="border-t border-gray-100 mt-2 pt-2">
                  <DropdownMenuItem
                    onClick={() => onSearch?.("")}
-                   className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer bg-purple-600 text-white hover:bg-purple-700"
+                   className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer bg-orange-600 text-white hover:bg-orange-700"
                  >
                    View all products
                  </DropdownMenuItem>
@@ -312,7 +310,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
           </DropdownMenu>
 
           <div className="flex items-center gap-8">
-            {["Flash sales", "New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+            {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
               <a 
                 key={link} 
                 href="#" 
@@ -320,16 +318,16 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                   e.preventDefault();
                   onOpenInfoPage?.(link);
                 }}
-                className="text-sm font-bold text-gray-700 hover:text-purple-600 transition-colors  tracking-tight"
+                className="text-sm font-bold text-gray-700 hover:text-orange-600 transition-colors  tracking-tight"
               >
                 {link}
               </a>
             ))}
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-bold text-purple-600">
+          <div className="flex items-center gap-4 text-xs font-bold text-orange-600">
             <span className="flex items-center gap-1 cursor-pointer hover:underline">
-              <Zap className="h-3 w-3 fill-purple-600" />
+              <Zap className="h-3 w-3 fill-orange-600" />
               Top deals
             </span>
             <span className="flex items-center gap-1 cursor-pointer hover:underline">Sell on Vivi</span>
