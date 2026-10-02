@@ -88,7 +88,7 @@ export default function SpinToWin() {
       if (reward.value) {
         setResult(reward.text);
 
-        // Add voucher via Django API
+        // Add voucher via API
         await fetch(`${API_URL}/api/profile/add_voucher/`, {
           method: 'POST',
           headers: {

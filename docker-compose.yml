@@ -12,11 +12,10 @@ services:
     ports:
       - "5432:5432"
 
-  backend-django:
-    build: ./backend_django
+  backend:
+    build: ./backend
     environment:
       - DATABASE_URL=postgres://postgres:postgres@db:5432/shop
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-prod-secret-key}
       - DEBUG=False
     depends_on:
       - db
@@ -27,13 +26,13 @@ services:
     build: .
     environment:
       - NODE_ENV=production
-      - PYTHON_API=http://backend-django:8000
+      - PYTHON_API=http://backend:8000
       - RESEND_API_KEY=${RESEND_API_KEY}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - FIREBASE_SERVICE_ACCOUNT_KEY=${FIREBASE_SERVICE_ACCOUNT_KEY}
       - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY}
     depends_on:
-      - backend-django
+      - backend
     ports:
       - "3000:3000"
 

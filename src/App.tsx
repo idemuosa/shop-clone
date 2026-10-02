@@ -160,22 +160,24 @@ function MainContent() {
         const response = await fetch(`${API_URL}/products/`);
         const data = await response.json();
 
-        const prods = data.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          description: p.description,
-          price: p.price,
-          oldPrice: p.old_price,
-          image: p.image,
-          category: p.category_name || "General",
-          tag: p.tag,
-          rating: p.rating || 4.5,
-          reviews: p.reviews_count || 0,
-          sold: p.sold || 0,
-          stock: p.stock || 0,
-          createdAt: p.created_at
-        }));
-        setProducts(prods);
+        if (Array.isArray(data)) {
+          const prods = data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            price: p.price,
+            oldPrice: p.old_price,
+            image: p.image,
+            category: p.category_name || "General",
+            tag: p.tag,
+            rating: p.rating || 4.5,
+            reviews: p.reviews_count || 0,
+            sold: p.sold || 0,
+            stock: p.stock || 0,
+            createdAt: p.created_at
+          }));
+          setProducts(prods);
+        }
       } catch (error) {
         console.error("App products fetch error:", error);
       } finally {

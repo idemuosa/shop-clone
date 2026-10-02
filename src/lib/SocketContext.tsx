@@ -14,11 +14,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Connect to the new Node.js backend
-    const newSocket = io(import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000');
+    // Connect to Node.js Socket.IO backend (defaults to window.location.origin or http://localhost:3000)
+    const socketUrl = import.meta.env.VITE_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    const newSocket = io(socketUrl, {
+      transports: ['websocket', 'polling']
+    });
 
     newSocket.on('connect', () => {
-      console.log('Connected to Real-time Server');
+      console.log('Connected to Node.js Real-time Socket.IO Server');
       setConnected(true);
     });
 
