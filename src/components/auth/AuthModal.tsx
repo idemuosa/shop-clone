@@ -101,12 +101,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       const data = await response.json();
       
       if (response.ok && data.success) {
-        setTempData({ email, phone, name, password, identifier, devOtp: data.devOtp });
+        setTempData({ email, phone, name, password, identifier });
         setStep('otp');
-        toast.info(`Verification code sent to your ${email ? 'email' : 'phone'}`);
+        toast.info(`OTP sent to your ${email ? 'email' : 'phone'}`);
         if (data.devOtp) {
-          console.log("VERIFICATION CODE:", data.devOtp);
-          toast.success(`Verification Code: ${data.devOtp}`, { duration: 15000 });
+          console.log("DEMO OTP:", data.devOtp);
+          toast.success(`Demo OTP: ${data.devOtp}`, { duration: 10000 });
         }
       } else {
         throw new Error(data.message || "Failed to send OTP");
@@ -296,31 +296,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     <h3 className="text-xl font-black  tracking-tighter italic">Verify your <span className="text-orange-600">Identity</span></h3>
                     <p className="text-xs font-bold text-gray-400  tracking-widest leading-relaxed">
                       Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData.identifier}</span>
-                    <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto text-purple-600 mb-4">
-                       <Lock className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-xl font-black tracking-tighter italic">Verify your <span className="text-purple-600">Email Code</span></h3>
-                    <p className="text-xs font-bold text-gray-400 tracking-widest leading-relaxed">
-                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData?.identifier}</span>
                     </p>
-
-                    {tempData?.devOtp && (
-                      <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-3 mt-3 text-center">
-                        <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Your Verification Code</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-2xl font-black tracking-[0.3em] text-purple-900">{tempData.devOtp}</span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setOtpCode(tempData.devOtp)}
-                            className="h-8 text-[10px] font-black rounded-xl bg-purple-600 text-white hover:bg-purple-700 border-none ml-2"
-                          >
-                            Auto Fill
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <form onSubmit={handleVerifyOtp} className="space-y-6">
