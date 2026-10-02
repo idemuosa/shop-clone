@@ -107,7 +107,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const verifyAndCreateOrder = async (reference: string) => {
     setIsProcessing(true);
     try {
-      const token = await user.getIdToken();
+      const token = await user?.getIdToken();
       const response = await fetch(`${PYTHON_API_URL}/api/orders/verify_payment/`, {
         method: 'POST',
         headers: {
@@ -117,7 +117,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         body: JSON.stringify({
           reference: reference,
           order_details: {
-            full_name: user.displayName || profile?.displayName || user.email,
+            full_name: user?.displayName || profile?.displayName || user?.email,
             address: address,
             city: city
           }
