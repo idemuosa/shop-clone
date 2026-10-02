@@ -58,8 +58,6 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [activeModal, setActiveModal] = useState<'none' | 'track' | 'wallets' | 'alerts' | 'sell'>('none');
 
-  const DJANGO_API = API_URL;
-
   useEffect(() => {
     fetchDashboardProducts();
   }, []);
@@ -68,8 +66,8 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
     setIsSearching(true);
     try {
       const url = search
-        ? `${DJANGO_API}/api/products/?search=${encodeURIComponent(search)}`
-        : `${DJANGO_API}/api/products/`;
+        ? `${API_URL}/api/products/?search=${encodeURIComponent(search)}`
+        : `${API_URL}/api/products/`;
       const response = await fetch(url);
       const data = await response.json();
       if (Array.isArray(data)) {
@@ -95,7 +93,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
     const fetchOrders = async () => {
       try {
         const token = await user.getIdToken();
-        const response = await fetch(`${DJANGO_API}/api/orders/`, {
+        const response = await fetch(`${API_URL}/api/orders/`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -533,7 +531,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
 
              try {
                 const token = await user.getIdToken();
-                const response = await fetch(`${DJANGO_API}/api/merchants/`, {
+                const response = await fetch(`${API_URL}/api/merchants/`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

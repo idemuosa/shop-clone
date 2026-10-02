@@ -1,4 +1,6 @@
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { Resend } from "resend";
@@ -9,7 +11,33 @@ import fs from "fs";
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const httpServer = http.createServer(app);
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+// Initialize Socket.IO Server
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log(`[Socket.IO] Client connected: ${socket.id}`);
+
+  socket.on("ping", () => {
+    socket.emit("pong");
+  });
+
+  socket.on("send_activity", (data: { message: string; type: string }) => {
+    console.log(`[Socket.IO Activity] ${data.type}: ${data.message}`);
+    io.emit("new_activity", data);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`[Socket.IO] Client disconnected: ${socket.id}`);
+  });
+});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -134,6 +162,12 @@ app.post("/api/paystack/verify", async (req, res) => {
     });
 
     const data = await response.json();
+    if (data.status && data.data?.status === "success") {
+      io.emit("new_activity", {
+        message: `Payment verified for transaction ${reference}`,
+        type: "payment"
+      });
+    }
     res.json(data);
   } catch (error: any) {
     res.status(500).json({ status: false, message: error.message });
@@ -145,6 +179,11 @@ app.post("/api/paystack/webhook", async (req, res) => {
   if (event.event === 'charge.success') {
     const { reference, customer, amount, metadata } = event.data;
     console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer.email}, Amount ${amount}`);
+
+    io.emit("new_activity", {
+      message: `New payment received: $${amount / 100} from ${customer.email}`,
+      type: "payment"
+    });
 
     try {
       if (isFirebaseAdminInitialized) {
@@ -213,6 +252,11 @@ app.post("/api/send-otp", async (req, res) => {
   setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
 
   console.log(`[OTP] Generated ${otp} for ${identifier}`);
+
+  io.emit("new_activity", {
+    message: `Verification code requested for ${identifier.replace(/(.{2}).*(@.*)/, "$1***$2")}`,
+    type: "auth"
+  });
 
   if (email) {
     if (!resendClient) {
@@ -321,6 +365,12 @@ app.post("/api/send-order-confirmation", async (req, res) => {
   const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body;
   const resendClient = getResend();
 
+  // Broadcast real-time order activity via Socket.IO
+  io.emit("new_activity", {
+    message: `New Order #${orderId ? orderId.slice(-6).toUpperCase() : 'NEW'}: ${productName} ($${totalAmount})`,
+    type: "order"
+  });
+
   if (resendClient && email) {
     try {
       const userEmail = resendClient.emails.send({
@@ -391,7 +441,7 @@ app.all([
     console.error(`Proxy error for ${url}:`, error.message);
     res.status(503).json({
       error: "Product Service Unavailable",
-      details: "The Python backend (port 8000) might not be running. Please ensure RUN_SHOP.bat started both windows.",
+      details: "The Python backend (port 8000) might not be running.",
       url: url
     });
   }
@@ -404,10 +454,6 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
-
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
@@ -415,6 +461,10 @@ async function startServer() {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
+
+  httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`Node.js Express & Socket.IO server running on http://localhost:${PORT}`);
+  });
 }
 
 export default app;

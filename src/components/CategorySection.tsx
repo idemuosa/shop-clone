@@ -43,7 +43,9 @@ export default function CategorySection({ onSelectCategory }: CategorySectionPro
       try {
         const response = await fetch(`${API_URL}/categories/`);
         const data = await response.json();
-        setCategories(data);
+        if (Array.isArray(data)) {
+          setCategories(data);
+        }
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
