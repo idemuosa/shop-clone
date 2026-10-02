@@ -58,8 +58,8 @@ export default function Hero() {
             }}
             className="mb-3"
           >
-            <span className="inline-flex items-center gap-1.5 bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
-              <Zap className="h-3.5 w-3.5 fill-purple-600 text-purple-600" />
+            <span className="inline-flex items-center gap-1.5 bg-orange-50 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold">
+              <Zap className="h-3.5 w-3.5 fill-orange-600 text-orange-600" />
               Featured Collection
             </span>
           </motion.div>
@@ -72,7 +72,7 @@ export default function Hero() {
             className="text-xl md:text-3xl font-bold text-zinc-900 leading-tight mb-3 tracking-tight"
           >
             Upgrade Your Style & Tech <br />
-            With <span className="text-purple-600">Exclusive Deals</span>
+            With <span className="text-orange-600">Exclusive Deals</span>
           </motion.h1>
           
           <motion.p 
@@ -92,7 +92,7 @@ export default function Hero() {
             }}
             className="flex flex-wrap justify-center md:justify-start gap-3"
           >
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95">
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95">
               <ShoppingBag className="mr-2 h-4 w-4" /> Shop Deals Now
             </Button>
             <Button variant="outline" className="border border-gray-200 px-5 py-3 rounded-xl text-sm font-semibold transition-all hover:bg-gray-50">

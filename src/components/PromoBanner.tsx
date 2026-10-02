@@ -46,7 +46,7 @@ export default function PromoBanner() {
       });
       toast.success("Coupon added to your profile!", {
         description: "Use code FIRST20 at checkout.",
-        icon: <Gift className="h-4 w-4 text-purple-600" />
+        icon: <Gift className="h-4 w-4 text-orange-600" />
       });
     } catch (e) {
       console.error("Coupon error:", e);
@@ -57,7 +57,7 @@ export default function PromoBanner() {
   return (
     <section className="py-6 md:py-8 bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative bg-purple-600 rounded-[32px] overflow-hidden shadow-2xl shadow-purple-100">
+        <div className="relative bg-orange-600 rounded-[32px] overflow-hidden shadow-2xl shadow-orange-100">
           {/* Animated Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
@@ -80,27 +80,27 @@ export default function PromoBanner() {
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.hours).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Hours</span>
+                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Hours</span>
                 </div>
                 <div className="text-white text-3xl font-black self-center mb-6">:</div>
                 <div className="flex flex-col items-center">
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.minutes).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Mins</span>
+                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Mins</span>
                 </div>
                 <div className="text-white text-3xl font-black self-center mb-6">:</div>
                 <div className="flex flex-col items-center">
                   <div className="bg-white/20 backdrop-blur-md text-white w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black border border-white/30">
                     {String(timeLeft.seconds).padStart(2, '0')}
                   </div>
-                  <span className="text-[10px] font-black text-purple-100 mt-2 uppercase tracking-widest">Secs</span>
+                  <span className="text-[10px] font-black text-orange-100 mt-2 uppercase tracking-widest">Secs</span>
                 </div>
               </div>
 
               <Button
                 onClick={handleGetCoupon}
-                className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95"
+                className="bg-white text-orange-600 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95"
               >
                 Get My Coupon <ArrowRight className="ml-2 h-4 w-4" />
               </Button>

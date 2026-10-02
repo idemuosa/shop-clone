@@ -146,9 +146,9 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                   <div className="w-16 h-16 md:w-24 md:h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8">
                       <ShoppingBag className="h-8 w-8 md:h-12 md:w-12 text-gray-200" />
                   </div>
-                  <h2 className="text-xl md:text-3xl font-black tracking-tighter italic mb-3 md:mb-4">Your Cart is <span className="text-purple-600">Empty</span></h2>
+                  <h2 className="text-xl md:text-3xl font-black tracking-tighter italic mb-3 md:mb-4">Your Cart is <span className="text-orange-600">Empty</span></h2>
                   <p className="text-gray-400 font-bold text-[10px] md:text-xs tracking-widest mb-6 md:mb-10 uppercase">Add some items to your cart before checking out.</p>
-                  <Button onClick={onBack} className="w-full h-12 md:h-16 bg-purple-600 hover:bg-purple-700 text-white font-black rounded-2xl shadow-xl shadow-purple-100 text-xs md:text-base">
+                  <Button onClick={onBack} className="w-full h-12 md:h-16 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl shadow-xl shadow-orange-100 text-xs md:text-base">
                       Back to shopping
                   </Button>
               </div>
@@ -182,11 +182,11 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 md:gap-2">
-                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'address' ? 'bg-purple-600 text-white' : 'bg-green-100 text-green-700'}`}>
+                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'address' ? 'bg-orange-600 text-white' : 'bg-green-100 text-green-700'}`}>
                           {step === 'address' ? '1' : <CheckCircle2 className="h-3 w-3 md:h-4 md:w-4" />}
                        </div>
                        <div className="w-4 md:w-8 h-1 bg-gray-100 rounded-full"></div>
-                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'payment' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                       <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center font-black text-[10px] md:text-xs ${step === 'payment' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
                           2
                        </div>
                     </div>
@@ -200,7 +200,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     >
                       <div>
                         <h3 className="text-lg md:text-xl font-black tracking-tighter italic mb-4 md:mb-6 flex items-center gap-2">
-                          <MapPin className="h-4 w-4 md:h-5 md:w-5 text-purple-600" /> Shipping <span className="text-purple-600">Details</span>
+                          <MapPin className="h-4 w-4 md:h-5 md:w-5 text-orange-600" /> Shipping <span className="text-orange-600">Details</span>
                         </h3>
 
                         <div className="space-y-3 md:space-y-4">
@@ -211,7 +211,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                 placeholder="House number and street name"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
+                                className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-orange-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                               />
                               <Home className="absolute left-3.5 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-300" />
                             </div>
@@ -225,7 +225,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                   placeholder="City"
                                   value={city}
                                   onChange={(e) => setCity(e.target.value)}
-                                  className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
+                                  className="pl-10 md:pl-12 h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-orange-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                                 />
                                 <Building className="absolute left-3.5 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-gray-300" />
                               </div>
@@ -236,7 +236,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                 placeholder="100001"
                                 value={zip}
                                 onChange={(e) => setZip(e.target.value)}
-                                className="h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-purple-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
+                                className="h-12 md:h-16 rounded-xl md:rounded-2xl border-2 border-gray-50 focus:border-orange-500 font-bold transition-all bg-gray-50/50 text-xs md:text-base"
                               />
                             </div>
                           </div>
@@ -245,7 +245,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
                       <div className="bg-green-50 p-4 md:p-6 rounded-2xl md:rounded-[32px] border-2 border-green-100 flex items-start gap-3 md:gap-4">
                         <div className="bg-white p-2 md:p-3 rounded-xl md:rounded-2xl shadow-sm shrink-0">
-                           <Truck className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
+                           <Truck className="h-5 w-5 md:h-6 md:w-6 text-orange-600" />
                         </div>
                         <div>
                           <h4 className="font-black italic tracking-tighter text-green-900 text-sm md:text-base leading-none mb-1">Vivi Express Delivery</h4>
@@ -264,7 +264,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                           setStep('payment');
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
-                        className="w-full h-14 md:h-20 bg-purple-600 hover:bg-purple-700 text-white font-black text-base md:text-xl rounded-2xl shadow-xl shadow-purple-100 transition-all active:scale-95 group"
+                        className="w-full h-14 md:h-20 bg-orange-600 hover:bg-orange-700 text-white font-black text-base md:text-xl rounded-2xl shadow-xl shadow-orange-100 transition-all active:scale-95 group"
                       >
                         Continue to payment
                         <ArrowRight className="ml-2 h-5 w-5 md:h-6 md:w-6 group-hover:translate-x-1 transition-transform" />
@@ -278,7 +278,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     >
                       <div>
                         <h3 className="text-xl font-black  tracking-tighter italic mb-6 flex items-center gap-2">
-                          <CreditCard className="h-5 w-5 text-purple-600" /> Payment <span className="text-purple-600">Method</span>
+                          <CreditCard className="h-5 w-5 text-orange-600" /> Payment <span className="text-orange-600">Method</span>
                         </h3>
 
                         <div className="flex bg-gray-100 rounded-2xl p-1.5 mb-8">
@@ -291,7 +291,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                 setSelectedCard(null);
                               }}
                               className={`flex-1 rounded-xl font-black text-[10px]  tracking-widest h-12 transition-all ${
-                                paymentType === type ? 'bg-white text-purple-600 shadow-md' : 'text-gray-400 hover:text-gray-600'
+                                paymentType === type ? 'bg-white text-orange-600 shadow-md' : 'text-gray-400 hover:text-gray-600'
                               }`}
                             >
                               {type === 'card' ? 'Card' : type === 'momo' ? 'MoMo' : type === 'bank' ? 'Bank' : 'Cash'}
@@ -304,7 +304,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                             {savedCards.length > 0 ? (
                                <RadioGroup value={selectedCard?.id} onValueChange={(v) => setSelectedCard(savedCards.find(c => c.id === v))} className="gap-4">
                                   {savedCards.map(card => (
-                                    <div key={card.id} className={`flex items-center p-6 rounded-3xl border-2 cursor-pointer transition-all ${selectedCard?.id === card.id ? 'border-purple-500 bg-purple-50/30' : 'border-gray-50 bg-white hover:border-gray-200'}`} onClick={() => setSelectedCard(card)}>
+                                    <div key={card.id} className={`flex items-center p-6 rounded-3xl border-2 cursor-pointer transition-all ${selectedCard?.id === card.id ? 'border-orange-500 bg-orange-50/30' : 'border-gray-50 bg-white hover:border-gray-200'}`} onClick={() => setSelectedCard(card)}>
                                        <div className={`p-3 rounded-2xl mr-4 ${card.brand === 'Visa' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
                                           <CreditCard className="h-6 w-6" />
                                        </div>
@@ -313,13 +313,13 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                           <p className="text-[10px] text-gray-400  font-bold">Expires {card.expiry}</p>
                                        </div>
                                        {selectedCard?.id === card.id && (
-                                           <div className="bg-purple-600 rounded-full p-1">
+                                           <div className="bg-orange-600 rounded-full p-1">
                                                <CheckCircle2 className="h-4 w-4 text-white" />
                                            </div>
                                        )}
                                     </div>
                                   ))}
-                                  <div className="p-6 rounded-3xl border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 text-gray-400 hover:text-purple-600 hover:border-purple-200 transition-all cursor-pointer group">
+                                  <div className="p-6 rounded-3xl border-2 border-dashed border-gray-200 flex items-center justify-center gap-2 text-gray-400 hover:text-orange-600 hover:border-orange-200 transition-all cursor-pointer group">
                                       <Plus className="h-5 w-5 group-hover:scale-110 transition-transform" />
                                       <span className="text-xs font-black  tracking-widest">Add New Card</span>
                                   </div>
@@ -339,24 +339,24 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                  <ShoppingBag className="h-10 w-10 text-green-600" />
                               </div>
                               <div>
-                                <h4 className="text-2xl font-black  italic tracking-tighter">Pay on <span className="text-purple-600">Delivery</span></h4>
+                                <h4 className="text-2xl font-black  italic tracking-tighter">Pay on <span className="text-orange-600">Delivery</span></h4>
                                 <p className="text-sm text-gray-500 font-medium leading-relaxed max-w-sm mx-auto mt-2">
                                   Our rider will bring a POS terminal for card payments or accept cash when your order arrives.
                                 </p>
                               </div>
-                              <div className="flex items-center justify-center gap-2 text-[10px] font-black text-purple-600  tracking-widest bg-purple-50 py-2 rounded-full px-6 w-fit mx-auto">
+                              <div className="flex items-center justify-center gap-2 text-[10px] font-black text-orange-600  tracking-widest bg-orange-50 py-2 rounded-full px-6 w-fit mx-auto">
                                  <ShieldCheck className="h-3 w-3" /> Safe & Secure
                               </div>
                            </div>
                         ) : paymentType === 'bank' ? (
-                            <div className="bg-white p-5 md:p-10 rounded-[32px] md:rounded-[40px] border-2 border-purple-100 shadow-xl relative overflow-hidden group">
+                            <div className="bg-white p-5 md:p-10 rounded-[32px] md:rounded-[40px] border-2 border-orange-100 shadow-xl relative overflow-hidden group">
                                <div className="relative z-10">
                                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
                                      <div className="flex items-center gap-3">
-                                        <div className="bg-purple-600 p-2 rounded-xl text-white shadow-lg shadow-purple-200">
+                                        <div className="bg-orange-600 p-2 rounded-xl text-white shadow-lg shadow-orange-200">
                                            <Building className="h-5 w-5" />
                                         </div>
-                                        <h4 className="text-lg md:text-2xl font-black italic tracking-tighter text-black uppercase leading-none">Bank <span className="text-purple-600">Transfer</span></h4>
+                                        <h4 className="text-lg md:text-2xl font-black italic tracking-tighter text-black uppercase leading-none">Bank <span className="text-orange-600">Transfer</span></h4>
                                      </div>
                                      <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest w-fit">Manual Verification</div>
                                   </div>
@@ -370,18 +370,18 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
                                        <div className="space-y-4 md:space-y-6">
                                           <div className="flex flex-col gap-1">
-                                             <span className="text-[8px] font-black text-purple-400 tracking-widest uppercase">Bank Network</span>
+                                             <span className="text-[8px] font-black text-orange-400 tracking-widest uppercase">Bank Network</span>
                                              <span className="text-base md:text-lg font-black text-black tracking-tight">{storeSettings?.bankName || 'WEMA BANK / ALAT'}</span>
                                           </div>
 
                                           <div className="flex flex-col gap-1">
-                                             <span className="text-[8px] font-black text-purple-400 tracking-widest uppercase">Account Number</span>
+                                             <span className="text-[8px] font-black text-orange-400 tracking-widest uppercase">Account Number</span>
                                              <div className="flex items-center justify-between gap-2">
-                                                <span className="text-2xl md:text-4xl font-black tracking-[0.1em] md:tracking-[0.2em] text-purple-600 break-all">{storeSettings?.bankAccountNumber || '0123456789'}</span>
+                                                <span className="text-2xl md:text-4xl font-black tracking-[0.1em] md:tracking-[0.2em] text-orange-600 break-all">{storeSettings?.bankAccountNumber || '0123456789'}</span>
                                                 <Button
                                                    variant="ghost"
                                                    size="icon"
-                                                   className="rounded-full h-8 w-8 md:h-10 md:w-10 hover:bg-purple-100 hover:text-purple-600 shrink-0"
+                                                   className="rounded-full h-8 w-8 md:h-10 md:w-10 hover:bg-orange-100 hover:text-orange-600 shrink-0"
                                                    onClick={() => {
                                                       navigator.clipboard.writeText(storeSettings?.bankAccountNumber || '0123456789');
                                                       toast.success("Account number copied!");
@@ -394,7 +394,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                        </div>
                                     </div>
 
-                                    <div className="bg-purple-600 p-4 rounded-xl md:rounded-2xl flex items-center gap-3 shadow-lg shadow-purple-100">
+                                    <div className="bg-orange-600 p-4 rounded-xl md:rounded-2xl flex items-center gap-3 shadow-lg shadow-orange-100">
                                        <Zap className="h-4 w-4 md:h-5 md:w-5 text-yellow-400 fill-yellow-400 animate-pulse shrink-0" />
                                        <p className="text-[8px] md:text-[9px] text-white font-black uppercase tracking-widest leading-tight">
                                           Transfer exactly <span className="text-yellow-400">{formatPrice(totalPrice)}</span> then click "Place Order" below.
@@ -403,7 +403,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                   </div>
                                </div>
 
-                               <Building className="absolute right-[-20px] bottom-[-20px] h-32 w-32 md:h-48 md:w-40 text-purple-600/5 rotate-12" />
+                               <Building className="absolute right-[-20px] bottom-[-20px] h-32 w-32 md:h-48 md:w-40 text-orange-600/5 rotate-12" />
                             </div>
                         ) : paymentType === 'momo' ? (
                             <div className="bg-green-600 p-8 rounded-[40px] text-white space-y-6 shadow-xl">
@@ -455,7 +455,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                    </div>
                    <div className="w-px h-4 bg-gray-200"></div>
                    <div className="flex items-center gap-2">
-                      <Package className="h-5 w-5 text-purple-600" />
+                      <Package className="h-5 w-5 text-orange-600" />
                       <span className="text-[10px] font-black  tracking-widest text-gray-500">Vivi Guarantee</span>
                    </div>
                    <div className="w-px h-4 bg-gray-200"></div>
@@ -469,7 +469,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
               {/* Right Column: Order Summary */}
               <div className="space-y-8">
                 <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 sticky top-24">
-                  <h3 className="text-xl font-black  tracking-tighter italic mb-8 border-b border-gray-50 pb-4">Order <span className="text-purple-600">Summary</span></h3>
+                  <h3 className="text-xl font-black  tracking-tighter italic mb-8 border-b border-gray-50 pb-4">Order <span className="text-orange-600">Summary</span></h3>
 
                   <ScrollArea className="max-h-[300px] mb-8 pr-4">
                     <div className="space-y-6">
@@ -479,10 +479,10 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                             <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-xs font-black  truncate group-hover:text-purple-600 transition-colors">{item.name}</p>
+                            <p className="text-xs font-black  truncate group-hover:text-orange-600 transition-colors">{item.name}</p>
                             <div className="flex items-center justify-between mt-1">
                                <p className="text-[10px] font-bold text-gray-400 ">Qty: {item.quantity}</p>
-                               <p className="text-sm font-black text-purple-600">{formatPrice(item.priceValue * item.quantity)}</p>
+                               <p className="text-sm font-black text-orange-600">{formatPrice(item.priceValue * item.quantity)}</p>
                             </div>
                           </div>
                         </div>
@@ -497,8 +497,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     </div>
                     {discount > 0 && (
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black text-purple-600 tracking-widest">Discount ({selectedVoucher?.offer})</span>
-                        <span className="text-sm font-bold text-purple-600">-{formatPrice(discount)}</span>
+                        <span className="text-[10px] font-black text-orange-600 tracking-widest">Discount ({selectedVoucher?.offer})</span>
+                        <span className="text-sm font-bold text-orange-600">-{formatPrice(discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between items-center">
@@ -507,7 +507,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     </div>
                     <div className="flex justify-between items-center pt-4 border-t border-gray-50">
                       <span className="text-base font-black  tracking-tighter">Total Amount</span>
-                      <span className="text-2xl font-black text-purple-600 tracking-tighter">{formatPrice(totalPrice - discount)}</span>
+                      <span className="text-2xl font-black text-orange-600 tracking-tighter">{formatPrice(totalPrice - discount)}</span>
                     </div>
                   </div>
 
@@ -535,14 +535,14 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                       toast.success(`Voucher ${v.code} applied!`);
                                    }
                                 }}
-                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${selectedVoucher?.code === v.code ? 'border-purple-600 bg-purple-50' : 'border-gray-50 bg-gray-50/30 hover:border-purple-200'}`}
+                                className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${selectedVoucher?.code === v.code ? 'border-orange-600 bg-orange-50' : 'border-gray-50 bg-gray-50/30 hover:border-orange-200'}`}
                              >
                                 <div>
                                    <p className="font-black text-xs uppercase tracking-tight">{v.code}</p>
-                                   <p className="text-[9px] font-bold text-purple-600 uppercase">{v.offer}</p>
+                                   <p className="text-[9px] font-bold text-orange-600 uppercase">{v.offer}</p>
                                 </div>
                                 {selectedVoucher?.code === v.code ? (
-                                   <div className="h-5 w-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                   <div className="h-5 w-5 bg-orange-600 rounded-full flex items-center justify-center">
                                       <CheckCircle2 className="h-3 w-3 text-white" />
                                    </div>
                                 ) : (
@@ -554,8 +554,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     </div>
                   )}
 
-                  <div className="mt-8 p-4 bg-purple-50 rounded-2xl border border-purple-100 text-center">
-                     <p className="text-[10px] font-black text-purple-600  tracking-widest">Points Earned: {Math.floor(totalPrice - discount)}</p>
+                  <div className="mt-8 p-4 bg-orange-50 rounded-2xl border border-orange-100 text-center">
+                     <p className="text-[10px] font-black text-orange-600  tracking-widest">Points Earned: {Math.floor(totalPrice - discount)}</p>
                   </div>
                 </div>
               </div>
@@ -568,7 +568,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
               className="max-w-xl mx-auto py-6 md:py-12"
             >
               <div className="bg-white p-6 md:p-12 rounded-[32px] md:rounded-[50px] shadow-2xl text-center space-y-6 md:space-y-8 border-4 border-green-50 relative overflow-hidden">
-                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-600 via-green-500 to-yellow-400"></div>
+                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-600 via-green-500 to-yellow-400"></div>
 
                  <div className="w-20 h-20 md:w-32 md:h-32 bg-green-100 rounded-full flex items-center justify-center mx-auto relative group">
                     <CheckCircle2 className="h-10 w-10 md:h-16 md:w-16 text-green-600 group-hover:scale-110 transition-transform" />
@@ -576,7 +576,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                  </div>
 
                  <div className="space-y-2 md:space-y-3">
-                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter italic leading-none">Order <br /><span className="text-purple-600">Successful!</span></h2>
+                    <h2 className="text-3xl md:text-5xl font-black tracking-tighter italic leading-none">Order <br /><span className="text-orange-600">Successful!</span></h2>
                     <p className="text-gray-400 font-bold text-[8px] md:text-[10px] tracking-widest leading-relaxed pt-1 md:pt-2">
                       Your premium Vivi order has been placed. <br className="hidden md:block" /> Check your email for confirmation.
                     </p>
@@ -597,7 +597,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                     <Button onClick={onBack} className="w-full h-14 md:h-18 bg-black hover:bg-zinc-800 text-white font-black text-base md:text-lg rounded-2xl shadow-xl">
                         Track my order
                     </Button>
-                    <Button variant="ghost" onClick={onBack} className="w-full h-10 md:h-12 font-black tracking-widest text-[8px] md:text-[10px] text-gray-400 hover:text-purple-600">
+                    <Button variant="ghost" onClick={onBack} className="w-full h-10 md:h-12 font-black tracking-widest text-[8px] md:text-[10px] text-gray-400 hover:text-orange-600">
                         Continue shopping
                     </Button>
                  </div>

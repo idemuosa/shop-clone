@@ -103,7 +103,7 @@ export default function SpinToWin() {
 
         toast.success(`Congratulations! You won ${reward.text}!`, {
           description: `Code: ${reward.value} added to your profile.`,
-          icon: <Trophy className="h-4 w-4 text-purple-600" />
+          icon: <Trophy className="h-4 w-4 text-orange-600" />
         });
       } else {
         toast.error("Better luck next time!");
@@ -137,7 +137,7 @@ export default function SpinToWin() {
             onClick={() => setIsOpen(true)}
             className="w-14 h-14 rounded-full bg-black hover:bg-zinc-800 shadow-2xl border-4 border-white flex items-center justify-center p-0"
           >
-            <Gift className="h-6 w-6 text-purple-600 animate-bounce" />
+            <Gift className="h-6 w-6 text-orange-600 animate-bounce" />
           </Button>
         </motion.div>
       </div>
@@ -161,15 +161,15 @@ export default function SpinToWin() {
               </Button>
 
               <div className="mb-4">
-                <BadgeCheck className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <h2 className="text-xl font-black uppercase tracking-tighter italic">Lucky <span className="text-purple-600">Spin</span></h2>
+                <BadgeCheck className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                <h2 className="text-xl font-black uppercase tracking-tighter italic">Lucky <span className="text-orange-600">Spin</span></h2>
                 <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">Win exclusive Vivi rewards</p>
               </div>
 
               {/* Wheel Container */}
               <div className="relative w-48 h-48 mx-auto mb-6 mt-2">
                 <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 z-10">
-                   <ChevronDown className="h-8 w-8 text-purple-600 fill-purple-600 drop-shadow-lg" />
+                   <ChevronDown className="h-8 w-8 text-orange-600 fill-orange-600 drop-shadow-lg" />
                 </div>
                 
                 <motion.div
@@ -197,7 +197,7 @@ export default function SpinToWin() {
                   ))}
                   {/* Wheel Center */}
                   <div className="absolute inset-0 m-auto w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-zinc-900 z-10">
-                    <Zap className="h-4 w-4 text-purple-600 fill-purple-600" />
+                    <Zap className="h-4 w-4 text-orange-600 fill-orange-600" />
                   </div>
                 </motion.div>
               </div>
@@ -205,7 +205,7 @@ export default function SpinToWin() {
               <div className="space-y-3">
                 {result ? (
                   <div className="bg-green-50 p-4 rounded-2xl border-2 border-dashed border-green-200">
-                    <p className="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Your Reward:</p>
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Your Reward:</p>
                     <h3 className="text-2xl font-black tracking-tighter italic">{result}</h3>
                     <div className="flex items-center justify-center gap-1 mt-2 text-green-600">
                       <CheckCircle2 className="h-3 w-3" />
@@ -216,7 +216,7 @@ export default function SpinToWin() {
                   <Button 
                     onClick={spinWheel}
                     disabled={isSpinning}
-                    className="w-full h-12 bg-purple-600 hover:bg-purple-700 text-white font-black text-base rounded-xl shadow-lg shadow-purple-100 transition-all active:scale-95"
+                    className="w-full h-12 bg-orange-600 hover:bg-orange-700 text-white font-black text-base rounded-xl shadow-lg shadow-orange-100 transition-all active:scale-95"
                   >
                     {isSpinning ? (
                       <RefreshCcw className="h-5 w-5 animate-spin" />
@@ -231,7 +231,7 @@ export default function SpinToWin() {
 
               {/* Decorative elements */}
               <Sparkles className="absolute top-10 left-10 text-yellow-400 h-6 w-6 animate-pulse" />
-              <Star className="absolute bottom-10 right-10 text-purple-200 h-8 w-8 animate-bounce" />
+              <Star className="absolute bottom-10 right-10 text-orange-200 h-8 w-8 animate-bounce" />
             </motion.div>
           </div>
         )}
