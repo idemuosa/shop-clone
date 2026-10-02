@@ -136,7 +136,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
     <div className="bg-[#f8f9fa] min-h-screen pb-10">
       {/* Dashboard Top Area */}
       <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-black tracking-tighter italic leading-none mb-1">
@@ -167,7 +167,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           {/* Main Dashboard Feed */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">

@@ -517,8 +517,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   };
 
   return (
-    <section className="py-12 bg-[#f5f5f5]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-6 md:py-8 bg-[#f5f5f5]">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatePresence>
           {recentBoughVisible && (
             <motion.div 

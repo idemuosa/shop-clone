@@ -4,7 +4,6 @@ import Hero from "./components/Hero";
 import CategorySection from "./components/CategorySection";
 import ProductSection from "./components/ProductSection";
 import PromoBanner from "./components/PromoBanner";
-import FlashSaleTimer from "./components/FlashSaleTimer";
 import Footer from "./components/Footer";
 import AuthModal from "./components/auth/AuthModal";
 
@@ -375,23 +374,9 @@ function MainContent() {
         wishlistCount={wishlistCount}
       />
       <main>
-        {/* Flash Sale Banner */}
-        <div className="bg-purple-600 text-white py-2 overflow-hidden whitespace-nowrap">
-          <motion.div 
-            animate={{ x: ["100%", "-100%"] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="flex items-center gap-8 font-bold  text-sm"
-          >
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Flash Sale: Up to 90% Off!</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Limited Time Only</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Free Shipping on First Order</span>
-            <span className="flex items-center gap-2"><Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> Flash Sale: Up to 90% Off!</span>
-          </motion.div>
-        </div>
-
         {searchQuery ? (
-          <div className="py-12 bg-white">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+          <div className="py-6 md:py-8 bg-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
               <div className="flex items-center gap-4 bg-green-50 p-8 rounded-[40px] border-2 border-green-100">
                 <div className="bg-purple-600 p-4 rounded-3xl shadow-xl shadow-purple-200">
                    <Search className="h-8 w-8 text-white" />
@@ -437,8 +422,6 @@ function MainContent() {
           <>
             <Hero />
             <CategorySection onSelectCategory={(cat) => handleSearch(cat === "all" ? "" : cat)} />
-            
-            <FlashSaleTimer />
 
             <ProductSection 
               title="Flash" 
@@ -449,8 +432,8 @@ function MainContent() {
               onProductView={handleProductView}
             />
             
-            <section className="py-10">
-              <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <section className="py-6 md:py-8">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="relative bg-purple-500 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
                     <p className="font-bold mb-2  tracking-widest opacity-80">Smart Tech</p>
@@ -511,8 +494,8 @@ function MainContent() {
         )}
 
         {/* Features Section */}
-        <section className="py-20 bg-white border-t border-gray-100">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <section className="py-10 md:py-12 bg-white border-t border-gray-100">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="flex flex-col items-center text-center">
               <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
                 <Truck className="h-8 w-8 text-purple-600" />

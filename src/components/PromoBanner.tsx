@@ -55,8 +55,8 @@ export default function PromoBanner() {
   };
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-6 md:py-8 bg-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative bg-purple-600 rounded-[32px] overflow-hidden shadow-2xl shadow-purple-100">
           {/* Animated Background Pattern */}
           <div className="absolute inset-0 opacity-10">
@@ -70,10 +70,9 @@ export default function PromoBanner() {
                 Flash Sale Ending Soon
               </div>
               
-              <h2 className="text-4xl md:text-6xl font-black text-white leading-tight mb-6 uppercase italic tracking-tighter">
-                DON'T WAIT! <br />
-                <span className="text-yellow-400">EXTRA 20% OFF</span> <br />
-                ON YOUR FIRST ORDER
+              <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight mb-4 tracking-tight">
+                Get <span className="text-yellow-400">Extra 20% Off</span> <br />
+                On Your First Order
               </h2>
 
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 mb-8">
@@ -101,9 +100,9 @@ export default function PromoBanner() {
 
               <Button
                 onClick={handleGetCoupon}
-                className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-12 py-8 rounded-2xl text-xl font-black shadow-xl transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter"
+                className="bg-white text-purple-600 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-xl text-sm font-semibold shadow-md transition-all active:scale-95"
               >
-                Get My Coupon <ArrowRight className="ml-2 h-6 w-6" />
+                Get My Coupon <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
 

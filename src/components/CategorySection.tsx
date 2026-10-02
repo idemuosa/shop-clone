@@ -54,8 +54,8 @@ export default function CategorySection({ onSelectCategory }: CategorySectionPro
   }, []);
 
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-6 md:py-8 bg-white">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-3">
             <div className="bg-purple-600 p-2 rounded-lg">

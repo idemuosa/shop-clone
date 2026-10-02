@@ -601,7 +601,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-4 md:mb-6">
           <div className="bg-purple-600 p-2 rounded-xl shadow-lg shadow-purple-200">
             <Zap className="h-6 w-6 text-white fill-white" />

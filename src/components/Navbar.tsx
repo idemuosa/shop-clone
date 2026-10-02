@@ -83,17 +83,15 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       {/* Top bar */}
-      <div className="bg-purple-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
+      <div className="bg-zinc-900 text-white py-1.5 px-4 text-center text-xs font-medium tracking-wide">
         <span className="flex items-center justify-center gap-2">
-          <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          {storeSettings?.bannerMessage || 'Vivi Style Flash Sale: Up to 90% Off!'}
-          <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-          <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
+          <span>{storeSettings?.bannerMessage || 'Special Offers & Fast Free Shipping on Orders Over $50'}</span>
+          <a href="#" className="underline underline-offset-4 hover:text-purple-300 transition-colors ml-1">Shop Now</a>
         </span>
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20 gap-2 md:gap-4">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-1 md:gap-2 cursor-pointer" onClick={() => {
