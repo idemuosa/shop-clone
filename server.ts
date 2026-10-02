@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 import fs from "fs";
@@ -113,6 +114,74 @@ const adminEmail = process.env.ADMIN_EMAIL;
 const fromEmail = process.env.FROM_EMAIL || "Vivi Shop <onboarding@resend.dev>";
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+
+// Initialize SMTP Transporter
+const getSmtpTransporter = () => {
+  const host = process.env.SMTP_HOST;
+  const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASSWORD;
+
+  if (host && user && pass) {
+    return nodemailer.createTransport({
+      host,
+      port,
+      secure: port === 465,
+      auth: {
+        user,
+        pass,
+      },
+    });
+  }
+  return null;
+};
+
+// Unified Email Sending function (SMTP primary, Resend fallback)
+const sendEmail = async (to: string, subject: string, html: string) => {
+  const smtpFrom = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || fromEmail;
+  const smtpTransporter = getSmtpTransporter();
+
+  if (smtpTransporter) {
+    try {
+      const info = await smtpTransporter.sendMail({
+        from: smtpFrom,
+        to,
+        subject,
+        html,
+      });
+      console.log(`[EMAIL SENT via SMTP] To ${to}, MessageId: ${info.messageId}`);
+      return { success: true, provider: "smtp" };
+    } catch (smtpErr: any) {
+      console.error("[SMTP Email Error]:", smtpErr.message || smtpErr);
+      // Fall through to Resend
+    }
+  }
+
+  const resendClient = getResend();
+  if (resendClient) {
+    try {
+      const { data, error } = await resendClient.emails.send({
+        from: fromEmail,
+        to: [to],
+        subject,
+        html,
+      });
+
+      if (error) {
+        console.error("[Resend Email Error]:", error);
+        return { success: false, provider: "resend", error: error.message };
+      }
+      console.log(`[EMAIL SENT via Resend] To ${to}`);
+      return { success: true, provider: "resend" };
+    } catch (resendErr: any) {
+      console.error("[Resend Email Exception]:", resendErr);
+      return { success: false, provider: "resend", error: resendErr.message };
+    }
+  }
+
+  console.log(`[EMAIL SKIPPED - No Provider] To: ${to}, Subject: ${subject}`);
+  return { success: false, provider: "none", error: "No email provider configured" };
+};
 
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
@@ -243,7 +312,6 @@ app.get("/api/admin/analytics", async (req, res) => {
 
 app.post("/api/send-otp", async (req, res) => {
   const { email, phone, type } = req.body;
-  const resendClient = getResend();
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const identifier = email || phone;
@@ -259,53 +327,51 @@ app.post("/api/send-otp", async (req, res) => {
   });
 
   if (email) {
-    if (!resendClient) {
-      return res.status(500).json({
-        success: false,
-        message: "Email service not configured. Please check RESEND_API_KEY in .env",
-        devOtp: otp
-      });
-    }
+    const subject = `${otp} is your Vivi verification code`;
+    const html = `
+      <div style="font-family: sans-serif; padding: 20px; color: #333; text-align: center; border: 1px solid #eee; border-radius: 20px; max-width: 400px; margin: auto;">
+        <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivi</h1>
+        <p style="font-size: 16px; color: #666;">Your verification code is below:</p>
+        <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 20px auto; width: fit-content;">
+          <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">${otp}</span>
+        </div>
+        <p style="font-size: 12px; color: #999;">This code will expire in 10 minutes.</p>
+      </div>
+    `;
 
-    try {
-      const { data, error } = await resendClient.emails.send({
-        from: fromEmail,
-        to: [email],
-        subject: `${otp} is your Vivi verification code`,
-        html: `
-          <div style="font-family: sans-serif; padding: 20px; color: #333; text-align: center; border: 1px solid #eee; border-radius: 20px; max-width: 400px; margin: auto;">
-            <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivi</h1>
-            <p style="font-size: 16px; color: #666;">Your verification code is below:</p>
-            <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 20px auto; width: fit-content;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">${otp}</span>
-            </div>
-            <p style="font-size: 12px; color: #999;">This code will expire in 10 minutes.</p>
-          </div>
-        `,
-      });
-
-      if (error) {
-        console.error("Resend API Error:", error);
-        return res.status(400).json({
-          success: false,
-          message: `Resend Error: ${error.message}. Note: Free accounts can only send to the email you used to sign up for Resend.`,
-          devOtp: otp
-        });
-      }
-
-      console.log(`[Email] OTP sent successfully to ${email}`);
-    } catch (err: any) {
-      console.error("OTP Email Error:", err);
-      return res.status(500).json({ success: false, message: "Server error sending email", devOtp: otp });
-    }
+    const emailResult = await sendEmail(email, subject, html);
+    console.log(`[send-otp] Email dispatch status:`, emailResult);
   }
 
   if (phone) console.log(`[SMS SIMULATION] Sending OTP ${otp} to ${phone}`);
 
   res.json({
     success: true,
-    devOtp: otp // Ensure user can always log in while debugging
+    devOtp: otp // Ensure user can always see and use verification code
   });
+});
+
+app.post("/api/send-welcome", async (req, res) => {
+  const { email, name } = req.body;
+  if (!email) {
+    return res.status(400).json({ success: false, message: "Email is required" });
+  }
+
+  const subject = "Welcome to Vivi Shop!";
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 16px;">
+      <h1 style="color: #9333ea;">Welcome to Vivi, ${name || 'Explorer'}!</h1>
+      <p>We're thrilled to have you join our community.</p>
+      <p>Explore top products, flash sales, and exclusive digital rewards!</p>
+    </div>
+  `;
+
+  await sendEmail(email, subject, html);
+  if (adminEmail) {
+    await sendEmail(adminEmail, "New User Registration", `<p>New user <b>${name || email}</b> (${email}) joined Vivi!</p>`);
+  }
+
+  res.json({ success: true });
 });
 
 app.post("/api/verify-otp", async (req, res) => {
@@ -363,37 +429,48 @@ app.post("/api/verify-otp", async (req, res) => {
 
 app.post("/api/send-order-confirmation", async (req, res) => {
   const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body;
-  const resendClient = getResend();
+
+  const displayOrderId = orderId ? orderId.slice(-8).toUpperCase() : Math.random().toString(36).slice(-6).toUpperCase();
 
   // Broadcast real-time order activity via Socket.IO
   io.emit("new_activity", {
-    message: `New Order #${orderId ? orderId.slice(-6).toUpperCase() : 'NEW'}: ${productName} ($${totalAmount})`,
+    message: `New Order #${displayOrderId}: ${productName || 'Cart Items'} ($${totalAmount || '0'})`,
     type: "order"
   });
 
-  if (resendClient && email) {
-    try {
-      const userEmail = resendClient.emails.send({
-        from: fromEmail,
-        to: [email],
-        subject: `Order Confirmation #${orderId.slice(-8).toUpperCase()}`,
-        html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
-      });
+  if (email) {
+    const userSubject = `Order Confirmation #${displayOrderId}`;
+    const userHtml = `
+      <div style="font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 16px;">
+        <h2 style="color: #16a34a;">Payment & Order Confirmed!</h2>
+        <p>Hi ${name || 'Customer'}, thank you for shopping with Vivi.</p>
+        <div style="background: #f9fafb; padding: 16px; border-radius: 12px; margin: 16px 0;">
+          <p><strong>Order ID:</strong> #${displayOrderId}</p>
+          <p><strong>Item(s):</strong> ${productName || 'Order Items'}</p>
+          <p><strong>Total Amount:</strong> $${totalAmount || '0'}</p>
+          ${shippingAddress ? `<p><strong>Shipping Address:</strong> ${shippingAddress}</p>` : ''}
+        </div>
+        <p style="font-size: 12px; color: #6b7280;">If you have any questions, feel free to reply to this email.</p>
+      </div>
+    `;
 
-      const adminNotif = resendClient.emails.send({
-        from: fromEmail,
-        to: [adminEmail || 'idemudiawisdom27@gmail.com'],
-        subject: `NEW ORDER: #${orderId.slice(-8).toUpperCase()}`,
-        html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
-      });
+    const adminSubject = `NEW SALE: #${displayOrderId} ($${totalAmount || '0'})`;
+    const adminHtml = `
+      <div style="font-family: sans-serif; padding: 20px;">
+        <h2>New Order Received</h2>
+        <p><strong>Customer:</strong> ${name || 'Customer'} (${email})</p>
+        <p><strong>Order ID:</strong> #${displayOrderId}</p>
+        <p><strong>Amount:</strong> $${totalAmount || '0'}</p>
+      </div>
+    `;
 
-      await Promise.all([userEmail, adminNotif]);
-    } catch (err) {
-      console.error("Order Email Error:", err);
+    await sendEmail(email, userSubject, userHtml);
+    if (adminEmail) {
+      await sendEmail(adminEmail, adminSubject, adminHtml);
     }
   }
 
-  if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${orderId.slice(-8).toUpperCase()}.`);
+  if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${displayOrderId}.`);
 
   res.json({ success: true });
 });
