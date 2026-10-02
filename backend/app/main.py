@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
-from . import models, schemas, database, auth
+from . import models, schemas, database, auth, redis_client
 from .database import engine, get_db
 
 load_dotenv()
@@ -28,9 +28,6 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "idemudiawisdom27@gmail.com")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="My Shop API")
-
-# In-memory store for demo OTPs (Use Redis in production)
-demo_otps = {}
 
 def send_email(to_email, subject, html_content):
     # Try SMTP first if configured
@@ -180,7 +177,7 @@ async def send_otp(payload: dict = Body(...)):
         raise HTTPException(status_code=400, detail="Identifier (email or phone) required")
 
     otp = str(random.randint(100000, 999999))
-    demo_otps[identifier] = otp
+    redis_client.set_otp(identifier, otp)
 
     print(f"DEBUG: Sent OTP {otp} to {identifier}")
 
@@ -214,9 +211,10 @@ async def verify_otp(payload: dict = Body(...)):
     identifier = payload.get("identifier")
     code = payload.get("code")
 
-    if (identifier in demo_otps and demo_otps[identifier] == code) or (code == "123456"):
-        if identifier in demo_otps:
-            del demo_otps[identifier]
+    stored_otp = redis_client.get_otp(identifier)
+
+    if (stored_otp and stored_otp == code) or (code == "123456"):
+        redis_client.delete_otp(identifier)
 
         custom_token = None
         try:

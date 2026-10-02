@@ -5,6 +5,7 @@ import { Resend } from "resend";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 import fs from "fs";
+import Redis from "ioredis";
 
 dotenv.config();
 
@@ -86,8 +87,62 @@ const fromEmail = process.env.FROM_EMAIL || "Vivi Shop <onboarding@resend.dev>";
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
-// Store OTPs temporarily
+// Redis initialization with fallback for Express
+const REDIS_URL = process.env.REDIS_URL;
+let redisClient: Redis | null = null;
+
+if (REDIS_URL) {
+  try {
+    redisClient = new Redis(REDIS_URL, {
+      maxRetriesPerRequest: 1,
+      retryStrategy(times) {
+        if (times > 3) return null;
+        return Math.min(times * 100, 1000);
+      }
+    });
+    redisClient.on("connect", () => console.log("Connected to Redis in Express server"));
+    redisClient.on("error", (err) => console.warn("Express Redis warning:", err.message));
+  } catch (err: any) {
+    console.warn("Could not initialize Redis client in Express:", err.message);
+  }
+}
+
+// Store OTPs temporarily with Redis or In-Memory Map fallback
 const otpStore = new Map<string, string>();
+
+async function saveOtp(identifier: string, otp: string) {
+  if (redisClient) {
+    try {
+      await redisClient.setex(`otp:${identifier}`, 600, otp);
+      return;
+    } catch (e) {
+      console.warn("Redis setex failed, falling back to Map store");
+    }
+  }
+  otpStore.set(identifier, otp);
+  setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
+}
+
+async function getOtp(identifier: string): Promise<string | undefined> {
+  if (redisClient) {
+    try {
+      const val = await redisClient.get(`otp:${identifier}`);
+      if (val) return val;
+    } catch (e) {
+      console.warn("Redis get failed, falling back to Map store");
+    }
+  }
+  return otpStore.get(identifier);
+}
+
+async function deleteOtp(identifier: string) {
+  if (redisClient) {
+    try {
+      await redisClient.del(`otp:${identifier}`);
+    } catch (e) {}
+  }
+  otpStore.delete(identifier);
+}
 
 // API routes
 app.post("/api/paystack/initialize", async (req, res) => {
@@ -208,9 +263,7 @@ app.post("/api/send-otp", async (req, res) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const identifier = email || phone;
-  otpStore.set(identifier, otp);
-
-  setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
+  await saveOtp(identifier, otp);
 
   console.log(`[OTP] Generated ${otp} for ${identifier}`);
 
@@ -266,10 +319,10 @@ app.post("/api/send-otp", async (req, res) => {
 
 app.post("/api/verify-otp", async (req, res) => {
   const { identifier, code } = req.body;
-  const storedOtp = otpStore.get(identifier);
+  const storedOtp = await getOtp(identifier);
 
   if (storedOtp === code || (process.env.NODE_ENV === 'development' && code === '123456')) {
-    otpStore.delete(identifier);
+    await deleteOtp(identifier);
 
     let customToken = null;
     try {
