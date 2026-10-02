@@ -12,9 +12,9 @@ const brands = [
 export default function BrandPartners() {
   return (
     <section className="py-20 bg-gray-50 overflow-hidden border-t border-gray-100">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-           <h2 className="text-3xl font-black uppercase tracking-tighter italic italic">Official <span className="text-orange-600">Store</span> Partners</h2>
+           <h2 className="text-3xl font-black uppercase tracking-tighter italic italic">Official <span className="text-purple-600">Store</span> Partners</h2>
            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">100% Authentic Brands Guaranteed</p>
         </div>
 
