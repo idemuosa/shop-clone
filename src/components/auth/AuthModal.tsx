@@ -211,7 +211,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       <DialogContent className="sm:max-w-[350px] w-[92vw] rounded-[28px] border-none p-4 sm:p-5">
         <DialogHeader className="mb-2">
           <DialogTitle className="text-xl sm:text-2xl font-black text-center italic tracking-tighter">
-            Welcome to <span className="text-purple-600">Vivi</span>
+            Welcome to <span className="text-orange-600">Vivi</span>
           </DialogTitle>
           <DialogDescription className="text-center font-bold text-xs sm:text-sm uppercase tracking-widest opacity-60">
             Sign in or create account
@@ -231,13 +231,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-2'} bg-green-50 rounded-xl p-1 mb-4 sm:mb-6`}>
             {user ? (
               <>
-                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">My Profile</TabsTrigger>
-                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Wallets</TabsTrigger>
+                <TabsTrigger value="profile" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">My Profile</TabsTrigger>
+                <TabsTrigger value="payment" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Wallets</TabsTrigger>
               </>
             ) : (
               <>
-                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
-                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-purple-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
+                <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
+                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
               </>
             )}
           </TabsList>
@@ -247,7 +247,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <TabsContent value="profile">
                 <div className="space-y-4 sm:space-y-6 pt-2">
                   <div className="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto">
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-purple-400 to-purple-600 rounded-[24px] sm:rounded-[28px] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-xl shadow-purple-100 rotate-3">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-[24px] sm:rounded-[28px] flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-xl shadow-orange-100 rotate-3">
                       {user.displayName?.charAt(0) || user.email?.charAt(0)}
                     </div>
                     <div className="absolute -bottom-1 -right-1 sm:-bottom-1.5 sm:-right-1.5 bg-green-500 border-2 border-white w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-white">
@@ -262,10 +262,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                   <div className="bg-green-50 rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-green-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[7px] font-black text-purple-600  tracking-widest uppercase">Vivi Status</p>
-                      <h4 className="text-sm sm:text-base font-black  tracking-tighter italic">Premium <span className="text-purple-600">Member</span></h4>
+                      <p className="text-[7px] font-black text-orange-600  tracking-widest uppercase">Vivi Status</p>
+                      <h4 className="text-sm sm:text-base font-black  tracking-tighter italic">Premium <span className="text-orange-600">Member</span></h4>
                     </div>
-                    <div className="bg-purple-600 p-1 sm:p-1.5 rounded-lg text-white">
+                    <div className="bg-orange-600 p-1 sm:p-1.5 rounded-lg text-white">
                        <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
                     </div>
                   </div>
@@ -290,12 +290,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               {step === 'otp' ? (
                 <div className="space-y-6 py-4">
                   <div className="text-center space-y-2">
-                    <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto text-purple-600 mb-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto text-orange-600 mb-4">
                        <Lock className="h-8 w-8" />
                     </div>
-                    <h3 className="text-xl font-black tracking-tighter italic">Verify your <span className="text-purple-600">Email Code</span></h3>
-                    <p className="text-xs font-bold text-gray-400 tracking-widest leading-relaxed">
-                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData?.identifier}</span>
+                    <h3 className="text-xl font-black  tracking-tighter italic">Verify your <span className="text-orange-600">Identity</span></h3>
+                    <p className="text-xs font-bold text-gray-400  tracking-widest leading-relaxed">
+                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData.identifier}</span>
                     </p>
                   </div>
 
@@ -307,7 +307,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         onChange={(e) => setOtpCode(e.target.value)}
                         placeholder="000000"
                         maxLength={6}
-                        className="text-center text-3xl font-black tracking-[0.5em] h-20 rounded-2xl border-4 border-gray-100 focus:border-purple-500 focus:ring-0 bg-gray-50 placeholder:text-gray-200"
+                        className="text-center text-3xl font-black tracking-[0.5em] h-20 rounded-2xl border-4 border-gray-100 focus:border-orange-500 focus:ring-0 bg-gray-50 placeholder:text-gray-200"
                       />
                     </div>
                     
@@ -336,14 +336,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   <TabsContent value="login" className="mt-0">
                     <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
                       <Button 
-                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'email' ? 'bg-white text-purple-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
+                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'email' ? 'bg-white text-orange-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
                         onClick={() => setLoginMethod('email')}
                         type="button"
                       >
                         <Mail className="h-3 w-3 mr-2" /> Email
                       </Button>
                       <Button 
-                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'phone' ? 'bg-white text-purple-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
+                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'phone' ? 'bg-white text-orange-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
                         onClick={() => setLoginMethod('phone')}
                         type="button"
                       >
@@ -363,7 +363,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                  placeholder="hello@vivi.co"
                                  required
                                  autoComplete="username"
-                                 className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm"
+                                 className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
                                />
                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                              </div>
@@ -377,13 +377,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                  placeholder="••••••••"
                                  required
                                  autoComplete="current-password"
-                                 className="pl-10 pr-10 h-12 rounded-xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all text-sm"
+                                 className="pl-10 pr-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
                                />
                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                                <button
                                  type="button"
                                  onClick={() => setShowPassword(!showPassword)}
-                                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors"
                                  aria-label={showPassword ? "Hide password" : "Show password"}
                                >
                                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -395,13 +395,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Phone Number</Label>
                            <div className="relative">
-                             <Input name="phone" type="tel" placeholder="+234 000 000 0000" required className="pl-12 h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold transition-all" />
+                             <Input name="phone" type="tel" placeholder="+234 000 000 0000" required className="pl-12 h-14 rounded-2xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all" />
                              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
                            </div>
                         </div>
                       )}
 
-                      <Button type="submit" disabled={isLoading} className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-14 shadow-2xl shadow-purple-200 transition-all active:scale-95 text-base group">
+                      <Button type="submit" disabled={isLoading} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-14 shadow-2xl shadow-orange-200 transition-all active:scale-95 text-base group">
                         {isLoading ? 'Preparing...' : (
                           <div className="flex items-center gap-2">
                              Secure Entry <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -464,7 +464,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                              placeholder="Enter your Full Name"
                              required
                              autoComplete="name"
-                             className="h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
+                             className="h-14 rounded-2xl border-2 border-gray-100 focus:border-orange-500 font-bold"
                            />
                         </div>
                         <div className="space-y-2">
@@ -475,7 +475,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                              placeholder="you@example.com"
                              required
                              autoComplete="email"
-                             className="h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
+                             className="h-14 rounded-2xl border-2 border-gray-100 focus:border-orange-500 font-bold"
                            />
                         </div>
                         <div className="space-y-2">
@@ -487,13 +487,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                                placeholder="Min. 8 characters"
                                required
                                autoComplete="new-password"
-                               className="pl-10 pr-10 h-14 rounded-2xl border-2 border-gray-100 focus:border-purple-500 font-bold"
+                               className="pl-10 pr-10 h-14 rounded-2xl border-2 border-gray-100 focus:border-orange-500 font-bold"
                              />
                              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                              <button
                                type="button"
                                onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-purple-600 transition-colors"
+                               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors"
                                aria-label={showRegisterPassword ? "Hide password" : "Show password"}
                              >
                                {showRegisterPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -522,7 +522,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                            <ShieldCheck className="h-32 w-32" />
                         </div>
                         <div className="relative z-10">
-                          <Badge className="bg-purple-600 text-white font-black border-none mb-4">Restricted Area</Badge>
+                          <Badge className="bg-orange-600 text-white font-black border-none mb-4">Restricted Area</Badge>
                           <h3 className="text-3xl font-black italic tracking-tighter  mb-2">Staff Portal</h3>
                           <p className="text-[10px] font-bold text-gray-400  tracking-widest leading-relaxed max-w-[200px]">
                              Internal systems access for verified store managers.

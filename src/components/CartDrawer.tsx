@@ -32,10 +32,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <div className="bg-green-100 p-1.5 md:p-2 rounded-xl">
-                <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-purple-600" />
+                <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-orange-600" />
               </div>
               <div>
-                <SheetTitle className="text-lg md:text-xl font-black tracking-tighter">My <span className="text-purple-600">Cart</span></SheetTitle>
+                <SheetTitle className="text-lg md:text-xl font-black tracking-tighter">My <span className="text-orange-600">Cart</span></SheetTitle>
                 <SheetDescription className="text-gray-400 font-bold text-[8px] md:text-[10px] tracking-widest mt-0.5">
                   {totalItems} Items in bag
                 </SheetDescription>
@@ -71,7 +71,7 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                   <p className="text-gray-400 font-medium mb-6 md:mb-8 text-xs">No items added yet.</p>
                   <Button
                     onClick={onClose}
-                    className="bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl px-8 h-10 md:h-12 text-sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-8 h-10 md:h-12 text-sm"
                   >
                     Start shopping
                   </Button>
@@ -101,7 +101,7 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                         <div className="flex-1 flex flex-col justify-between py-0.5">
                           <div>
                             <h4 className="font-bold text-[10px] md:text-xs leading-tight mb-0.5 line-clamp-1">{item.name}</h4>
-                            <p className="text-purple-600 font-black text-sm md:text-base">{formatPrice(item.priceValue * item.quantity)}</p>
+                            <p className="text-orange-600 font-black text-sm md:text-base">{formatPrice(item.priceValue * item.quantity)}</p>
                           </div>
                           
                           <div className="flex items-center justify-between mt-auto">
@@ -161,7 +161,7 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               
               <Button 
                 onClick={onCheckout}
-                className="w-full h-12 md:h-14 bg-purple-600 hover:bg-purple-700 text-white font-black text-sm md:text-lg rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                className="w-full h-12 md:h-14 bg-orange-600 hover:bg-orange-700 text-white font-black text-sm md:text-lg rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 group"
               >
                 Proceed to Checkout
                 <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
