@@ -34,7 +34,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-white overflow-hidden border-b border-gray-100">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
         {/* Text Content */}
         <motion.div
           initial="hidden"
@@ -59,14 +59,14 @@ export default function Hero() {
             className="flex flex-col md:flex-row items-center gap-4 mb-6"
           >
             <div
-              className="inline-flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
+              className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
             >
               <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              Vivi Store
+              Vivi Flash Sales
             </div>
             
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-orange-600" />
+              <Clock className="h-4 w-4 text-purple-600" />
               <div className="flex gap-1">
                 {[timeLeft.hours, timeLeft.minutes, timeLeft.seconds].map((unit, i) => (
                   <div key={i} className="flex items-center">
@@ -87,7 +87,7 @@ export default function Hero() {
             }}
             className="text-2xl md:text-4xl font-black text-black leading-tight mb-4 md:mb-6 uppercase italic tracking-tighter"
           >
-            UP TO <span className="text-orange-600">90% OFF</span> <br />
+            UP TO <span className="text-purple-600">90% OFF</span> <br />
             ON ALL <span className="underline decoration-yellow-400 decoration-8 underline-offset-4">TRENDING</span> ITEMS
           </motion.h1>
           
@@ -108,7 +108,7 @@ export default function Hero() {
             }}
             className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4"
           >
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black shadow-xl shadow-orange-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black shadow-xl shadow-purple-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
               <ShoppingBag className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Shop Deals Now
             </Button>
             <Button variant="outline" className="border-2 border-gray-100 px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black transition-all hover:bg-gray-50 uppercase tracking-tighter">

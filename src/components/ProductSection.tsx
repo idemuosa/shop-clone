@@ -45,6 +45,7 @@ import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { API_URL, PYTHON_API_URL } from "@/lib/api";
 import { cn, getOptimizedImageUrl } from "@/lib/utils";
+import AIReviewSummarizer from "./ai/AIReviewSummarizer";
 
 interface Product {
   id: string | number;
@@ -129,7 +130,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       image: product.image
     }, quantity);
     toast.success(`${product.name} added to cart!`, {
-      icon: <ShoppingCart className="h-4 w-4 text-orange-600" />,
+      icon: <ShoppingCart className="h-4 w-4 text-purple-600" />,
       action: {
         label: "View Cart",
         onClick: () => setIsOpen(true)
@@ -447,7 +448,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold">Order Placed Successfully!</p>
-          <p className="text-[10px]  font-black tracking-widest text-orange-600">
+          <p className="text-[10px]  font-black tracking-widest text-purple-600">
             Vivi Reward: You saved ${(unitPrice * quantity * 0.9).toFixed(2)} today!
           </p>
           <Button variant="link" className="p-0 h-auto text-[10px] text-blue-600 font-bold  tracking-tighter">
@@ -517,23 +518,23 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
   return (
     <section className="py-12 bg-[#f5f5f5]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <AnimatePresence>
           {recentBoughVisible && (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mb-6 bg-gradient-to-r from-orange-600 to-orange-500 p-[1px] rounded-2xl shadow-lg shadow-orange-100 overflow-hidden"
+              className="mb-6 bg-gradient-to-r from-purple-600 to-purple-500 p-[1px] rounded-2xl shadow-lg shadow-purple-100 overflow-hidden"
             >
               <div className="bg-white p-4 rounded-[15px] flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-green-100 rounded-full p-2">
-                    <Truck className="h-5 w-5 text-orange-600" />
+                    <Truck className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-800">
-                      <span className="text-orange-600 font-black">VIVO PRICE ALERT:</span> 124 people bought this in the last hour!
+                      <span className="text-purple-600 font-black">VIVO PRICE ALERT:</span> 124 people bought this in the last hour!
                     </p>
                     <p className="text-[10px] text-gray-500 font-medium">Free express shipping available for your area <span className="font-bold underline cursor-pointer">Check Zip</span></p>
                   </div>
@@ -541,7 +542,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-8 w-8 text-gray-400 hover:text-orange-600 hover:bg-green-50"
+                  className="h-8 w-8 text-gray-400 hover:text-purple-600 hover:bg-green-50"
                   onClick={() => setRecentBoughVisible(false)}
                 >
                   <X className="h-4 w-4" />
@@ -554,11 +555,11 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="bg-orange-600 p-2 md:p-2.5 rounded-xl shadow-lg shadow-orange-100">
+            <div className="bg-purple-600 p-2 md:p-2.5 rounded-xl shadow-lg shadow-purple-100">
               <Zap className="h-4 w-4 md:h-5 md:w-5 text-white fill-white" />
             </div>
             <div>
-              <h2 className="text-lg md:text-2xl font-black text-black  tracking-tighter leading-none">{title} <span className="text-orange-600 italic">{subtitle}</span></h2>
+              <h2 className="text-lg md:text-2xl font-black text-black  tracking-tighter leading-none">{title} <span className="text-purple-600 italic">{subtitle}</span></h2>
               <p className="text-[9px] md:text-[10px] font-bold text-gray-400  tracking-widest mt-1">{filteredProducts.length} Products Found</p>
             </div>
           </div>
@@ -584,14 +585,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   <button
                     {...props}
                     className={cn(
-                      "inline-flex items-center justify-center gap-2 border-2 rounded-xl h-11 px-4 text-sm font-bold transition-all bg-white hover:bg-muted hover:text-foreground border-gray-100 hover:border-orange-200",
-                      activeFiltersCount > 0 && "bg-green-50 border-orange-500 text-orange-600"
+                      "inline-flex items-center justify-center gap-2 border-2 rounded-xl h-11 px-4 text-sm font-bold transition-all bg-white hover:bg-muted hover:text-foreground border-gray-100 hover:border-purple-200",
+                      activeFiltersCount > 0 && "bg-green-50 border-purple-500 text-purple-600"
                     )}
                   >
                     <SlidersHorizontal className="h-4 w-4" />
                     Filter Options
                     {activeFiltersCount > 0 && (
-                      <span className="ml-1 bg-orange-600 text-white h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                      <span className="ml-1 bg-purple-600 text-white h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
                         {activeFiltersCount}
                       </span>
                     )}
@@ -601,7 +602,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
               <SheetContent className="w-[300px] sm:w-[400px] rounded-l-3xl border-none">
                 <SheetHeader className="pb-6 border-b border-gray-100">
                   <SheetTitle className="text-2xl font-black  italic tracking-tighter">
-                    Filter <span className="text-orange-600">Products</span>
+                    Filter <span className="text-purple-600">Products</span>
                   </SheetTitle>
                   <SheetDescription className="font-medium">
                     Refine your search to find the best deals.
@@ -632,7 +633,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   <div className="space-y-5">
                     <div className="flex justify-between items-center">
                       <label className="text-xs font-black  tracking-widest text-gray-400">Price Range</label>
-                      <span className="text-sm font-black text-orange-600 bg-green-50 px-3 py-1 rounded-full">${priceRange[0]} - ${priceRange[1]}</span>
+                      <span className="text-sm font-black text-purple-600 bg-green-50 px-3 py-1 rounded-full">${priceRange[0]} - ${priceRange[1]}</span>
                     </div>
                     <Slider 
                       value={priceRange} 
@@ -664,7 +665,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   <Button 
                     variant="outline" 
                     onClick={resetFilters}
-                    className="w-full h-12 text-gray-400 hover:text-orange-600 gap-2 font-black  tracking-tighter rounded-xl border-2"
+                    className="w-full h-12 text-gray-400 hover:text-purple-600 gap-2 font-black  tracking-tighter rounded-xl border-2"
                   >
                     <X className="h-4 w-4" />
                     Reset All Filters
@@ -674,10 +675,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             </Sheet>
 
             <div className="hidden sm:flex gap-1">
-              <Button variant="ghost" size="icon" className="rounded-xl h-11 w-11 hover:bg-green-50 hover:text-orange-600 border border-transparent hover:border-green-100">
+              <Button variant="ghost" size="icon" className="rounded-xl h-11 w-11 hover:bg-green-50 hover:text-purple-600 border border-transparent hover:border-green-100">
                 <ChevronLeft className="h-5 w-5" />
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-xl h-11 w-11 hover:bg-green-50 hover:text-orange-600 border border-transparent hover:border-green-100">
+              <Button variant="ghost" size="icon" className="rounded-xl h-11 w-11 hover:bg-green-50 hover:text-purple-600 border border-transparent hover:border-green-100">
                 <ChevronRight className="h-5 w-5" />
               </Button>
             </div>
@@ -702,12 +703,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
               onClick={() => setMinRating(rating.value)}
               className={`rounded-full px-4 h-8 text-[11px] font-black  tracking-tighter transition-all border-2 flex-shrink-0 ${
                 minRating === rating.value 
-                  ? "bg-orange-600 border-orange-600 text-white shadow-lg shadow-orange-100"
-                  : "bg-white border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-600"
+                  ? "bg-purple-600 border-purple-600 text-white shadow-lg shadow-purple-100"
+                  : "bg-white border-gray-100 text-gray-400 hover:border-purple-200 hover:text-purple-600"
               }`}
             >
               {rating.value !== "0" && (
-                <Star className={`h-3 w-3 mr-1.5 ${minRating === rating.value ? "fill-white text-white" : "fill-orange-500 text-orange-500"}`} />
+                <Star className={`h-3 w-3 mr-1.5 ${minRating === rating.value ? "fill-white text-white" : "fill-purple-500 text-purple-500"}`} />
               )}
               {rating.label}
             </Button>
@@ -718,24 +719,24 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {selectedCategory !== "all" && (
-              <Badge variant="secondary" className="bg-white border border-green-200 text-orange-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
+              <Badge variant="secondary" className="bg-white border border-green-200 text-purple-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
                 Category: {selectedCategory}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory("all")} />
               </Badge>
             )}
             {(priceRange[0] !== 0 || priceRange[1] !== 200) && (
-              <Badge variant="secondary" className="bg-white border border-green-200 text-orange-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
+              <Badge variant="secondary" className="bg-white border border-green-200 text-purple-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
                 Price: ${priceRange[0]}-${priceRange[1]}
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setPriceRange([0, 200])} />
               </Badge>
             )}
             {minRating !== "0" && (
-              <Badge variant="secondary" className="bg-white border border-green-200 text-orange-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
+              <Badge variant="secondary" className="bg-white border border-green-200 text-purple-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
                 Rating: {minRating}+ Stars
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setMinRating("0")} />
               </Badge>
             )}
-            <Button variant="ghost" size="sm" onClick={resetFilters} className="text-[10px] font-black  text-gray-400 hover:text-orange-600">
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="text-[10px] font-black  text-gray-400 hover:text-purple-600">
               Clear All
             </Button>
           </div>
@@ -768,12 +769,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-transparent hover:border-orange-200"
+                  className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-transparent hover:border-purple-200"
                   onClick={() => setSelectedProduct(product)}
                 >
                   <div className="relative aspect-square bg-gray-50 overflow-hidden">
                     {product.tag && (
-                      <div className="absolute top-0 left-0 bg-orange-600 text-white text-[11px] font-black px-2 py-1 rounded-br-lg z-10 flex items-center gap-1">
+                      <div className="absolute top-0 left-0 bg-purple-600 text-white text-[11px] font-black px-2 py-1 rounded-br-lg z-10 flex items-center gap-1">
                         <Zap className="h-3 w-3 fill-white" />
                         {product.tag}
                       </div>
@@ -795,7 +796,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <Button 
                         size="icon" 
                         variant="secondary" 
-                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-orange-600 hover:text-white"
+                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-purple-600 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToWishlistAction(product);
@@ -806,7 +807,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <Button 
                         size="icon" 
                         variant="secondary" 
-                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-orange-600 hover:text-white"
+                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-purple-600 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAddToCart(product);
@@ -817,7 +818,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <Button 
                         size="icon" 
                         variant="secondary" 
-                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-orange-600 hover:text-white"
+                        className="rounded-full h-8 w-8 shadow-md bg-white/90 hover:bg-purple-600 hover:text-white"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedProduct(product);
@@ -831,7 +832,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
                       <Button 
                         variant="secondary" 
-                        className="bg-white/95 hover:bg-orange-600 hover:text-white font-black text-[10px]  tracking-tighter rounded-full px-6 h-9 shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                        className="bg-white/95 hover:bg-purple-600 hover:text-white font-black text-[10px]  tracking-tighter rounded-full px-6 h-9 shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedProduct(product);
@@ -853,10 +854,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   </div>
 
                   <div className="p-2 md:p-3">
-                    <h3 className="text-[10px] md:text-xs font-medium text-gray-800 line-clamp-2 h-7 md:h-8 mb-1 md:mb-2 group-hover:text-orange-600 transition-colors">{product.name}</h3>
+                    <h3 className="text-[10px] md:text-xs font-medium text-gray-800 line-clamp-2 h-7 md:h-8 mb-1 md:mb-2 group-hover:text-purple-600 transition-colors">{product.name}</h3>
                     
                     <div className="flex items-baseline gap-1 md:gap-1.5 mb-1">
-                      <span className="text-sm md:text-lg font-black text-orange-600 leading-none">{formatPrice(product.price)}</span>
+                      <span className="text-sm md:text-lg font-black text-purple-600 leading-none">{formatPrice(product.price)}</span>
                       {product.oldPrice && (
                         <span className="text-[9px] md:text-[11px] text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
                       )}
@@ -864,7 +865,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-0.5">
-                        <Star className="h-2.5 w-2.5 md:h-3 md:w-3 fill-orange-500 text-orange-500" />
+                        <Star className="h-2.5 w-2.5 md:h-3 md:w-3 fill-purple-500 text-purple-500" />
                         <span className="text-[9px] md:text-[11px] font-bold text-gray-700">{product.rating}</span>
                       </div>
                       {product.sold && (
@@ -876,7 +877,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-7 w-7 rounded-md hover:bg-white hover:text-purple-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -891,7 +892,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-7 w-7 rounded-md hover:bg-white hover:text-purple-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -904,7 +905,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         </Button>
                       </div>
                         <Button
-                          className="w-full h-8 bg-orange-600 text-white hover:bg-orange-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm gap-2"
+                          className="w-full h-8 bg-purple-600 text-white hover:bg-purple-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm gap-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart(product, productQuantities[product.id] || 1);
@@ -925,7 +926,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             </div>
             <h3 className="text-xl font-black  tracking-tighter mb-2">No results found</h3>
             <p className="text-gray-400 mb-8 font-medium">Try adjusting your filters or search terms.</p>
-            <Button onClick={resetFilters} variant="outline" className="rounded-full px-8 border-2 border-orange-600 text-orange-600 font-black hover:bg-orange-600 hover:text-white">
+            <Button onClick={resetFilters} variant="outline" className="rounded-full px-8 border-2 border-purple-600 text-purple-600 font-black hover:bg-purple-600 hover:text-white">
               Clear all filters
             </Button>
           </div>
@@ -985,13 +986,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100/50 rounded-2xl p-1">
                         <TabsTrigger 
                           value="overview" 
-                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all"
+                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm transition-all"
                         >
                           Overview
                         </TabsTrigger>
                         <TabsTrigger 
                           value="reviews" 
-                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5"
+                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5"
                         >
                           <Sparkles className="h-3 w-3" />
                           Reviews ({selectedProduct.reviews})
@@ -1002,14 +1003,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         <ScrollArea className="flex-1 pr-4 -mr-4">
                           <DialogHeader className="mb-6">
                             <div className="flex items-center gap-2 mb-2">
-                              <Badge className="bg-orange-600 text-white border-none">{selectedProduct.category}</Badge>
-                              {selectedProduct.tag && <Badge variant="outline" className="border-orange-600 text-orange-600">{selectedProduct.tag} OFF</Badge>}
+                              <Badge className="bg-purple-600 text-white border-none">{selectedProduct.category}</Badge>
+                              {selectedProduct.tag && <Badge variant="outline" className="border-purple-600 text-purple-600">{selectedProduct.tag} OFF</Badge>}
                             </div>
                             <DialogTitle className="text-3xl font-black leading-tight mb-2">{selectedProduct.name}</DialogTitle>
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => (
-                                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(selectedProduct.rating) ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
+                                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(selectedProduct.rating) ? "fill-purple-500 text-purple-500" : "text-gray-200"}`} />
                                 ))}
                                 <span className="text-sm font-bold ml-1">{selectedProduct.rating}</span>
                               </div>
@@ -1018,7 +1019,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           </DialogHeader>
                           
                           <div className="flex items-baseline gap-3 mb-8">
-                            <span className="text-5xl font-black text-orange-600">{formatPrice(selectedProduct.price)}</span>
+                            <span className="text-5xl font-black text-purple-600">{formatPrice(selectedProduct.price)}</span>
                             {selectedProduct.oldPrice && (
                               <span className="text-xl text-gray-400 line-through font-medium">{formatPrice(selectedProduct.oldPrice)}</span>
                             )}
@@ -1054,7 +1055,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             </div>
                             <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
                               <p className="text-[10px] font-black text-gray-400  tracking-widest mb-1 flex items-center gap-2">
-                                <Clock className="h-3 w-3 text-orange-500" /> Shopsy Express
+                                <Clock className="h-3 w-3 text-purple-500" /> Shopsy Express
                               </p>
                               <p className="text-xs font-bold">Delivery by tomorrow</p>
                             </div>
@@ -1063,7 +1064,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           <div className="space-y-6 mb-8">
                             <div className="bg-white p-6 rounded-3xl border-2 border-gray-100">
                               <h4 className="text-sm font-black  tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <Info className="h-4 w-4 text-orange-600" /> Apple Style Specs
+                                <Info className="h-4 w-4 text-purple-600" /> Apple Style Specs
                               </h4>
                               <div className="space-y-3">
                                 <div className="flex justify-between items-center py-2 border-b border-gray-50 text-[11px]">
@@ -1093,10 +1094,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           <div className="space-y-8 pb-4">
                             <div className="bg-gradient-to-br from-green-50 to-white p-8 rounded-[32px] border-2 border-green-100 shadow-sm">
                               <div className="flex items-center gap-3 mb-6">
-                                <div className="bg-orange-600 p-2 rounded-xl text-white">
+                                <div className="bg-purple-600 p-2 rounded-xl text-white">
                                   <Edit className="h-5 w-5" />
                                 </div>
-                                <h4 className="text-xl font-black  tracking-tighter italic">Write a <span className="text-orange-600">Review</span></h4>
+                                <h4 className="text-xl font-black  tracking-tighter italic">Write a <span className="text-purple-600">Review</span></h4>
                               </div>
                               
                               <div className="space-y-6">
@@ -1109,7 +1110,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                         onClick={() => setNewReviewRating(star)}
                                         className="transition-all active:scale-75 hover:scale-110"
                                       >
-                                        <Star className={`h-10 w-10 ${star <= newReviewRating ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
+                                        <Star className={`h-10 w-10 ${star <= newReviewRating ? "fill-purple-500 text-purple-500" : "text-gray-200"}`} />
                                       </button>
                                     ))}
                                   </div>
@@ -1120,7 +1121,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     value={newReviewComment}
                                     onChange={(e) => setNewReviewComment(e.target.value)}
                                     placeholder="What did you like? How was the delivery?"
-                                    className="w-full min-h-[120px] p-5 rounded-3xl border-2 border-gray-100 focus:border-orange-500 focus:outline-none transition-all resize-none text-sm font-medium bg-white/50 backdrop-blur-sm"
+                                    className="w-full min-h-[120px] p-5 rounded-3xl border-2 border-gray-100 focus:border-purple-500 focus:outline-none transition-all resize-none text-sm font-medium bg-white/50 backdrop-blur-sm"
                                   />
                                 </div>
                                 <Button 
@@ -1134,10 +1135,17 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             </div>
 
                             <div className="space-y-6 px-2">
+                              <div className="flex items-center justify-between border-b-2 border-gray-100 pb-4">
+                                <h4 className="text-base font-black  tracking-tighter italic flex items-center gap-2">
+                                  <Sparkles className="h-5 w-5 text-purple-600" /> What <span className="text-purple-600">AI</span> Thinks
+                                </h4>
+                                <Badge className="bg-green-100 text-purple-600 font-black border-none text-[9px] ">BETA</Badge>
+                              </div>
+                              <AIReviewSummarizer reviews={reviews} productName={selectedProduct.name} />
 
                               <div className="flex items-center justify-between mt-8 border-b-2 border-gray-100 pb-4">
                                 <h4 className="text-sm font-black  tracking-widest text-gray-400">Community Gallery</h4>
-                                <span className="text-[10px] font-black text-orange-600  tracking-widest">{reviews.length} total reviews</span>
+                                <span className="text-[10px] font-black text-purple-600  tracking-widest">{reviews.length} total reviews</span>
                               </div>
 
                               {reviews.length > 0 ? (
@@ -1146,7 +1154,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     <div key={review.id} className="p-6 rounded-[24px] border-2 border-gray-50 bg-white hover:border-green-100 transition-all shadow-sm hover:shadow-md">
                                       <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-4">
-                                          <div className="w-12 h-12 rounded-2xl bg-orange-600 flex items-center justify-center text-white font-black shadow-lg shadow-orange-100">
+                                          <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white font-black shadow-lg shadow-purple-100">
                                             {review.userName.charAt(0)}
                                           </div>
                                           <div>
@@ -1158,7 +1166,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                             </div>
                                             <div className="flex gap-0.5 mt-1">
                                               {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-orange-500 text-orange-500" : "text-gray-100"}`} />
+                                                <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-purple-500 text-purple-500" : "text-gray-100"}`} />
                                               ))}
                                             </div>
                                           </div>
@@ -1181,7 +1189,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                   <p className="text-gray-400 font-black  tracking-[0.2em] text-xs">No reviews match your criteria yet.</p>
                                   <Button
                             variant="link"
-                            className="text-orange-600 mt-4 font-black  text-[10px] tracking-widest"
+                            className="text-purple-600 mt-4 font-black  text-[10px] tracking-widest"
                           >
                             Be the first to review
                           </Button>
@@ -1198,7 +1206,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-orange-600 transition-all"
+                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-purple-600 transition-all"
                               onClick={() => setProductQuantities(prev => ({
                                 ...prev,
                                 [selectedProduct.id]: Math.max(1, (prev[selectedProduct.id] || 1) - 1)
@@ -1206,11 +1214,11 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             >
                               <Minus className="h-4 w-4" />
                             </Button>
-                            <span className="text-lg font-black w-12 text-center text-orange-600">{productQuantities[selectedProduct.id] || 1}</span>
+                            <span className="text-lg font-black w-12 text-center text-purple-600">{productQuantities[selectedProduct.id] || 1}</span>
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-orange-600 transition-all"
+                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-purple-600 transition-all"
                               onClick={() => setProductQuantities(prev => ({
                                 ...prev,
                                 [selectedProduct.id]: (prev[selectedProduct.id] || 1) + 1
@@ -1223,14 +1231,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         </div>
                         <div className="flex gap-4">
                           <Button 
-                            className="flex-1 h-16 bg-orange-600 hover:bg-orange-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-orange-200 transition-all active:scale-95"
+                            className="flex-1 h-16 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-purple-200 transition-all active:scale-95"
                             onClick={() => handlePlaceOrder(selectedProduct)}
                           >
                             Buy now
                           </Button>
                           <Button 
                             variant="secondary"
-                            className="flex-1 h-16 bg-white border-2 border-orange-600 text-orange-600 hover:bg-green-50 font-black text-xl rounded-2xl transition-all active:scale-95"
+                            className="flex-1 h-16 bg-white border-2 border-purple-600 text-purple-600 hover:bg-green-50 font-black text-xl rounded-2xl transition-all active:scale-95"
                             onClick={() => handleAddToCart(selectedProduct, productQuantities[selectedProduct.id] || 1)}
                           >
                             Add to cart
@@ -1239,12 +1247,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         <div className="flex gap-4">
                           <Button 
                             variant="outline" 
-                            className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-gray-700"
+                            className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-purple-600 transition-all text-gray-700"
                             onClick={() => handleAddToWishlistAction(selectedProduct)}
                           >
                             <Heart className="h-5 w-5 mr-2" /> Wishlist
                           </Button>
-                          <Button variant="outline" className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-orange-600 transition-all  tracking-tighter">
+                          <Button variant="outline" className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-purple-600 transition-all  tracking-tighter">
                             Share
                           </Button>
                         </div>
@@ -1254,10 +1262,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <div className="mt-12 pt-10 border-t border-gray-100">
                         <div className="flex items-center justify-between mb-8">
                           <div>
-                            <h3 className="text-2xl font-black  tracking-tighter italic">Recommended for <span className="text-orange-600">You</span></h3>
+                            <h3 className="text-2xl font-black  tracking-tighter italic">Recommended for <span className="text-purple-600">You</span></h3>
                             <p className="text-[10px] font-black text-gray-400  tracking-widest mt-1">Customers who viewed this also bought</p>
                           </div>
-                          <Badge className="bg-green-100 text-orange-600 border-none font-bold text-[10px] ">TOP PICKS</Badge>
+                          <Badge className="bg-green-100 text-purple-600 border-none font-bold text-[10px] ">TOP PICKS</Badge>
                         </div>
                         <div className="grid grid-cols-2 gap-6 mb-10">
                           {products
@@ -1266,7 +1274,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             .map((relatedP) => (
                               <div 
                                 key={relatedP.id} 
-                                className="group cursor-pointer bg-white rounded-3xl p-3 border-2 border-transparent hover:border-orange-500 transition-all hover:shadow-xl hover:shadow-orange-100"
+                                className="group cursor-pointer bg-white rounded-3xl p-3 border-2 border-transparent hover:border-purple-500 transition-all hover:shadow-xl hover:shadow-purple-100"
                                 onClick={() => {
                                   setSelectedProduct(relatedP);
                                   // Scroll top of the dialog
@@ -1283,16 +1291,16 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     }}
                                   />
                                   <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-md p-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <ShoppingBag className="h-4 w-4 text-orange-600" />
+                                    <ShoppingBag className="h-4 w-4 text-purple-600" />
                                   </div>
                                 </div>
                                 <div className="px-1">
                                   <p className="text-[9px] font-black text-gray-400  tracking-widest mb-1">{relatedP.tag || 'New Arrival'}</p>
                                   <h4 className="font-bold text-sm truncate mb-2 leading-tight">{relatedP.name}</h4>
                                   <div className="flex items-center justify-between">
-                                    <p className="font-black text-orange-600 text-lg">{formatPrice(relatedP.price)}</p>
+                                    <p className="font-black text-purple-600 text-lg">{formatPrice(relatedP.price)}</p>
                                     <div className="flex items-center gap-1">
-                                      <Star className="h-3 w-3 fill-orange-500 text-orange-500" />
+                                      <Star className="h-3 w-3 fill-purple-500 text-purple-500" />
                                       <span className="text-[10px] font-bold text-gray-400">{relatedP.rating || '5.0'}</span>
                                     </div>
                                   </div>
@@ -1323,7 +1331,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           <ChevronLeft className="h-5 w-5" />
                         </Button>
                         <DialogTitle className="text-2xl font-black  tracking-tighter">
-                          {checkoutStep === 'address' ? 'Delivery' : 'Complete'} <span className="text-orange-600">{checkoutStep === 'address' ? 'Details' : 'Purchase'}</span>
+                          {checkoutStep === 'address' ? 'Delivery' : 'Complete'} <span className="text-purple-600">{checkoutStep === 'address' ? 'Details' : 'Purchase'}</span>
                         </DialogTitle>
                       </div>
 
@@ -1345,7 +1353,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                               <p className="text-xs text-gray-500">Qty: {productQuantities[selectedProduct.id] || 1}</p>
                             </div>
                           </div>
-                          <p className="text-lg font-black text-orange-600">
+                          <p className="text-lg font-black text-purple-600">
                             {formatPrice((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price.toString().replace(/[^\d.]/g, ''))) * (productQuantities[selectedProduct.id] || 1))}
                           </p>
                         </div>
@@ -1364,7 +1372,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     placeholder="House number and street name"
                                     value={deliveryAddress}
                                     onChange={(e) => setDeliveryAddress(e.target.value)}
-                                    className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                    className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 pl-10"
                                   />
                                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 </div>
@@ -1378,7 +1386,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                       placeholder="City"
                                       value={deliveryCity}
                                       onChange={(e) => setDeliveryCity(e.target.value)}
-                                      className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                      className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 pl-10"
                                     />
                                     <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                   </div>
@@ -1391,7 +1399,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                       placeholder="12345"
                                       value={deliveryZip}
                                       onChange={(e) => setDeliveryZip(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                      className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                      className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 pl-10"
                                     />
                                     <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                   </div>
@@ -1406,7 +1414,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                               <div className="flex gap-4">
                                 <Button 
                                   variant="link" 
-                                  className="text-orange-600 font-bold p-0 h-auto text-xs"
+                                  className="text-purple-600 font-bold p-0 h-auto text-xs"
                                   onClick={() => {
                                     setSelectedProduct(null);
                                     setCheckoutStep('details');
@@ -1430,7 +1438,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     setSelectedPaymentMethod(null);
                                   }}
                                   className={`flex-1 rounded-lg font-black text-[9px]  tracking-tighter h-9 px-1 ${
-                                    paymentType === type ? 'bg-white text-orange-600 shadow-sm' : 'text-gray-400'
+                                    paymentType === type ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-400'
                                   }`}
                                 >
                                   {type === 'card' ? 'Card' : type === 'momo' ? 'MoMo' : type === 'bank' ? 'Transfer' : 'POD'}
@@ -1457,7 +1465,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                   key={method.id}
                                   className={`relative flex items-center p-4 rounded-2xl border-2 transition-all cursor-pointer bg-white ${
                                     selectedPaymentMethod?.id === method.id 
-                                      ? 'border-orange-500 bg-green-50/30'
+                                      ? 'border-purple-500 bg-green-50/30'
                                       : 'border-gray-50 hover:border-gray-200'
                                   }`}
                                   onClick={() => setSelectedPaymentMethod(method)}
@@ -1472,7 +1480,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                       <p className="text-[10px] text-gray-400  font-black">Expires {method.expiry}</p>
                                     </div>
                                     {selectedPaymentMethod?.id === method.id && (
-                                      <div className="bg-orange-600 rounded-full p-1 h-5 w-5 flex items-center justify-center">
+                                      <div className="bg-purple-600 rounded-full p-1 h-5 w-5 flex items-center justify-center">
                                         <CheckCircle2 className="h-3 w-3 text-white" />
                                       </div>
                                     )}
@@ -1485,13 +1493,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                 onClick={() => setSelectedPaymentMethod({ id: 'manual' })}
                                 className={`relative flex items-center p-4 rounded-2xl border-2 border-dashed transition-all cursor-pointer bg-white ${
                                   selectedPaymentMethod?.id === 'manual' 
-                                    ? 'border-orange-500 bg-green-50/30 border-solid shadow-sm'
+                                    ? 'border-purple-500 bg-green-50/30 border-solid shadow-sm'
                                     : 'border-gray-200 hover:border-orange-200 hover:bg-orange-50/10'
                                 }`}
                               >
                                 <RadioGroupItem value="manual" id="manual" className="sr-only" />
                                 <div className="flex items-center gap-3 w-full">
-                                  <div className={`p-2 rounded-lg bg-gray-50 text-gray-400 ${selectedPaymentMethod?.id === 'manual' ? 'bg-orange-600 text-white' : ''}`}>
+                                  <div className={`p-2 rounded-lg bg-gray-50 text-gray-400 ${selectedPaymentMethod?.id === 'manual' ? 'bg-purple-600 text-white' : ''}`}>
                                     <Plus className="h-5 w-5" />
                                   </div>
                                   <div className="flex-1">
@@ -1499,7 +1507,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     <p className="text-[10px] text-gray-400  font-black">Secure one-time payment</p>
                                   </div>
                                   {selectedPaymentMethod?.id === 'manual' && (
-                                    <div className="bg-orange-600 rounded-full p-1 h-5 w-5 flex items-center justify-center">
+                                    <div className="bg-purple-600 rounded-full p-1 h-5 w-5 flex items-center justify-center">
                                       <CheckCircle2 className="h-3 w-3 text-white" />
                                     </div>
                                   )}
@@ -1509,22 +1517,22 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             ) : paymentType === 'momo' ? (
                               <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
                                 <div className="bg-green-50 p-6 rounded-3xl border-2 border-green-100 space-y-4">
-                                  <h4 className="text-sm font-black  italic tracking-tighter">Mobile <span className="text-orange-600">Money</span></h4>
+                                  <h4 className="text-sm font-black  italic tracking-tighter">Mobile <span className="text-purple-600">Money</span></h4>
                                   <div className="space-y-3">
                                     <div className="space-y-1">
                                       <Label className="text-[10px] font-black  text-gray-400">Select Provider</Label>
                                       <div className="grid grid-cols-2 gap-2">
-                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'mtn' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'mtn' ? 'border-orange-500 shadow-orange-100 shadow-md' : 'border-zinc-100'}`}>
+                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'mtn' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'mtn' ? 'border-purple-500 shadow-purple-100 shadow-md' : 'border-zinc-100'}`}>
                                           <div className="w-6 h-6 bg-yellow-400 rounded-full mr-2" /> MTN
                                         </Button>
-                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'airtel' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'airtel' ? 'border-orange-500 shadow-orange-100 shadow-md' : 'border-zinc-100'}`}>
+                                        <Button variant="outline" onClick={() => setSelectedPaymentMethod({ id: 'airtel' })} className={`h-12 rounded-xl border-2 font-bold justify-start px-3 bg-white ${selectedPaymentMethod?.id === 'airtel' ? 'border-purple-500 shadow-purple-100 shadow-md' : 'border-zinc-100'}`}>
                                           <div className="w-6 h-6 bg-red-600 rounded-full mr-2" /> Airtel
                                         </Button>
                                       </div>
                                     </div>
                                     <div className="space-y-1">
                                       <Label className="text-[10px] font-black  text-gray-400">Phone Number</Label>
-                                      <Input placeholder="+234 ..." className="h-12 rounded-xl border-2 border-zinc-100 focus:border-orange-500 bg-white" />
+                                      <Input placeholder="+234 ..." className="h-12 rounded-xl border-2 border-zinc-100 focus:border-purple-500 bg-white" />
                                     </div>
                                   </div>
                                 </div>
@@ -1543,7 +1551,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     </div>
                                     <div className="flex justify-between items-center">
                                       <span className="text-[10px]  font-black text-zinc-500">Account No.</span>
-                                      <span className="text-lg font-black tracking-widest text-orange-400">{storeSettings?.bankAccountNumber || '0123456789'}</span>
+                                      <span className="text-lg font-black tracking-widest text-purple-400">{storeSettings?.bankAccountNumber || '0123456789'}</span>
                                     </div>
                                   </div>
                                   <p className="text-[9px] text-zinc-500 font-bold  text-center">Transfer AND CLICK "PAY NOW"</p>
@@ -1552,9 +1560,9 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             ) : (
                                <div className="bg-gray-50 p-8 rounded-3xl border-2 border-dashed border-gray-200 text-center space-y-3 cursor-pointer" onClick={() => setSelectedPaymentMethod({ id: 'pod' })}>
                                 <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm">
-                                   <Truck className="h-6 w-6 text-orange-600" />
+                                   <Truck className="h-6 w-6 text-purple-600" />
                                 </div>
-                                <h4 className="font-black  italic tracking-tighter">Pay on <span className="text-orange-600">Delivery</span></h4>
+                                <h4 className="font-black  italic tracking-tighter">Pay on <span className="text-purple-600">Delivery</span></h4>
                                 <p className="text-[10px] text-gray-500 font-bold  leading-relaxed max-w-[200px] mx-auto">
                                   Pay cash or card when your rider arrives.
                                 </p>
@@ -1579,12 +1587,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                             placeholder="Full Name as on card"
                                             value={manualName}
                                             onChange={(e) => setManualName(e.target.value)}
-                                            className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                            className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 pl-10"
                                           />
                                           <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                         </div>
                                         {manualName.length > 0 && manualName.trim().split(' ').length < 2 && (
-                                          <p className="text-[10px] text-orange-400 font-bold  tracking-tight">Enter First and Last Name</p>
+                                          <p className="text-[10px] text-purple-400 font-bold  tracking-tight">Enter First and Last Name</p>
                                         )}
                                         {manualName.trim().split(' ').length >= 2 && (
                                           <p className="text-[10px] text-green-600 font-bold  tracking-tight flex items-center gap-1">
@@ -1600,7 +1608,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                             placeholder="Card Number"
                                             value={manualCardNumber}
                                             onChange={(e) => setManualCardNumber(formatCardNumber(e.target.value))}
-                                            className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                            className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 pl-10"
                                             maxLength={19} // 16 digits + 3 spaces
                                           />
                                           <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -1638,7 +1646,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                               setManualExpiry(val);
                                             }}
                                             maxLength={5}
-                                            className={`rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 ${manualExpiry.length === 5 && !validateExpiry(manualExpiry) ? 'border-red-500' : ''}`}
+                                            className={`rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30 ${manualExpiry.length === 5 && !validateExpiry(manualExpiry) ? 'border-red-500' : ''}`}
                                           />
                                           {manualExpiry.length === 5 && !validateExpiry(manualExpiry) && (
                                             <p className="text-[10px] text-red-500 font-bold  tracking-tight">Invalid Expiry</p>
@@ -1658,7 +1666,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                             value={manualCVC}
                                             onChange={(e) => setManualCVC(e.target.value.replace(/\D/g, '').slice(0, 3))}
                                             maxLength={3}
-                                            className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30"
+                                            className="rounded-xl border-gray-100 focus:border-purple-500 bg-gray-50/30"
                                           />
                                         </div>
                                       </div>
@@ -1668,7 +1676,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                           id="save-card"
                                           checked={saveCard}
                                           onChange={(e) => setSaveCard(e.target.checked)}
-                                          className="rounded border-orange-300 text-orange-600 focus:ring-orange-500 h-4 w-4"
+                                          className="rounded border-purple-300 text-purple-600 focus:ring-purple-500 h-4 w-4"
                                         />
                                         <Label htmlFor="save-card" className="text-xs text-gray-600 font-bold cursor-pointer">Save card details for future shopping</Label>
                                       </div>
@@ -1692,7 +1700,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           </div>
                           <div className="flex justify-between items-center">
                             <span className="font-black  tracking-widest text-lg">Total</span>
-                            <span className="text-2xl font-black text-orange-600 tracking-tighter">
+                            <span className="text-2xl font-black text-purple-600 tracking-tighter">
                               {formatPrice((typeof selectedProduct.price === 'number' ? selectedProduct.price : parseFloat(selectedProduct.price.toString().replace(/[^\d.]/g, ''))) * (productQuantities[selectedProduct.id] || 1))}
                             </span>
                           </div>
@@ -1701,7 +1709,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
                       <div className="mt-8">
                         <Button 
-                          className="w-full h-16 bg-orange-600 hover:bg-orange-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-orange-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full h-16 bg-purple-600 hover:bg-purple-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-purple-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                           onClick={() => handlePlaceOrder(selectedProduct)}
                           disabled={isOrdering || (checkoutStep === 'payment' && !selectedPaymentMethod)}
                         >

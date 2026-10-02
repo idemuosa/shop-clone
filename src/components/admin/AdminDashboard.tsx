@@ -139,7 +139,7 @@ export default function AdminDashboard() {
           facebookUrl: "https://facebook.com/vivi",
           twitterUrl: "https://twitter.com/vivi",
           whatsappNumber: "+2348000000000",
-          bannerMessage: "Welcome to Vivi - Enjoy Free Shipping on Orders Over $140!",
+          bannerMessage: "Vivi Style Flash Sale: Up to 90% Off!",
           logoUrl: "Vivi"
         };
         const ref = await addDoc(collection(db, 'settings'), defaultSettings);
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
       case 'processing':
         return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 capitalize"><Zap className="w-3 h-3 mr-1" /> {status}</Badge>;
       case 'shipped':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 capitalize"><Truck className="w-3 h-3 mr-1" /> {status}</Badge>;
+        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 capitalize"><Truck className="w-3 h-3 mr-1" /> {status}</Badge>;
       case 'delivered':
         return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 capitalize"><CheckCircle2 className="w-3 h-3 mr-1" /> {status}</Badge>;
       case 'cancelled':
@@ -601,9 +601,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-2 mb-4 md:mb-6">
-          <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200">
+          <div className="bg-purple-600 p-2 rounded-xl shadow-lg shadow-purple-200">
             <Zap className="h-6 w-6 text-white fill-white" />
           </div>
           <div className="flex-1">
@@ -618,7 +618,7 @@ export default function AdminDashboard() {
                     {...props}
                     className={cn(
                       buttonVariants({ variant: "outline" }),
-                      "rounded-lg border-2 font-black text-xs px-3 h-9 border-gray-100 hover:border-orange-200 gap-1.5 transition-all bg-white"
+                      "rounded-lg border-2 font-black text-xs px-3 h-9 border-gray-100 hover:border-purple-200 gap-1.5 transition-all bg-white"
                     )}
                   >
                     <Plus className="h-3.5 w-3.5" /> Category
@@ -658,7 +658,7 @@ export default function AdminDashboard() {
                             reader.readAsDataURL(file);
                           }
                         }}
-                        className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
+                        className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-purple-50 file:text-purple-700"
                       />
                       {newCategoryImage && (
                         <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
@@ -667,7 +667,7 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
                     {isLoading ? 'Creating...' : 'Create category'}
                   </Button>
                 </form>
@@ -679,7 +679,7 @@ export default function AdminDashboard() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-9 rounded-lg border-gray-200 focus:border-orange-500 transition-all bg-white text-xs"
+                className="pl-8 h-9 rounded-lg border-gray-200 focus:border-purple-500 transition-all bg-white text-xs"
               />
             </div>
           </div>
@@ -691,7 +691,7 @@ export default function AdminDashboard() {
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
                 <div className="p-1.5 bg-green-100 rounded-lg">
-                  <TrendingUp className="h-4 w-4 text-orange-600" />
+                  <TrendingUp className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
               <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Sales</p>
@@ -712,8 +712,8 @@ export default function AdminDashboard() {
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
-                <div className="p-1.5 bg-orange-100 rounded-lg">
-                  <DollarSign className="h-4 w-4 text-orange-600" />
+                <div className="p-1.5 bg-purple-100 rounded-lg">
+                  <DollarSign className="h-4 w-4 text-purple-600" />
                 </div>
               </div>
               <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Profit</p>
@@ -741,28 +741,28 @@ export default function AdminDashboard() {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className="bg-white p-0.5 rounded-xl shadow-sm border border-gray-100 flex-wrap h-auto gap-0.5">
-            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Products
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Gallery
             </TabsTrigger>
-            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Admins
             </TabsTrigger>
-            <TabsTrigger value="merchants" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="merchants" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Merchants
             </TabsTrigger>
-            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Logs
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
               Settings
             </TabsTrigger>
           </TabsList>
@@ -814,7 +814,7 @@ export default function AdminDashboard() {
                         <span className="text-[10px] font-bold text-gray-400 ">Items</span>
                      </div>
                    </div>
-                   <p className="mt-6 text-sm font-bold text-gray-600">Inventory capacity at <span className="text-orange-600">{(products.length / 5).toFixed(1)}%</span></p>
+                   <p className="mt-6 text-sm font-bold text-gray-600">Inventory capacity at <span className="text-purple-600">{(products.length / 5).toFixed(1)}%</span></p>
                    <p className="text-[10px] text-gray-400 font-medium">Optimal storage detected</p>
                 </CardContent>
               </Card>
@@ -827,7 +827,7 @@ export default function AdminDashboard() {
                   {/* Top Product Spotlight */}
                   {products.length > 0 && (
                     <div className="mb-6 p-4 bg-green-50 rounded-2xl border border-green-100">
-                      <p className="text-[10px] font-black  text-orange-600 tracking-widest mb-3">Top performing product</p>
+                      <p className="text-[10px] font-black  text-purple-600 tracking-widest mb-3">Top performing product</p>
                       <div className="flex gap-3">
                         <img 
                           src={[...products].sort((a,b) => (b.sold || 0) - (a.sold || 0))[0]?.image}
@@ -859,16 +859,16 @@ export default function AdminDashboard() {
                   {orders.slice(0, 5).map((o, i) => (
                     <div key={o.id} className="flex items-center gap-4">
                       <div className="bg-green-100 p-2 rounded-lg">
-                        <ShoppingCart className="h-4 w-4 text-orange-600" />
+                        <ShoppingCart className="h-4 w-4 text-purple-600" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-bold truncate">{o.customerEmail}</p>
                         <p className="text-[10px] text-gray-500  font-black">Placed order #{o.id.slice(-4).toUpperCase()}</p>
                       </div>
-                      <p className="font-black text-sm text-orange-600">{formatPrice(o.totalAmount)}</p>
+                      <p className="font-black text-sm text-purple-600">{formatPrice(o.totalAmount)}</p>
                     </div>
                   ))}
-                  <Button variant="ghost" className="w-full text-orange-600 font-bold  tracking-tighter text-xs h-10 hover:bg-green-50" onClick={() => setActiveTab('orders')}>
+                  <Button variant="ghost" className="w-full text-purple-600 font-bold  tracking-tighter text-xs h-10 hover:bg-green-50" onClick={() => setActiveTab('orders')}>
                     View all orders <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </CardContent>
@@ -887,16 +887,16 @@ export default function AdminDashboard() {
                   <form onSubmit={handleAddProduct} className="space-y-3">
                     <div className="space-y-1">
                       <Label className="text-[10px]">Product name</Label>
-                      <Input id="name" name="name" required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                      <Input id="name" name="name" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
                         <Label className="text-[10px]">Price ($)</Label>
-                        <Input id="price" name="price" type="number" step="0.01" required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                        <Input id="price" name="price" type="number" step="0.01" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-[10px]">Stock</Label>
-                        <Input id="stock" name="stock" type="number" defaultValue="100" required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                        <Input id="stock" name="stock" type="number" defaultValue="100" required className="rounded-lg h-10 text-xs border-2 focus:border-purple-500" />
                       </div>
                     </div>
                     <div className="space-y-1">
@@ -922,7 +922,7 @@ export default function AdminDashboard() {
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleImageUpload(e, 'new')}
-                          className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
+                          className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-purple-50 file:text-purple-700"
                         />
                         {newProductImage && (
                           <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
@@ -940,7 +940,7 @@ export default function AdminDashboard() {
                         )}
                       </div>
                     </div>
-                    <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-lg h-10 text-xs mt-2" disabled={isLoading}>
+                    <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-black rounded-lg h-10 text-xs mt-2" disabled={isLoading}>
                       <Plus className="h-4 w-4 mr-1.5" /> {isLoading ? 'Adding...' : 'Add product'}
                     </Button>
                   </form>
@@ -978,7 +978,7 @@ export default function AdminDashboard() {
                                 <span className="text-sm truncate max-w-[150px]">{p.name}</span>
                               </div>
                             </TableCell>
-                            <TableCell className="font-black text-orange-600 text-sm py-2">{formatPrice(p.price)}</TableCell>
+                            <TableCell className="font-black text-purple-600 text-sm py-2">{formatPrice(p.price)}</TableCell>
                             <TableCell className="py-2">
                               <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold text-xs h-6 px-2`}>
                                 {p.stock || 0}
@@ -1025,10 +1025,10 @@ export default function AdminDashboard() {
                   <p className="text-[10px] font-black text-gray-400  tracking-widest mt-1">Visual inventory browsing and management</p>
                 </div>
                 <div className="flex gap-2">
-                  <Badge className="bg-orange-600 font-black  tracking-widest text-[9px] px-3">{products.length} Products</Badge>
+                  <Badge className="bg-purple-600 font-black  tracking-widest text-[9px] px-3">{products.length} Products</Badge>
                   <Button 
                     variant="outline"
-                    className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2"
+                    className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-purple-200 gap-2"
                     onClick={() => setActiveTab('products')}
                   >
                     <Plus className="h-4 w-4" /> Add new
@@ -1038,7 +1038,7 @@ export default function AdminDashboard() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                 {filteredProducts.map((p) => (
-                  <div key={p.id} className="group relative bg-white rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all overflow-hidden shadow-sm hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
+                  <div key={p.id} className="group relative bg-white rounded-3xl border-2 border-transparent hover:border-purple-500 transition-all overflow-hidden shadow-sm hover:shadow-xl hover:shadow-purple-100 hover:-translate-y-1">
                     <div className="aspect-square relative overflow-hidden bg-gray-50">
                       <img 
                         src={p.image} 
@@ -1052,7 +1052,7 @@ export default function AdminDashboard() {
                         <Button 
                           size="icon"
                           variant="secondary"
-                          className="rounded-xl bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-orange-600 h-10 w-10"
+                          className="rounded-xl bg-white/20 backdrop-blur-md border-white/30 text-white hover:bg-purple-600 h-10 w-10"
                           onClick={() => {
                             setEditingProduct(p);
                             setEditCategoryId(categories.find(c => c.name === (p.category_name || p.category))?.id?.toString() || "");
@@ -1072,21 +1072,21 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                       {p.tag && (
-                        <div className="absolute top-3 left-3 bg-orange-600 text-white text-[8px] font-black  px-2 py-1 rounded-full shadow-lg">
+                        <div className="absolute top-3 left-3 bg-purple-600 text-white text-[8px] font-black  px-2 py-1 rounded-full shadow-lg">
                           {p.tag}
                         </div>
                       )}
                     </div>
                     <div className="p-4 flex flex-col gap-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[10px] font-black text-orange-600  tracking-widest truncate max-w-[80px]">{p.category}</p>
+                        <p className="text-[10px] font-black text-purple-600  tracking-widest truncate max-w-[80px]">{p.category}</p>
                         <Badge variant="outline" className={`${p.stock < 10 ? 'border-red-200 text-red-500' : 'border-gray-100 text-gray-400'} text-[8px] font-black h-5`}>
                           {p.stock} left
                         </Badge>
                       </div>
                       <h4 className="font-bold text-sm truncate leading-tight mb-1">{p.name}</h4>
                       <div className="flex items-center justify-between">
-                        <p className="font-black text-orange-600 text-base">{formatPrice(p.price)}</p>
+                        <p className="font-black text-purple-600 text-base">{formatPrice(p.price)}</p>
                         <div className="flex items-center gap-1 text-gray-400">
                            <ImageIcon className="h-3 w-3" />
                            <span className="text-[9px] font-bold  tracking-tighter">{p.sold || '0 sold'}</span>
@@ -1141,7 +1141,7 @@ export default function AdminDashboard() {
                             {o.shippingAddress?.address}, {o.shippingAddress?.city}
                           </span>
                         </TableCell>
-                        <TableCell className="font-black text-orange-600 text-sm">{formatPrice(o.totalAmount)}</TableCell>
+                        <TableCell className="font-black text-purple-600 text-sm">{formatPrice(o.totalAmount)}</TableCell>
                         <TableCell>
                           {getStatusBadge(o.status)}
                         </TableCell>
@@ -1170,7 +1170,7 @@ export default function AdminDashboard() {
                                   />
                               <DialogContent className="max-w-md rounded-3xl">
                                 <DialogHeader>
-                                  <DialogTitle className="text-2xl font-black  tracking-tighter">Order <span className="text-orange-600">details</span></DialogTitle>
+                                  <DialogTitle className="text-2xl font-black  tracking-tighter">Order <span className="text-purple-600">details</span></DialogTitle>
                                 </DialogHeader>
                                 {selectedOrder && (
                                   <div className="space-y-6">
@@ -1217,7 +1217,7 @@ export default function AdminDashboard() {
                                               </div>
                                               <p className="font-bold text-sm">{item.name}</p>
                                             </div>
-                                            <p className="font-black text-orange-600">{formatPrice(item.price)}</p>
+                                            <p className="font-black text-purple-600">{formatPrice(item.price)}</p>
                                           </div>
                                         ))}
                                       </div>
@@ -1244,7 +1244,7 @@ export default function AdminDashboard() {
                                       </div>
                                       <div className="text-right">
                                         <p className="text-xs font-black  text-gray-400">Total paid</p>
-                                        <p className="text-3xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
+                                        <p className="text-3xl font-black text-purple-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
                                       </div>
                                     </div>
                                   </div>
@@ -1292,7 +1292,7 @@ export default function AdminDashboard() {
                       <TableRow key={u.id}>
                         <TableCell className="font-bold">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-black text-xs">
+                            <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 font-black text-xs">
                               {u.displayName?.charAt(0) || u.email?.charAt(0)?.toUpperCase() || '?'}
                             </div>
                             {u.displayName || 'Unnamed User'}
@@ -1300,7 +1300,7 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell className="text-gray-500">{u.email}</TableCell>
                         <TableCell>
-                          <Badge className={u.role === 'admin' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-600'}>
+                          <Badge className={u.role === 'admin' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'}>
                             {u.role || 'user'}
                           </Badge>
                         </TableCell>
@@ -1349,7 +1349,7 @@ export default function AdminDashboard() {
                     {applications.map((app) => (
                       <TableRow key={app.id}>
                         <TableCell className="font-black">{app.businessName}</TableCell>
-                        <TableCell className="text-xs font-bold text-orange-600">{app.category}</TableCell>
+                        <TableCell className="text-xs font-bold text-purple-600">{app.category}</TableCell>
                         <TableCell className="text-xs font-medium">{app.userEmail}</TableCell>
                         <TableCell>
                           <Badge className={app.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}>
@@ -1361,7 +1361,7 @@ export default function AdminDashboard() {
                              {app.status === 'pending' && (
                                 <Button
                                   size="sm"
-                                  className="h-8 bg-orange-600 text-white font-bold text-[10px]"
+                                  className="h-8 bg-purple-600 text-white font-bold text-[10px]"
                                   onClick={async () => {
                                      await updateDoc(doc(db, 'merchant_applications', app.id), { status: 'approved' });
                                      toast.success("Merchant approved!");
@@ -1416,7 +1416,7 @@ export default function AdminDashboard() {
                   <TableBody>
                     {notifications.map((n) => (
                       <TableRow key={n.id}>
-                        <TableCell className="font-bold text-orange-600  text-xs">{n.type.replace('_', ' ')}</TableCell>
+                        <TableCell className="font-bold text-purple-600  text-xs">{n.type.replace('_', ' ')}</TableCell>
                         <TableCell className="font-medium">{n.email}</TableCell>
                         <TableCell>
                           <span className="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-black ">
@@ -1441,10 +1441,10 @@ export default function AdminDashboard() {
           <TabsContent value="settings">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-4 md:p-8">
                <div className="flex items-center gap-3 mb-6 md:mb-8">
-                  <div className="bg-orange-600 p-2 rounded-lg">
+                  <div className="bg-purple-600 p-2 rounded-lg">
                     <Wallet className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-black tracking-tighter uppercase">Store <span className="text-orange-600">Settings</span></h3>
+                  <h3 className="text-xl font-black tracking-tighter uppercase">Store <span className="text-purple-600">Settings</span></h3>
                </div>
 
                <form onSubmit={handleUpdateSettings} className="space-y-8 md:space-y-12">
@@ -1452,25 +1452,25 @@ export default function AdminDashboard() {
                     {/* General Store Info */}
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 mb-2">
-                         <LayoutDashboard className="h-4 w-4 text-orange-600" />
+                         <LayoutDashboard className="h-4 w-4 text-purple-600" />
                          <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">General Info</h4>
                       </div>
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Store Name</Label>
-                          <Input name="storeName" defaultValue={settings?.storeName} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="storeName" defaultValue={settings?.storeName} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Logo Text/URL</Label>
-                          <Input name="logoUrl" defaultValue={settings?.logoUrl} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="logoUrl" defaultValue={settings?.logoUrl} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Banner Message</Label>
-                          <Input name="bannerMessage" defaultValue={settings?.bannerMessage} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="bannerMessage" defaultValue={settings?.bannerMessage} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Store Address</Label>
-                          <Textarea name="storeAddress" defaultValue={settings?.storeAddress} className="rounded-xl min-h-[100px] border-2 focus:border-orange-500 font-bold" />
+                          <Textarea name="storeAddress" defaultValue={settings?.storeAddress} className="rounded-xl min-h-[100px] border-2 focus:border-purple-500 font-bold" />
                         </div>
                       </div>
                     </div>
@@ -1478,29 +1478,29 @@ export default function AdminDashboard() {
                     {/* Contact Info */}
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 mb-2">
-                         <Mail className="h-4 w-4 text-orange-600" />
+                         <Mail className="h-4 w-4 text-purple-600" />
                          <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">Contact & Support</h4>
                       </div>
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Email</Label>
-                          <Input name="storeEmail" defaultValue={settings?.storeEmail} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="storeEmail" defaultValue={settings?.storeEmail} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Support Phone</Label>
-                          <Input name="storePhone" defaultValue={settings?.storePhone} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="storePhone" defaultValue={settings?.storePhone} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">WhatsApp Number</Label>
-                          <Input name="whatsappNumber" defaultValue={settings?.whatsappNumber} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="whatsappNumber" defaultValue={settings?.whatsappNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">MoMo Number</Label>
-                          <Input name="momoNumber" defaultValue={settings?.momoNumber} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="momoNumber" defaultValue={settings?.momoNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Instagram URL</Label>
-                          <Input name="instagramUrl" defaultValue={settings?.instagramUrl} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="instagramUrl" defaultValue={settings?.instagramUrl} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                       </div>
                     </div>
@@ -1508,25 +1508,25 @@ export default function AdminDashboard() {
                     {/* Payment Info */}
                     <div className="space-y-6">
                       <div className="flex items-center gap-2 mb-2">
-                         <Wallet className="h-4 w-4 text-orange-600" />
+                         <Wallet className="h-4 w-4 text-purple-600" />
                          <h4 className="text-sm font-black tracking-widest text-gray-400 uppercase">Payment Info</h4>
                       </div>
                       <div className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Bank Name</Label>
-                          <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="bankName" defaultValue={settings?.bankName} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Number</Label>
-                          <Input name="bankAccountNumber" defaultValue={settings?.bankAccountNumber} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="bankAccountNumber" defaultValue={settings?.bankAccountNumber} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Account Name</Label>
-                          <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Monthly Expenses ($)</Label>
-                          <Input name="expenses" type="number" step="0.01" defaultValue={settings?.expenses} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
+                          <Input name="expenses" type="number" step="0.01" defaultValue={settings?.expenses} className="rounded-xl h-11 border-2 focus:border-purple-500 font-bold" />
                         </div>
                       </div>
                     </div>
