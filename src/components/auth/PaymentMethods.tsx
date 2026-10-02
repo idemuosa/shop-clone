@@ -79,7 +79,7 @@ export default function PaymentMethods() {
           <Button 
             onClick={() => setIsAdding(true)}
             variant="outline"
-            className="rounded-xl border-2 border-green-100 hover:border-orange-500 hover:bg-green-50 text-orange-600 gap-2"
+            className="rounded-xl border-2 border-green-100 hover:border-purple-500 hover:bg-green-50 text-purple-600 gap-2"
           >
             <Plus className="h-4 w-4" /> Add New
           </Button>
@@ -120,7 +120,7 @@ export default function PaymentMethods() {
             </Button>
             <Button 
               type="submit" 
-              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl"
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl"
               disabled={isLoading}
             >
               {isLoading ? 'Saving...' : 'Save Card'}
@@ -139,7 +139,7 @@ export default function PaymentMethods() {
             </div>
           ) : (
             methods.map((method) => (
-              <div key={method.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-gray-50 hover:border-orange-100 transition-all group">
+              <div key={method.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border-2 border-gray-50 hover:border-purple-100 transition-all group">
                 <div className="flex items-center gap-4">
                   <div className={`p-3 rounded-xl ${method.brand === 'Visa' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}`}>
                     <CreditCard className="h-6 w-6" />
