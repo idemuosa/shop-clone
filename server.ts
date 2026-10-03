@@ -7,6 +7,7 @@ import { Resend } from "resend";
 import dotenv from "dotenv";
 import admin from "firebase-admin";
 import fs from "fs";
+import cors from "cors";
 
 dotenv.config();
 
@@ -14,11 +15,20 @@ const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
+// Configure CORS origin
+const corsOriginEnv = process.env.CORE_ORIGIN || process.env.CLIENT_ORIGIN;
+const allowedOrigins = corsOriginEnv
+  ? corsOriginEnv.includes(",")
+    ? corsOriginEnv.split(",").map((origin) => origin.trim())
+    : corsOriginEnv.trim()
+  : true;
+
 // Initialize Socket.IO Server
 const io = new Server(httpServer, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"]
+    origin: corsOriginEnv || "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
   }
 });
 
@@ -42,15 +52,15 @@ io.on("connection", (socket) => {
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// Enable CORS manually
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  next();
+// Enable CORS middleware
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
 });
 
 // Initialize Firebase Admin safely

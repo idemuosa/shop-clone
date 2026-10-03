@@ -14,8 +14,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    // Connect to Node.js Socket.IO backend (defaults to window.location.origin or http://localhost:3000)
-    const socketUrl = import.meta.env.VITE_BACKEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    // Connect to Node.js Socket.IO backend (defaults to VITE_BACKEND_URL, VITE_API_URL, window.location.origin or http://localhost:3000)
+    const socketUrl = import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling']
     });
