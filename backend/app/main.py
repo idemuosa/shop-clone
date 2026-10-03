@@ -91,6 +91,10 @@ app.add_middleware(
 def read_root():
     return {"message": "Welcome to My Shop API", "status": "online"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 @app.post("/api/seed")
 def seed_database(db: Session = Depends(get_db)):
     # Add Categories first and get their IDs
