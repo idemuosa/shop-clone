@@ -24,7 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
-import { API_URL } from '@/lib/api';
+import { API_URL, handleApiResponse } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
 import { ShieldCheck, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -79,13 +79,18 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-    const email = formData.get('email') as string;
-    const phone = formData.get('phone') as string;
-    const name = formData.get('name') as string;
-    const password = formData.get('password') as string;
+    const email = (formData.get('email') as string || '').trim();
+    const phone = (formData.get('phone') as string || '').trim();
+    const name = (formData.get('name') as string || '').trim();
+    const password = (formData.get('password') as string || '').trim();
 
     const identifier = email || phone;
-    
+    if (!identifier) {
+      toast.error("Please enter your email or phone number.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       console.log(`Sending OTP to ${identifier} via ${API_URL}`);
       const response = await fetch(`${API_URL}/api/send-otp`, {
@@ -98,9 +103,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         }),
       });
 
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
+      const data = await handleApiResponse(response);
+
+      if (data.success) {
         setTempData({ email, phone, name, password, identifier });
         setStep('otp');
         toast.info(`OTP sent to your ${email ? 'email' : 'phone'}`);
@@ -112,7 +117,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         throw new Error(data.message || "Failed to send OTP");
       }
     } catch (error: any) {
-      toast.error(error.message, {
+      toast.error(error.message || "Failed to send verification code", {
         style: { color: 'black' }
       });
     } finally {
@@ -129,15 +134,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          identifier: tempData.identifier, 
+          identifier: tempData?.identifier,
           code: otpCode 
         }),
       });
 
-      const data = await response.json();
-      if (!data.success) throw new Error(data.message);
+      const data = await handleApiResponse(response);
+      if (!data.success) throw new Error(data.message || "Verification failed");
 
-      // 1. If we got a custom token, use it for seamless login (fixes invalid-credential)
+      // 1. If we got a custom token, use it for seamless login
       if (data.customToken) {
         try {
           await signInWithCustomToken(auth, data.customToken);
@@ -146,7 +151,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           return;
         } catch (tokenLoginError: any) {
           console.error("Custom token login failed:", tokenLoginError);
-          // If custom token fails, we fall through to traditional flow
         }
       }
 
@@ -154,7 +158,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (authMode === 'register') {
         const userCredential = await createUserWithEmailAndPassword(auth, tempData.email, tempData.password);
         await updateProfile(userCredential.user, { displayName: tempData.name });
-        
+
         const isAdminEmail = tempData.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
                            tempData.email === import.meta.env.VITE_ADMIN_EMAIL;
 
@@ -181,9 +185,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           try {
             await signInWithEmailAndPassword(auth, tempData.email, tempData.password);
           } catch (loginError: any) {
-            // If user already exists but password is different, we can't auto-register easily via client SDK
-            // The custom token from the server is the primary way to bypass this.
-            // If we're here, it means custom token also failed.
             if (loginError.code === 'auth/invalid-credential' || loginError.code === 'auth/user-not-found') {
                toast.error("Authentication failed. Please check your credentials or use the OTP sent.");
             } else {
@@ -191,14 +192,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             }
           }
         } else {
-          // Phone login flow - handled by customToken from server
           toast.success("Phone Identity Verified!");
         }
         toast.success("Welcome Back!");
       }
       onClose();
     } catch (error: any) {
-      toast.error(error.message, {
+      toast.error(error.message || "Verification failed", {
         style: { color: 'black' }
       });
     } finally {
@@ -295,7 +295,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     </div>
                     <h3 className="text-xl font-black  tracking-tighter italic">Verify your <span className="text-orange-600">Identity</span></h3>
                     <p className="text-xs font-bold text-gray-400  tracking-widest leading-relaxed">
-                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData.identifier}</span>
+                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData?.identifier}</span>
                     </p>
                   </div>
 
