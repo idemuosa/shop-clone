@@ -26,7 +26,7 @@ import {
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL, PYTHON_API_URL } from '@/lib/api';
+import { API_URL, PYTHON_API_URL, handleApiResponse } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -129,8 +129,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
         clearCart();
         toast.success("Order confirmed!");
       } else {
-        const errData = await response.json();
-        toast.error("Verification failed: " + (errData.error || "Unknown error"));
+        const errData = await handleApiResponse(response).catch((e: any) => ({ error: e.message }));
+        toast.error("Verification failed: " + (errData.error || errData.message || "Unknown error"));
       }
     } catch (error: any) {
       toast.error("Network error during verification");

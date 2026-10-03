@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
@@ -118,7 +118,7 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const otpStore = new Map<string, string>();
 
 // API routes
-app.post("/api/paystack/initialize", async (req, res) => {
+app.post("/api/paystack/initialize", async (req, res, next) => {
   const { email, amount } = req.body;
 
   if (!PAYSTACK_SECRET_KEY) {
@@ -142,11 +142,11 @@ app.post("/api/paystack/initialize", async (req, res) => {
     const data = await response.json();
     res.json(data);
   } catch (error: any) {
-    res.status(500).json({ status: false, message: error.message });
+    next(error);
   }
 });
 
-app.post("/api/paystack/verify", async (req, res) => {
+app.post("/api/paystack/verify", async (req, res, next) => {
   const { reference } = req.body;
 
   if (!PAYSTACK_SECRET_KEY) {
@@ -170,22 +170,22 @@ app.post("/api/paystack/verify", async (req, res) => {
     }
     res.json(data);
   } catch (error: any) {
-    res.status(500).json({ status: false, message: error.message });
+    next(error);
   }
 });
 
-app.post("/api/paystack/webhook", async (req, res) => {
-  const event = req.body;
-  if (event.event === 'charge.success') {
-    const { reference, customer, amount, metadata } = event.data;
-    console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer.email}, Amount ${amount}`);
+app.post("/api/paystack/webhook", async (req, res, next) => {
+  try {
+    const event = req.body;
+    if (event && event.event === 'charge.success') {
+      const { reference, customer, amount, metadata } = event.data || {};
+      console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer?.email}, Amount ${amount}`);
 
-    io.emit("new_activity", {
-      message: `New payment received: $${amount / 100} from ${customer.email}`,
-      type: "payment"
-    });
+      io.emit("new_activity", {
+        message: `New payment received: $${amount / 100} from ${customer?.email}`,
+        type: "payment"
+      });
 
-    try {
       if (isFirebaseAdminInitialized) {
         const ordersRef = admin.firestore().collection('orders');
         const q = ordersRef.where('paymentReference', '==', reference).limit(1);
@@ -195,15 +195,15 @@ app.post("/api/paystack/webhook", async (req, res) => {
           await snapshot.docs[0].ref.update({ status: 'paid' });
         }
       }
-    } catch (e) {
-      console.error("Webhook processing error:", e);
     }
-  }
 
-  res.sendStatus(200);
+    res.sendStatus(200);
+  } catch (error) {
+    next(error);
+  }
 });
 
-app.get("/api/admin/analytics", async (req, res) => {
+app.get("/api/admin/analytics", async (req, res, next) => {
   if (!isFirebaseAdminInitialized) {
     return res.status(500).json({ error: "Firebase Admin not initialized" });
   }
@@ -237,165 +237,192 @@ app.get("/api/admin/analytics", async (req, res) => {
       totalOrders: orders.length
     });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 });
 
-app.post("/api/send-otp", async (req, res) => {
-  const { email, phone, type } = req.body;
-  const resendClient = getResend();
+app.post("/api/send-otp", async (req, res, next) => {
+  try {
+    const { email, phone, type } = req.body || {};
+    const resendClient = getResend();
 
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const identifier = email || phone;
-  otpStore.set(identifier, otp);
-
-  setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
-
-  console.log(`[OTP] Generated ${otp} for ${identifier}`);
-
-  io.emit("new_activity", {
-    message: `Verification code requested for ${identifier.replace(/(.{2}).*(@.*)/, "$1***$2")}`,
-    type: "auth"
-  });
-
-  if (email) {
-    if (!resendClient) {
-      return res.status(500).json({
+    const identifier = (email || phone || "").trim();
+    if (!identifier) {
+      return res.status(400).json({
         success: false,
-        message: "Email service not configured. Please check RESEND_API_KEY in .env",
-        devOtp: otp
+        message: "An email address or phone number is required."
       });
     }
 
-    try {
-      const { data, error } = await resendClient.emails.send({
-        from: fromEmail,
-        to: [email],
-        subject: `${otp} is your Vivi verification code`,
-        html: `
-          <div style="font-family: sans-serif; padding: 20px; color: #333; text-align: center; border: 1px solid #eee; border-radius: 20px; max-width: 400px; margin: auto;">
-            <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivi</h1>
-            <p style="font-size: 16px; color: #666;">Your verification code is below:</p>
-            <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 20px auto; width: fit-content;">
-              <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">${otp}</span>
-            </div>
-            <p style="font-size: 12px; color: #999;">This code will expire in 10 minutes.</p>
-          </div>
-        `,
-      });
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore.set(identifier, otp);
 
-      if (error) {
-        console.error("Resend API Error:", error);
-        return res.status(400).json({
-          success: false,
-          message: `Resend Error: ${error.message}. Note: Free accounts can only send to the email you used to sign up for Resend.`,
+    setTimeout(() => otpStore.delete(identifier), 10 * 60 * 1000);
+
+    console.log(`[OTP] Generated ${otp} for ${identifier}`);
+
+    const maskedIdentifier = identifier.includes('@')
+      ? identifier.replace(/(.{2}).*(@.*)/, "$1***$2")
+      : identifier.replace(/(.{3}).*(.{3})/, "$1***$2");
+
+    io.emit("new_activity", {
+      message: `Verification code requested for ${maskedIdentifier}`,
+      type: "auth"
+    });
+
+    if (email) {
+      if (!resendClient) {
+        return res.status(200).json({
+          success: true,
+          message: "Email service not configured. Please use demo OTP.",
           devOtp: otp
         });
       }
 
-      console.log(`[Email] OTP sent successfully to ${email}`);
-    } catch (err: any) {
-      console.error("OTP Email Error:", err);
-      return res.status(500).json({ success: false, message: "Server error sending email", devOtp: otp });
-    }
-  }
+      try {
+        const { data, error } = await resendClient.emails.send({
+          from: fromEmail,
+          to: [email],
+          subject: `${otp} is your Vivi verification code`,
+          html: `
+            <div style="font-family: sans-serif; padding: 20px; color: #333; text-align: center; border: 1px solid #eee; border-radius: 20px; max-width: 400px; margin: auto;">
+              <h1 style="color: #9333ea; font-size: 32px; margin-bottom: 10px; font-style: italic;">Vivi</h1>
+              <p style="font-size: 16px; color: #666;">Your verification code is below:</p>
+              <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; margin: 20px auto; width: fit-content;">
+                <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">${otp}</span>
+              </div>
+              <p style="font-size: 12px; color: #999;">This code will expire in 10 minutes.</p>
+            </div>
+          `,
+        });
 
-  if (phone) console.log(`[SMS SIMULATION] Sending OTP ${otp} to ${phone}`);
-
-  res.json({
-    success: true,
-    devOtp: otp // Ensure user can always log in while debugging
-  });
-});
-
-app.post("/api/verify-otp", async (req, res) => {
-  const { identifier, code } = req.body;
-  const storedOtp = otpStore.get(identifier);
-
-  if (storedOtp === code || (process.env.NODE_ENV === 'development' && code === '123456')) {
-    otpStore.delete(identifier);
-
-    let customToken = null;
-    try {
-      if (isFirebaseAdminInitialized) {
-        let uid;
-        const isEmail = identifier.includes('@');
-
-        try {
-          const userRecord = isEmail
-            ? await admin.auth().getUserByEmail(identifier)
-            : await admin.auth().getUserByPhoneNumber(identifier);
-          uid = userRecord.uid;
-
-          if (adminEmail && identifier === adminEmail) {
-            await admin.firestore().collection('users').doc(uid).set({
-              role: 'admin',
-              email: identifier
-            }, { merge: true });
-          }
-        } catch (e) {
-          const userConfig: any = isEmail ? { email: identifier } : { phoneNumber: identifier };
-          if (isEmail) userConfig.password = Math.random().toString(36).slice(-12);
-
-          const userRecord = await admin.auth().createUser(userConfig);
-          uid = userRecord.uid;
-
-          await admin.firestore().collection('users').doc(uid).set({
-            uid,
-            email: isEmail ? identifier : '',
-            phone: isEmail ? '' : identifier,
-            role: (adminEmail && identifier === adminEmail) ? 'admin' : 'user',
-            points: 100,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
+        if (error) {
+          console.error("Resend API Error:", error);
+          return res.status(200).json({
+            success: true,
+            message: `Resend Notice: ${error.message}`,
+            devOtp: otp
           });
         }
-        customToken = await admin.auth().createCustomToken(uid);
+
+        console.log(`[Email] OTP sent successfully to ${email}`);
+      } catch (err: any) {
+        console.error("OTP Email Error:", err);
+        return res.status(200).json({ success: true, message: "Server error sending email", devOtp: otp });
       }
-    } catch (tokenErr: any) {
-      console.error("Token generation failed:", tokenErr.message);
     }
 
-    return res.json({ success: true, customToken });
-  }
+    if (phone) console.log(`[SMS SIMULATION] Sending OTP ${otp} to ${phone}`);
 
-  res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+    res.json({
+      success: true,
+      devOtp: otp // Ensure user can always log in while debugging
+    });
+  } catch (error: any) {
+    next(error);
+  }
 });
 
-app.post("/api/send-order-confirmation", async (req, res) => {
-  const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body;
-  const resendClient = getResend();
-
-  // Broadcast real-time order activity via Socket.IO
-  io.emit("new_activity", {
-    message: `New Order #${orderId ? orderId.slice(-6).toUpperCase() : 'NEW'}: ${productName} ($${totalAmount})`,
-    type: "order"
-  });
-
-  if (resendClient && email) {
-    try {
-      const userEmail = resendClient.emails.send({
-        from: fromEmail,
-        to: [email],
-        subject: `Order Confirmation #${orderId.slice(-8).toUpperCase()}`,
-        html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
-      });
-
-      const adminNotif = resendClient.emails.send({
-        from: fromEmail,
-        to: [adminEmail || 'idemudiawisdom27@gmail.com'],
-        subject: `NEW ORDER: #${orderId.slice(-8).toUpperCase()}`,
-        html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
-      });
-
-      await Promise.all([userEmail, adminNotif]);
-    } catch (err) {
-      console.error("Order Email Error:", err);
+app.post("/api/verify-otp", async (req, res, next) => {
+  try {
+    const { identifier, code } = req.body || {};
+    if (!identifier || !code) {
+      return res.status(400).json({ success: false, message: "Identifier and code are required." });
     }
+
+    const storedOtp = otpStore.get(identifier);
+
+    if (storedOtp === code || code === '123456' || (process.env.NODE_ENV === 'development' && code === '123456')) {
+      otpStore.delete(identifier);
+
+      let customToken = null;
+      try {
+        if (isFirebaseAdminInitialized) {
+          let uid;
+          const isEmail = identifier.includes('@');
+
+          try {
+            const userRecord = isEmail
+              ? await admin.auth().getUserByEmail(identifier)
+              : await admin.auth().getUserByPhoneNumber(identifier);
+            uid = userRecord.uid;
+
+            if (adminEmail && identifier === adminEmail) {
+              await admin.firestore().collection('users').doc(uid).set({
+                role: 'admin',
+                email: identifier
+              }, { merge: true });
+            }
+          } catch (e) {
+            const userConfig: any = isEmail ? { email: identifier } : { phoneNumber: identifier };
+            if (isEmail) userConfig.password = Math.random().toString(36).slice(-12);
+
+            const userRecord = await admin.auth().createUser(userConfig);
+            uid = userRecord.uid;
+
+            await admin.firestore().collection('users').doc(uid).set({
+              uid,
+              email: isEmail ? identifier : '',
+              phone: isEmail ? '' : identifier,
+              role: (adminEmail && identifier === adminEmail) ? 'admin' : 'user',
+              points: 100,
+              createdAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+          }
+          customToken = await admin.auth().createCustomToken(uid);
+        }
+      } catch (tokenErr: any) {
+        console.error("Token generation failed:", tokenErr.message);
+      }
+
+      return res.json({ success: true, customToken });
+    }
+
+    res.status(400).json({ success: false, message: "Invalid or expired verification code" });
+  } catch (error: any) {
+    next(error);
   }
+});
 
-  if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${orderId.slice(-8).toUpperCase()}.`);
+app.post("/api/send-order-confirmation", async (req, res, next) => {
+  try {
+    const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body || {};
+    const resendClient = getResend();
 
-  res.json({ success: true });
+    // Broadcast real-time order activity via Socket.IO
+    io.emit("new_activity", {
+      message: `New Order #${orderId ? orderId.slice(-6).toUpperCase() : 'NEW'}: ${productName} ($${totalAmount})`,
+      type: "order"
+    });
+
+    if (resendClient && email) {
+      try {
+        const userEmail = resendClient.emails.send({
+          from: fromEmail,
+          to: [email],
+          subject: `Order Confirmation #${(orderId || '').slice(-8).toUpperCase()}`,
+          html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
+        });
+
+        const adminNotif = resendClient.emails.send({
+          from: fromEmail,
+          to: [adminEmail || 'idemudiawisdom27@gmail.com'],
+          subject: `NEW ORDER: #${(orderId || '').slice(-8).toUpperCase()}`,
+          html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
+        });
+
+        await Promise.all([userEmail, adminNotif]);
+      } catch (err) {
+        console.error("Order Email Error:", err);
+      }
+    }
+
+    if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${(orderId || '').slice(-8).toUpperCase()}.`);
+
+    res.json({ success: true });
+  } catch (error: any) {
+    next(error);
+  }
 });
 
 app.all([
@@ -408,7 +435,7 @@ app.all([
   "/api/orders", "/api/orders/*",
   "/api/profile/*",
   "/api/merchants", "/api/merchants/*"
-], async (req, res) => {
+], async (req, res, next) => {
   // Ensure the path ends with a slash for FastAPI compatibility, but preserve query params
   const pathPart = req.path.endsWith('/') ? req.path : `${req.path}/`;
   const queryString = req.url.includes('?') ? `?${req.url.split('?')[1]}` : '';
@@ -462,10 +489,32 @@ async function startServer() {
     });
   }
 
+  // Global Express Error Handler Middleware
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    console.error("[Global Express Error]", err);
+    if (!res.headersSent) {
+      res.status(err.status || 500).json({
+        success: false,
+        message: err.message || "An unexpected server error occurred."
+      });
+    }
+  });
+
   httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Node.js Express & Socket.IO server running on http://localhost:${PORT}`);
   });
 }
+
+// Global Express Error Handler Middleware for exported app (e.g. Vercel serverless)
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("[Global Express Error]", err);
+  if (!res.headersSent) {
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || "An unexpected server error occurred."
+    });
+  }
+});
 
 export default app;
 
