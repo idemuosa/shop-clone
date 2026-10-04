@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import http from "http";
 import { Server } from "socket.io";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 import { Resend } from "resend";
 import dotenv from "dotenv";
@@ -484,6 +483,7 @@ app.all([
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
