@@ -119,8 +119,45 @@ const getResend = () => {
 };
 
 const adminEmail = process.env.ADMIN_EMAIL;
-const rawFromEmail = (process.env.FROM_EMAIL || "").replace(/^["']|["']$/g, "").trim();
-const fromEmail = (rawFromEmail && rawFromEmail.includes("@")) ? rawFromEmail : "Vivi Shop <onboarding@resend.dev>";
+const DEFAULT_FROM_EMAIL = "Vivi Shop <onboarding@resend.dev>";
+
+function parseFromEmail(rawFrom?: string): string {
+  if (!rawFrom) return DEFAULT_FROM_EMAIL;
+  const cleaned = rawFrom.replace(/^["']|["']$/g, "").trim();
+  const pattern = /^(?:([^<]+)\s*<)?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>?$/;
+  const match = cleaned.match(pattern);
+  if (match) {
+    const [, name, addr] = match;
+    if (name && name.trim()) {
+      return `${name.trim()} <${addr}>`;
+    }
+    return addr;
+  }
+  return DEFAULT_FROM_EMAIL;
+}
+
+async function sendResendEmail(resendClient: Resend, payload: { to: string[]; subject: string; html: string }) {
+  let fromEmail = parseFromEmail(process.env.FROM_EMAIL);
+  let result = await resendClient.emails.send({
+    from: fromEmail,
+    to: payload.to,
+    subject: payload.subject,
+    html: payload.html,
+  });
+
+  if (result.error && fromEmail !== DEFAULT_FROM_EMAIL) {
+    console.warn(`Resend failed with custom fromEmail (${fromEmail}): ${result.error.message}. Retrying with default ${DEFAULT_FROM_EMAIL}`);
+    result = await resendClient.emails.send({
+      from: DEFAULT_FROM_EMAIL,
+      to: payload.to,
+      subject: payload.subject,
+      html: payload.html,
+    });
+  }
+
+  return result;
+}
+
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
@@ -296,8 +333,7 @@ app.post("/api/send-otp", async (req, res, next) => {
       }
 
       try {
-        const { data, error } = await resendClient.emails.send({
-          from: fromEmail,
+        const { error } = await sendResendEmail(resendClient, {
           to: [email],
           subject: `${otp} is your Vivi verification code`,
           html: `
@@ -412,15 +448,13 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 
     if (resendClient && email) {
       try {
-        const userEmail = resendClient.emails.send({
-          from: fromEmail,
+        const userEmail = sendResendEmail(resendClient, {
           to: [email],
           subject: `Order Confirmation #${(orderId || '').slice(-8).toUpperCase()}`,
           html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
         });
 
-        const adminNotif = resendClient.emails.send({
-          from: fromEmail,
+        const adminNotif = sendResendEmail(resendClient, {
           to: [adminEmail || 'idemudiawisdom27@gmail.com'],
           subject: `NEW ORDER: #${(orderId || '').slice(-8).toUpperCase()}`,
           html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
