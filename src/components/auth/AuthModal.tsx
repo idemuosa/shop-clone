@@ -4,7 +4,6 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   updateProfile,
-  signInWithCustomToken,
   signOut,
   GoogleAuthProvider,
   signInWithPopup
@@ -38,7 +37,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<'form' | 'otp'>('form');
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [loginMethod, setLoginMethod] = useState<'email' | 'phone'>('email');
   const [otpCode, setOtpCode] = useState('');
   const [tempData, setTempData] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -75,42 +73,73 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
     const email = (formData.get('email') as string || '').trim();
-    const phone = (formData.get('phone') as string || '').trim();
-    const name = (formData.get('name') as string || '').trim();
     const password = (formData.get('password') as string || '').trim();
 
-    const identifier = email || phone;
-    if (!identifier) {
-      toast.error("Please enter your email or phone number.");
+    if (!email || !password) {
+      toast.error("Please enter both email and password.");
       setIsLoading(false);
       return;
     }
 
     try {
-      console.log(`Sending OTP to ${identifier} via ${API_URL}`);
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success("Welcome Back!");
+      onClose();
+    } catch (error: any) {
+      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        toast.error("Invalid email or password.");
+      } else {
+        toast.error(error.message || "Login failed.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendRegisterOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const email = (formData.get('email') as string || '').trim();
+    const name = (formData.get('name') as string || '').trim();
+    const password = (formData.get('password') as string || '').trim();
+
+    if (!email || !name || !password) {
+      toast.error("Please fill in all required fields.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      console.log(`Sending registration OTP to ${email} via ${API_URL}`);
       const response = await fetch(`${API_URL}/api/send-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           email, 
-          phone, 
-          type: authMode 
+          type: 'register'
         }),
       });
 
       const data = await handleApiResponse(response);
 
       if (data.success) {
-        setTempData({ email, phone, name, password, identifier });
+        setTempData({ email, name, password, identifier: email });
         setStep('otp');
-        toast.success(`Verification code sent to your ${email ? 'email address' : 'phone number'}`);
+        toast.success("Verification code sent to your email address");
       } else {
-        throw new Error(data.message || "Failed to send OTP");
+        throw new Error(data.message || "Failed to send verification code");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to send verification code", {
@@ -138,65 +167,38 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       const data = await handleApiResponse(response);
       if (!data.success) throw new Error(data.message || "Verification failed");
 
-      // 1. If we got a custom token, use it for seamless login
-      if (data.customToken) {
-        try {
-          await signInWithCustomToken(auth, data.customToken);
-          toast.success("Identity Verified & Logged In!");
-          onClose();
-          return;
-        } catch (tokenLoginError: any) {
-          console.error("Custom token login failed:", tokenLoginError);
-        }
-      }
+      // Register user with email and password after OTP verification
+      const userCredential = await createUserWithEmailAndPassword(auth, tempData.email, tempData.password);
+      await updateProfile(userCredential.user, { displayName: tempData.name });
 
-      // 2. Fallback to traditional flows if no token (legacy support)
-      if (authMode === 'register') {
-        const userCredential = await createUserWithEmailAndPassword(auth, tempData.email, tempData.password);
-        await updateProfile(userCredential.user, { displayName: tempData.name });
+      const isAdminEmail = tempData.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
+                         tempData.email === import.meta.env.VITE_ADMIN_EMAIL;
 
-        const isAdminEmail = tempData.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
-                           tempData.email === import.meta.env.VITE_ADMIN_EMAIL;
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        uid: userCredential.user.uid,
+        email: tempData.email,
+        displayName: tempData.name,
+        role: isAdminEmail ? 'admin' : 'user',
+        createdAt: serverTimestamp(),
+      });
 
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
-          uid: userCredential.user.uid,
-          email: tempData.email,
-          phone: tempData.phone || '',
-          displayName: tempData.name,
-          role: isAdminEmail ? 'admin' : 'user',
-          createdAt: serverTimestamp(),
-        });
+      // Send welcome email
+      fetch(`${API_URL}/api/send-welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: tempData.email, name: tempData.name }),
+      }).catch(console.error);
 
-        // Send welcome
-        fetch(`${API_URL}/api/send-welcome`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: tempData.email, name: tempData.name }),
-        }).catch(console.error);
-
-        toast.success("Registration Successful!");
-      } else {
-        // Login flow
-        if (loginMethod === 'email') {
-          try {
-            await signInWithEmailAndPassword(auth, tempData.email, tempData.password);
-          } catch (loginError: any) {
-            if (loginError.code === 'auth/invalid-credential' || loginError.code === 'auth/user-not-found') {
-               toast.error("Authentication failed. Please check your credentials or use the OTP sent.");
-            } else {
-               throw loginError;
-            }
-          }
-        } else {
-          toast.success("Phone Identity Verified!");
-        }
-        toast.success("Welcome Back!");
-      }
+      toast.success("Registration Successful!");
       onClose();
     } catch (error: any) {
-      toast.error(error.message || "Verification failed", {
-        style: { color: 'black' }
-      });
+      if (error.code === 'auth/email-already-in-use') {
+        toast.error("An account with this email already exists. Please log in.");
+      } else {
+        toast.error(error.message || "Verification failed", {
+          style: { color: 'black' }
+        });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -313,7 +315,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         disabled={isLoading || otpCode.length < 6}
                         className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 text-lg shadow-2xl shadow-zinc-200 transition-all active:scale-95"
                       >
-                        {isLoading ? 'Verifying...' : 'Confirm & Login'}
+                        {isLoading ? 'Verifying...' : 'Confirm & Register'}
                       </Button>
                       
                       <Button 
@@ -322,7 +324,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         onClick={() => setStep('form')}
                         className="w-full font-black  tracking-widest text-[10px] text-gray-400"
                       >
-                        Change {loginMethod}
+                        Back to Registration
                       </Button>
                     </div>
                   </form>
@@ -330,77 +332,50 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               ) : (
                 <>
                   <TabsContent value="login" className="mt-0">
-                    <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-                      <Button 
-                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'email' ? 'bg-white text-orange-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
-                        onClick={() => setLoginMethod('email')}
-                        type="button"
-                      >
-                        <Mail className="h-3 w-3 mr-2" /> Email
-                      </Button>
-                      <Button 
-                        className={`flex-1 rounded-lg font-black text-[10px]  tracking-widest h-10 ${loginMethod === 'phone' ? 'bg-white text-orange-600 shadow-sm' : 'bg-transparent text-gray-400'}`}
-                        onClick={() => setLoginMethod('phone')}
-                        type="button"
-                      >
-                        <Phone className="h-3 w-3 mr-2" /> Phone
-                      </Button>
-                    </div>
-
-                    <form onSubmit={handleSendOtp} className="space-y-5">
-                      {loginMethod === 'email' ? (
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                             <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Email Address</Label>
-                             <div className="relative">
-                               <Input
-                                 name="email"
-                                 type="email"
-                                 placeholder="hello@vivi.co"
-                                 required
-                                 autoComplete="username"
-                                 className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
-                               />
-                               <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                             </div>
-                          </div>
-                          <div className="space-y-1.5">
-                             <Label className="text-[9px] font-black  tracking-widest text-gray-400 ml-1">Secure Password</Label>
-                             <div className="relative">
-                               <Input
-                                 name="password"
-                                 type={showPassword ? "text" : "password"}
-                                 placeholder="••••••••"
-                                 required
-                                 autoComplete="current-password"
-                                 className="pl-10 pr-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
-                               />
-                               <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
-                               <button
-                                 type="button"
-                                 onClick={() => setShowPassword(!showPassword)}
-                                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors"
-                                 aria-label={showPassword ? "Hide password" : "Show password"}
-                               >
-                                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                               </button>
-                             </div>
-                          </div>
-                        </div>
-                      ) : (
+                    <form onSubmit={handleLogin} className="space-y-5">
+                      <div className="space-y-4">
                         <div className="space-y-2">
-                           <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Phone Number</Label>
+                           <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Email Address</Label>
                            <div className="relative">
-                             <Input name="phone" type="tel" placeholder="+234 000 000 0000" required className="pl-12 h-14 rounded-2xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all" />
-                             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-300" />
+                             <Input
+                               name="email"
+                               type="email"
+                               placeholder="hello@vivi.co"
+                               required
+                               autoComplete="username"
+                               className="pl-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
+                             />
+                             <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
                            </div>
                         </div>
-                      )}
+                        <div className="space-y-1.5">
+                           <Label className="text-[9px] font-black  tracking-widest text-gray-400 ml-1">Secure Password</Label>
+                           <div className="relative">
+                             <Input
+                               name="password"
+                               type={showPassword ? "text" : "password"}
+                               placeholder="••••••••"
+                               required
+                               autoComplete="current-password"
+                               className="pl-10 pr-10 h-12 rounded-xl border-2 border-gray-100 focus:border-orange-500 font-bold transition-all text-sm"
+                             />
+                             <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                             <button
+                               type="button"
+                               onClick={() => setShowPassword(!showPassword)}
+                               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors"
+                               aria-label={showPassword ? "Hide password" : "Show password"}
+                             >
+                               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                             </button>
+                           </div>
+                        </div>
+                      </div>
 
                       <Button type="submit" disabled={isLoading} className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-14 shadow-2xl shadow-orange-200 transition-all active:scale-95 text-base group">
-                        {isLoading ? 'Preparing...' : (
+                        {isLoading ? 'Signing in...' : (
                           <div className="flex items-center gap-2">
-                             Secure Entry <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                             Log In <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                           </div>
                         )}
                       </Button>
@@ -451,7 +426,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </TabsContent>
 
                   <TabsContent value="register" className="mt-0">
-                    <form onSubmit={handleSendOtp} className="space-y-5">
+                    <form onSubmit={handleSendRegisterOtp} className="space-y-5">
                       <div className="space-y-4">
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Your Full Name</Label>
@@ -525,7 +500,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           </p>
                         </div>
                       </div>
-                      <form onSubmit={handleSendOtp} className="space-y-4">
+                      <form onSubmit={handleLogin} className="space-y-4">
                         <div className="space-y-2">
                           <Label className="text-[10px] font-black  tracking-widest text-zinc-400">Merchant Email</Label>
                           <Input
