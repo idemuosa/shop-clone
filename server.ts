@@ -533,6 +533,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 export default app;
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
   startServer();
 }
