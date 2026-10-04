@@ -190,6 +190,12 @@ async def send_otp(payload: dict = Body(...)):
 
     if email:
         if not resend or not resend.api_key:
+             if os.getenv("NODE_ENV") != "production" and os.getenv("DEBUG", "True").lower() == "true":
+                 print(f"[DEV OTP SIMULATION] Email service not configured. Generated OTP for {email}: {otp}")
+                 return {
+                     "success": True,
+                     "message": f"[DEV MODE] Verification code generated: {otp} (Email service not configured)"
+                 }
              raise HTTPException(status_code=400, detail="Email service not configured on server")
 
         subject = f"{otp} is your Vivi Verification Code"
