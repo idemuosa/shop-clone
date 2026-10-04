@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Body
+from fastapi import FastAPI, Depends, HTTPException, status, Body, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -65,7 +66,8 @@ def send_email(to_email, subject, html_content):
             print(f"SKIPPING EMAIL (No SMTP or Resend): To {to_email}, Sub: {subject}")
             return False
 
-        from_email = os.getenv("FROM_EMAIL", "Vivi Shop <onboarding@resend.dev>")
+        raw_from = os.getenv("FROM_EMAIL", "").strip("\"' \t\r\n")
+        from_email = raw_from if (raw_from and "@" in raw_from) else "Vivi Shop <onboarding@resend.dev>"
         params = {
             "from": from_email,
             "to": [to_email],
@@ -354,6 +356,21 @@ def get_products(skip: int = 0, limit: int = 100, search: Optional[str] = None, 
     if search:
         query = query.filter(models.Product.name.ilike(f"%{search}%"))
     return query.offset(skip).limit(limit).all()
+
+# Socket.IO stub routes for FastAPI to avoid 404s and WebSocket upgrade errors when frontend connects directly
+@app.get("/socket.io/")
+@app.get("/socket.io/{path:path}")
+def socket_io_fallback(path: str = ""):
+    return JSONResponse(
+        status_code=400,
+        content={"message": "Socket.IO not available on Python FastAPI service. Please use Node server for real-time WebSocket connection."}
+    )
+
+@app.websocket("/socket.io/")
+@app.websocket("/socket.io/{path:path}")
+async def socket_io_ws_fallback(websocket: WebSocket, path: str = ""):
+    await websocket.accept()
+    await websocket.close(code=1000, reason="Socket.IO not supported on FastAPI server")
 
 # Additional endpoints to prevent 404s/fetch failures on direct backend requests
 @app.get("/api/reviews/")

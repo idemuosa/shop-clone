@@ -119,7 +119,8 @@ const getResend = () => {
 };
 
 const adminEmail = process.env.ADMIN_EMAIL;
-const fromEmail = process.env.FROM_EMAIL || "Vivi Shop <onboarding@resend.dev>";
+const rawFromEmail = (process.env.FROM_EMAIL || "").replace(/^["']|["']$/g, "").trim();
+const fromEmail = (rawFromEmail && rawFromEmail.includes("@")) ? rawFromEmail : "Vivi Shop <onboarding@resend.dev>";
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
