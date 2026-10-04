@@ -1,6 +1,8 @@
 fastapi
 uvicorn[standard]
 websockets
+wsproto
+python-socketio
 firebase-admin
 sqlalchemy
 psycopg2-binary

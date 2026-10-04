@@ -1,11 +1,13 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Body, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, HTTPException, status, Body
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import random
 import os
+import re
 import smtplib
+import socketio
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
@@ -14,6 +16,21 @@ from . import models, schemas, database, auth
 from .database import engine, get_db
 
 load_dotenv()
+
+DEFAULT_FROM_EMAIL = "Vivi Shop <onboarding@resend.dev>"
+
+def parse_from_email(raw_from: str) -> str:
+    if not raw_from:
+        return DEFAULT_FROM_EMAIL
+    cleaned = raw_from.strip("\"' \t\r\n")
+    email_pattern = r'^(?:([^<]+)\s*<)?([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})>?$'
+    match = re.match(email_pattern, cleaned)
+    if match:
+        name, addr = match.groups()
+        if name and name.strip():
+            return f"{name.strip()} <{addr}>"
+        return addr
+    return DEFAULT_FROM_EMAIL
 
 # Initialize Resend Safely
 try:
@@ -29,6 +46,28 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "idemudiawisdom27@gmail.com")
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="My Shop API")
+
+# Socket.IO Server initialization for real-time events
+sio = socketio.AsyncServer(async_mode='asgi', cors_allowed_origins='*')
+sio_app = socketio.ASGIApp(sio, socketio_path='')
+app.mount("/socket.io", sio_app)
+
+@sio.event
+async def connect(sid, environ):
+    print(f"[Socket.IO] Client connected: {sid}")
+
+@sio.event
+async def disconnect(sid):
+    print(f"[Socket.IO] Client disconnected: {sid}")
+
+@sio.event
+async def ping(sid):
+    await sio.emit('pong', room=sid)
+
+@sio.event
+async def send_activity(sid, data):
+    print(f"[Socket.IO Activity] {data.get('type')}: {data.get('message')}")
+    await sio.emit('new_activity', data)
 
 # In-memory store for demo OTPs (Use Redis in production)
 demo_otps = {}
@@ -61,24 +100,32 @@ def send_email(to_email, subject, html_content):
             # Fall through to Resend if SMTP fails
 
     # Fallback to Resend
-    try:
-        if not resend or not resend.api_key:
-            print(f"SKIPPING EMAIL (No SMTP or Resend): To {to_email}, Sub: {subject}")
-            return False
+    if not resend or not resend.api_key:
+        print(f"SKIPPING EMAIL (No SMTP or Resend): To {to_email}, Sub: {subject}")
+        return False
 
-        raw_from = os.getenv("FROM_EMAIL", "").strip("\"' \t\r\n")
-        from_email = raw_from if (raw_from and "@" in raw_from) else "Vivi Shop <onboarding@resend.dev>"
-        params = {
-            "from": from_email,
-            "to": [to_email],
-            "subject": subject,
-            "html": html_content,
-        }
+    from_email = parse_from_email(os.getenv("FROM_EMAIL", ""))
+    params = {
+        "from": from_email,
+        "to": [to_email],
+        "subject": subject,
+        "html": html_content,
+    }
+    try:
         resend.Emails.send(params)
         print(f"EMAIL SENT (via Resend): To {to_email}, Sub: {subject}")
         return True
     except Exception as e:
-        print(f"RESEND EMAIL ERROR: {e}")
+        print(f"RESEND EMAIL ERROR with 'from'={from_email}: {e}")
+        if from_email != DEFAULT_FROM_EMAIL:
+            print(f"Retrying email send with default sender: {DEFAULT_FROM_EMAIL}")
+            try:
+                params["from"] = DEFAULT_FROM_EMAIL
+                resend.Emails.send(params)
+                print(f"EMAIL SENT (via Resend fallback): To {to_email}, Sub: {subject}")
+                return True
+            except Exception as retry_err:
+                print(f"RESEND EMAIL RETRY ERROR: {retry_err}")
         return False
 
 # Configure CORS
@@ -190,6 +237,15 @@ async def send_otp(payload: dict = Body(...)):
     demo_otps[identifier] = otp
 
     print(f"DEBUG: Sent OTP {otp} to {identifier}")
+
+    try:
+        masked_id = re.sub(r'(.{2}).*(@.*)', r'\1***\2', identifier) if "@" in identifier else re.sub(r'(.{3}).*(.{3})', r'\1***\2', identifier)
+        await sio.emit("new_activity", {
+            "message": f"Verification code requested for {masked_id}",
+            "type": "auth"
+        })
+    except Exception as e:
+        print(f"Socket emit notice: {e}")
 
     if email:
         if not resend or not resend.api_key:
@@ -307,6 +363,14 @@ async def send_order_confirmation(payload: dict = Body(...)):
     admin_html = f"<div><h2>NEW SALE!</h2><p>Customer: {name} ({email})</p><p>Revenue: ${total_amount}</p></div>"
     send_email(ADMIN_EMAIL, f"NEW ORDER: ${total_amount}", admin_html)
 
+    try:
+        await sio.emit("new_activity", {
+            "message": f"New Order #{order_id[-8:].upper() if order_id else 'NEW'}: {product_name} (${total_amount})",
+            "type": "order"
+        })
+    except Exception as e:
+        print(f"Socket emit notice: {e}")
+
     return {"success": True}
 
 @app.get("/api/cart", response_model=schemas.Cart)
@@ -357,20 +421,6 @@ def get_products(skip: int = 0, limit: int = 100, search: Optional[str] = None, 
         query = query.filter(models.Product.name.ilike(f"%{search}%"))
     return query.offset(skip).limit(limit).all()
 
-# Socket.IO stub routes for FastAPI to avoid 404s and WebSocket upgrade errors when frontend connects directly
-@app.get("/socket.io/")
-@app.get("/socket.io/{path:path}")
-def socket_io_fallback(path: str = ""):
-    return JSONResponse(
-        status_code=400,
-        content={"message": "Socket.IO not available on Python FastAPI service. Please use Node server for real-time WebSocket connection."}
-    )
-
-@app.websocket("/socket.io/")
-@app.websocket("/socket.io/{path:path}")
-async def socket_io_ws_fallback(websocket: WebSocket, path: str = ""):
-    await websocket.accept()
-    await websocket.close(code=1000, reason="Socket.IO not supported on FastAPI server")
 
 # Additional endpoints to prevent 404s/fetch failures on direct backend requests
 @app.get("/api/reviews/")
