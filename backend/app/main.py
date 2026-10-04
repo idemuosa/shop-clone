@@ -190,27 +190,26 @@ async def send_otp(payload: dict = Body(...)):
 
     if email:
         if not resend or not resend.api_key:
-             print("ERROR: Resend not configured in Python backend")
-        else:
-            subject = f"{otp} is your Vivi Verification Code"
-            html = f"""
-            <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #9333ea; text-transform: uppercase; font-style: italic;">Verification Code</h2>
-                <p>Welcome to Vivi! Use the code below to complete your login or registration:</p>
-                <div style="background: #f3f4f6; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0;">
-                    <h1 style="letter-spacing: 10px; font-size: 32px; margin: 0;">{otp}</h1>
-                </div>
-                <p style="font-size: 12px; color: #6b7280;">If you didn't request this code, you can safely ignore this email.</p>
+             raise HTTPException(status_code=400, detail="Email service not configured on server")
+
+        subject = f"{otp} is your Vivi Verification Code"
+        html = f"""
+        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <h2 style="color: #9333ea; text-transform: uppercase; font-style: italic;">Verification Code</h2>
+            <p>Welcome to Vivi! Use the code below to complete your login or registration:</p>
+            <div style="background: #f3f4f6; padding: 20px; text-align: center; border-radius: 10px; margin: 20px 0;">
+                <h1 style="letter-spacing: 10px; font-size: 32px; margin: 0;">{otp}</h1>
             </div>
-            """
-            success = send_email(email, subject, html)
-            if not success:
-                print(f"FAILED to send email to {email}")
+            <p style="font-size: 12px; color: #6b7280;">If you didn't request this code, you can safely ignore this email.</p>
+        </div>
+        """
+        success = send_email(email, subject, html)
+        if not success:
+            raise HTTPException(status_code=400, detail="Failed to send verification email to recipient")
 
     return {
         "success": True,
-        "message": f"OTP sent to {identifier}",
-        "devOtp": otp
+        "message": f"OTP sent to {identifier}"
     }
 
 @app.post("/api/verify-otp")
@@ -218,7 +217,7 @@ async def verify_otp(payload: dict = Body(...)):
     identifier = payload.get("identifier")
     code = payload.get("code")
 
-    if (identifier in demo_otps and demo_otps[identifier] == code) or (code == "123456"):
+    if identifier in demo_otps and demo_otps[identifier] == code:
         if identifier in demo_otps:
             del demo_otps[identifier]
 

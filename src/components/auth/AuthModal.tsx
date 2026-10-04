@@ -108,11 +108,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (data.success) {
         setTempData({ email, phone, name, password, identifier });
         setStep('otp');
-        toast.info(`OTP sent to your ${email ? 'email' : 'phone'}`);
-        if (data.devOtp) {
-          console.log("DEMO OTP:", data.devOtp);
-          toast.success(`Demo OTP: ${data.devOtp}`, { duration: 10000 });
-        }
+        toast.success(`Verification code sent to your ${email ? 'email address' : 'phone number'}`);
       } else {
         throw new Error(data.message || "Failed to send OTP");
       }
