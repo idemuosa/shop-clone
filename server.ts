@@ -282,10 +282,9 @@ app.post("/api/send-otp", async (req, res, next) => {
 
     if (email) {
       if (!resendClient) {
-        return res.status(200).json({
-          success: true,
-          message: "Email service not configured. Please use demo OTP.",
-          devOtp: otp
+        return res.status(400).json({
+          success: false,
+          message: "Email service is not configured. Please contact system administrator."
         });
       }
 
@@ -308,17 +307,16 @@ app.post("/api/send-otp", async (req, res, next) => {
 
         if (error) {
           console.error("Resend API Error:", error);
-          return res.status(200).json({
-            success: true,
-            message: `Resend Notice: ${error.message}`,
-            devOtp: otp
+          return res.status(400).json({
+            success: false,
+            message: `Failed to send verification email: ${error.message}`
           });
         }
 
         console.log(`[Email] OTP sent successfully to ${email}`);
       } catch (err: any) {
         console.error("OTP Email Error:", err);
-        return res.status(200).json({ success: true, message: "Server error sending email", devOtp: otp });
+        return res.status(500).json({ success: false, message: "Server error sending verification email." });
       }
     }
 
@@ -326,7 +324,7 @@ app.post("/api/send-otp", async (req, res, next) => {
 
     res.json({
       success: true,
-      devOtp: otp // Ensure user can always log in while debugging
+      message: "Verification code sent successfully."
     });
   } catch (error: any) {
     next(error);
@@ -342,7 +340,7 @@ app.post("/api/verify-otp", async (req, res, next) => {
 
     const storedOtp = otpStore.get(identifier);
 
-    if (storedOtp === code || code === '123456' || (process.env.NODE_ENV === 'development' && code === '123456')) {
+    if (storedOtp && storedOtp === code) {
       otpStore.delete(identifier);
 
       let customToken = null;
