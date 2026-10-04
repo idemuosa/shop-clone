@@ -281,6 +281,13 @@ app.post("/api/send-otp", async (req, res, next) => {
 
     if (email) {
       if (!resendClient) {
+        if (process.env.NODE_ENV !== "production") {
+          console.log(`[DEV OTP SIMULATION] Email service not configured. Generated OTP for ${email}: ${otp}`);
+          return res.json({
+            success: true,
+            message: `[DEV MODE] Verification code generated: ${otp} (Email service not configured)`
+          });
+        }
         return res.status(400).json({
           success: false,
           message: "Email service is not configured. Please contact system administrator."
