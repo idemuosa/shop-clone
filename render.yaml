@@ -1,0 +1,44 @@
+services:
+  # Express Node.js & Socket.IO Backend Server
+  - type: web
+    name: vivi-shop-backend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: Vivi Shop <onboarding@resend.dev>
+      - key: CORE_ORIGIN
+        sync: false # Set to your Vercel frontend URL, e.g. https://your-app.vercel.app
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: PYTHON_API
+        sync: false # Set to python backend URL if running Python API separately
+
+  # FastAPI Python Backend API (Optional direct microservice)
+  - type: web
+    name: vivi-shop-python-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port 10000
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: Vivi Shop <onboarding@resend.dev>
+      - key: ADMIN_EMAIL
+        sync: false
