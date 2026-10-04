@@ -65,8 +65,9 @@ def send_email(to_email, subject, html_content):
             print(f"SKIPPING EMAIL (No SMTP or Resend): To {to_email}, Sub: {subject}")
             return False
 
+        from_email = os.getenv("FROM_EMAIL", "Vivi Shop <onboarding@resend.dev>")
         params = {
-            "from": "Vivi Shop <onboarding@resend.dev>",
+            "from": from_email,
             "to": [to_email],
             "subject": subject,
             "html": html_content,
