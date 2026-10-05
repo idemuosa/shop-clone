@@ -435,6 +435,34 @@ app.post("/api/verify-otp", async (req, res, next) => {
   }
 });
 
+app.post("/api/send-welcome", async (req, res, next) => {
+  try {
+    const { email, name, verificationLink } = req.body || {};
+    const resendClient = getResend();
+
+    if (resendClient && email) {
+      try {
+        const link = verificationLink || `${process.env.APP_URL || 'http://localhost:5173'}/verify?email=${encodeURIComponent(email)}`;
+        await sendResendEmail(resendClient, {
+          to: [email],
+          subject: "Verify your VIVI Shop account",
+          html: `
+    <h2>Welcome to VIVI Shop</h2>
+    <p>Please verify your account by clicking the link below.</p>
+    <a href="${link}">Verify Account</a>
+  `,
+        });
+      } catch (err) {
+        console.error("Welcome/Verification Email Error:", err);
+      }
+    }
+
+    res.json({ success: true });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
 app.post("/api/send-order-confirmation", async (req, res, next) => {
   try {
     const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body || {};

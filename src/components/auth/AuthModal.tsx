@@ -182,11 +182,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         createdAt: serverTimestamp(),
       });
 
-      // Send welcome email
+      // Send welcome/verification email
+      const verificationLink = `${window.location.origin}/verify?email=${encodeURIComponent(tempData.email)}`;
       fetch(`${API_URL}/api/send-welcome`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: tempData.email, name: tempData.name }),
+        body: JSON.stringify({
+          email: tempData.email,
+          name: tempData.name,
+          verificationLink
+        }),
       }).catch(console.error);
 
       toast.success("Registration Successful!");
