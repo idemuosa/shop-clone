@@ -35,10 +35,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState<'form' | 'otp'>('form');
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [otpCode, setOtpCode] = useState('');
-  const [tempData, setTempData] = useState<any>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const { user } = useAuth();
@@ -101,7 +98,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
-  const handleSendRegisterOtp = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
@@ -122,74 +119,29 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
 
     try {
-      console.log(`Sending registration OTP to ${email} via ${API_URL}`);
-      const response = await fetch(`${API_URL}/api/send-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email, 
-          type: 'register'
-        }),
-      });
+      // Register user with email and password directly
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
 
-      const data = await handleApiResponse(response);
-
-      if (data.success) {
-        setTempData({ email, name, password, identifier: email });
-        setStep('otp');
-        toast.success("Verification code sent to your email address");
-      } else {
-        throw new Error(data.message || "Failed to send verification code");
-      }
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send verification code", {
-        style: { color: 'black' }
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await fetch(`${API_URL}/api/verify-otp`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          identifier: tempData?.identifier,
-          code: otpCode 
-        }),
-      });
-
-      const data = await handleApiResponse(response);
-      if (!data.success) throw new Error(data.message || "Verification failed");
-
-      // Register user with email and password after OTP verification
-      const userCredential = await createUserWithEmailAndPassword(auth, tempData.email, tempData.password);
-      await updateProfile(userCredential.user, { displayName: tempData.name });
-
-      const isAdminEmail = tempData.email?.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
-                         tempData.email === import.meta.env.VITE_ADMIN_EMAIL;
+      const isAdminEmail = email.toLowerCase().trim() === 'idemudiawisdom27@gmail.com' ||
+                         email === import.meta.env.VITE_ADMIN_EMAIL;
 
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         uid: userCredential.user.uid,
-        email: tempData.email,
-        displayName: tempData.name,
+        email: email,
+        displayName: name,
         role: isAdminEmail ? 'admin' : 'user',
         createdAt: serverTimestamp(),
       });
 
-      // Send welcome/verification email
-      const verificationLink = `${window.location.origin}/verify?email=${encodeURIComponent(tempData.email)}`;
+      // Send welcome email
+      const verificationLink = `${window.location.origin}/verify?email=${encodeURIComponent(email)}`;
       fetch(`${API_URL}/api/send-welcome`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: tempData.email,
-          name: tempData.name,
+          email: email,
+          name: name,
           verificationLink
         }),
       }).catch(console.error);
@@ -200,7 +152,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (error.code === 'auth/email-already-in-use') {
         toast.error("An account with this email already exists. Please log in.");
       } else {
-        toast.error(error.message || "Verification failed", {
+        toast.error(error.message || "Registration failed", {
           style: { color: 'black' }
         });
       }
@@ -225,7 +177,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           defaultValue={user ? "payment" : "login"}
           onValueChange={(val) => {
             if (val === 'login' || val === 'register') {
-              setStep('form');
               setAuthMode(val as any);
             }
           }}
@@ -290,53 +241,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </>
           ) : (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {step === 'otp' ? (
-                <div className="space-y-6 py-4">
-                  <div className="text-center space-y-2">
-                    <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto text-orange-600 mb-4">
-                       <Lock className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-xl font-black  tracking-tighter italic">Verify your <span className="text-orange-600">Identity</span></h3>
-                    <p className="text-xs font-bold text-gray-400  tracking-widest leading-relaxed">
-                      Enter the 6-digit code sent to <span className="text-black font-black italic">{tempData?.identifier}</span>
-                    </p>
-                  </div>
-
-                  <form onSubmit={handleVerifyOtp} className="space-y-6">
-                    <div className="flex justify-center gap-2">
-                       <Input 
-                        autoFocus
-                        value={otpCode}
-                        onChange={(e) => setOtpCode(e.target.value)}
-                        placeholder="000000"
-                        maxLength={6}
-                        className="text-center text-3xl font-black tracking-[0.5em] h-20 rounded-2xl border-4 border-gray-100 focus:border-orange-500 focus:ring-0 bg-gray-50 placeholder:text-gray-200"
-                      />
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <Button 
-                        type="submit"
-                        disabled={isLoading || otpCode.length < 6}
-                        className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 text-lg shadow-2xl shadow-zinc-200 transition-all active:scale-95"
-                      >
-                        {isLoading ? 'Verifying...' : 'Confirm & Register'}
-                      </Button>
-                      
-                      <Button 
-                        type="button"
-                        variant="ghost"
-                        onClick={() => setStep('form')}
-                        className="w-full font-black  tracking-widest text-[10px] text-gray-400"
-                      >
-                        Back to Registration
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-              ) : (
-                <>
-                  <TabsContent value="login" className="mt-0">
+              <>
+                <TabsContent value="login" className="mt-0">
                     <form onSubmit={handleLogin} className="space-y-5">
                       <div className="space-y-4">
                         <div className="space-y-2">
@@ -431,7 +337,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   </TabsContent>
 
                   <TabsContent value="register" className="mt-0">
-                    <form onSubmit={handleSendRegisterOtp} className="space-y-5">
+                    <form onSubmit={handleRegister} className="space-y-5">
                       <div className="space-y-4">
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black  tracking-widest text-gray-400 ml-1">Your Full Name</Label>
@@ -481,12 +387,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-3">
                          <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                          <p className="text-[10px] text-blue-700 font-bold leading-relaxed  tracking-tight">
-                            By joining, an OTP will be sent to your email to verify your identity and protect your digital wallet.
+                            Create your Vivi account to start shopping and manage your digital wallet.
                          </p>
                       </div>
 
                       <Button type="submit" disabled={isLoading} className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 shadow-2xl shadow-zinc-200 text-lg transition-all active:scale-95">
-                        {isLoading ? 'Processing...' : 'Verify Email & Join'}
+                        {isLoading ? 'Creating Account...' : 'Create Account & Join'}
                       </Button>
                     </form>
                   </TabsContent>
@@ -579,7 +485,6 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     </div>
                   </TabsContent>
                 </>
-              )}
             </div>
           )}
         </Tabs>
