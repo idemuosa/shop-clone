@@ -118,7 +118,7 @@ const getResend = () => {
   return resend;
 };
 
-const adminEmail = process.env.ADMIN_EMAIL;
+const adminEmail = process.env.ADMIN_EMAIL || "idemudiawisdom7@gmail.com";
 const DEFAULT_FROM_EMAIL = "Vivi Shop <onboarding@resend.dev>";
 
 function parseFromEmail(rawFrom?: string): string {
@@ -350,6 +350,13 @@ app.post("/api/send-otp", async (req, res, next) => {
 
         if (error) {
           console.error("Resend API Error:", error);
+          if (process.env.NODE_ENV !== "production" || process.env.DEBUG === "true") {
+            console.log(`[DEV OTP FALLBACK] Resend error: ${error.message}. Generated OTP for ${email}: ${otp}`);
+            return res.json({
+              success: true,
+              message: `Verification code generated: ${otp} (Delivery note: ${error.message})`
+            });
+          }
           return res.status(400).json({
             success: false,
             message: `Failed to send verification email: ${error.message}`
@@ -455,7 +462,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
         });
 
         const adminNotif = sendResendEmail(resendClient, {
-          to: [adminEmail || 'idemudiawisdom27@gmail.com'],
+          to: [adminEmail || 'idemudiawisdom7@gmail.com'],
           subject: `NEW ORDER: #${(orderId || '').slice(-8).toUpperCase()}`,
           html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
         });
