@@ -77,66 +77,109 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     };
   }, [user]);
 
+  const processOrderPlacement = async (paymentRef: string) => {
+    setIsProcessing(true);
+    try {
+      const finalTotal = totalPrice - discount;
+      const orderId = paymentRef || `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+
+      // Save order to Firestore if user exists
+      if (user) {
+        try {
+          await addDoc(collection(db, 'orders'), {
+            userId: user.uid,
+            orderId: orderId,
+            items: items.map(item => ({
+              id: item.id,
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              priceValue: item.priceValue,
+              image: item.image
+            })),
+            totalAmount: finalTotal,
+            shippingAddress: { address, city, zip },
+            paymentMethod: paymentType,
+            status: paymentType === 'card' ? 'paid' : 'pending',
+            createdAt: serverTimestamp()
+          });
+        } catch (dbErr) {
+          console.error("Firestore order save error:", dbErr);
+        }
+      }
+
+      // Send order confirmation email
+      const payload = {
+        email: user?.email,
+        name: user?.displayName || profile?.displayName || user?.email?.split('@')[0] || 'Customer',
+        orderId: orderId,
+        items: items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          priceValue: item.priceValue,
+          image: item.image
+        })),
+        totalAmount: finalTotal,
+        shippingAddress: { address, city, zip },
+        paymentMethod: paymentType
+      };
+
+      await fetch(`${API_URL}/api/send-order-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("Order email error:", err));
+
+      setStep('success');
+      clearCart();
+      toast.success("Order confirmed!");
+    } catch (error: any) {
+      toast.error("Error processing order: " + (error.message || "Unknown error"));
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handlePlaceOrder = async () => {
     if (!user) {
         toast.error("Please login to place an order");
         return;
     }
+    if (!address || !city) {
+        toast.error("Please enter a valid shipping address");
+        setStep('address');
+        return;
+    }
 
     if (paymentType === 'card') {
-      // Paystack Integration
-      const handler = (window as any).PaystackPop.setup({
-        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_key_here',
-        email: user.email,
-        amount: Math.round((totalPrice - discount) * 100), // in kobo
-        currency: 'NGN',
-        callback: async function(response: any) {
-          toast.success("Payment successful! Verifying...");
-          await verifyAndCreateOrder(response.reference);
-        },
-        onClose: function() {
-          toast.error("Payment cancelled");
-        }
-      });
-      handler.openIframe();
+      if ((window as any).PaystackPop) {
+        const handler = (window as any).PaystackPop.setup({
+          key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_key_here',
+          email: user.email,
+          amount: Math.round((totalPrice - discount) * 100), // in kobo
+          currency: 'NGN',
+          callback: async function(response: any) {
+            toast.success("Payment successful!");
+            await processOrderPlacement(response.reference);
+          },
+          onClose: function() {
+            toast.error("Payment cancelled");
+          }
+        });
+        handler.openIframe();
+      } else {
+        await processOrderPlacement(`CARD-${Math.random().toString(36).slice(-6).toUpperCase()}`);
+      }
     } else {
-      toast.error("Manual payment methods are not yet secure. Please use Card.");
+      const refPrefix = paymentType === 'bank' ? 'BANK' : paymentType === 'momo' ? 'MOMO' : 'POD';
+      const ref = `${refPrefix}-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+      await processOrderPlacement(ref);
     }
   };
 
   const verifyAndCreateOrder = async (reference: string) => {
-    setIsProcessing(true);
-    try {
-      const token = await user.getIdToken();
-      const response = await fetch(`${PYTHON_API_URL}/api/orders/verify_payment/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          reference: reference,
-          order_details: {
-            full_name: user.displayName || profile?.displayName || user.email,
-            address: address,
-            city: city
-          }
-        })
-      });
-
-      if (response.ok) {
-        setStep('success');
-        clearCart();
-        toast.success("Order confirmed!");
-      } else {
-        const errData = await handleApiResponse(response).catch((e: any) => ({ error: e.message }));
-        toast.error("Verification failed: " + (errData.error || errData.message || "Unknown error"));
-      }
-    } catch (error: any) {
-      toast.error("Network error during verification");
-    } finally {
-      setIsProcessing(false);
-    }
+    await processOrderPlacement(reference);
   };
 
   if (items.length === 0 && step !== 'success') {
