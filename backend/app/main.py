@@ -323,18 +323,17 @@ async def verify_otp(payload: dict = Body(...)):
 @app.post("/api/send-welcome")
 async def send_welcome(payload: dict = Body(...)):
     email = payload.get("email")
-    name = payload.get("name")
+    name = payload.get("name", "Explorer")
+    verification_link = payload.get("verificationLink") or f"{os.getenv('APP_URL', 'http://localhost:5173')}/verify?email={email}"
 
-    subject = "Welcome to Vivi Shop!"
+    subject = "Verify your VIVI Shop account"
     html = f"""
-    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;">
-        <h1 style="color: #9333ea;">Welcome, {name}!</h1>
-        <p>We're thrilled to have you join our community.</p>
-        <a href="{os.getenv('APP_URL')}" style="background: #000; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 8px; display: inline-block;">Start Shopping</a>
-    </div>
+    <h2>Welcome to VIVI Shop</h2>
+    <p>Please verify your account by clicking the link below.</p>
+    <a href="{verification_link}">Verify Account</a>
     """
     send_email(email, subject, html)
-    send_email(ADMIN_EMAIL, "New User Registered", f"<p>New user <b>{name}</b> ({email}) joined Vivi!</p>")
+    send_email(ADMIN_EMAIL, "New User Registered", f"<p>New user <b>{name}</b> ({email}) joined VIVI Shop!</p>")
 
     return {"success": True}
 
