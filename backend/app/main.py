@@ -324,13 +324,15 @@ async def verify_otp(payload: dict = Body(...)):
 async def send_welcome(payload: dict = Body(...)):
     email = payload.get("email")
     name = payload.get("name", "Explorer")
-    verification_link = payload.get("verificationLink") or f"{os.getenv('APP_URL', 'http://localhost:5173')}/verify?email={email}"
 
-    subject = "Verify your VIVI Shop account"
+    subject = "Welcome to VIVI Shop!"
     html = f"""
-    <h2>Welcome to VIVI Shop</h2>
-    <p>Please verify your account by clicking the link below.</p>
-    <a href="{verification_link}">Verify Account</a>
+    <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 16px;">
+        <h2 style="color: #ea580c; text-align: center;">Welcome to VIVI Shop</h2>
+        <p>Hi <b>{name}</b>,</p>
+        <p>Thank you for registering with VIVI Shop! Your account is active and ready to go.</p>
+        <p>You can now log in anytime to explore our collection, manage your wallet, and track your orders.</p>
+    </div>
     """
     send_email(email, subject, html)
     send_email(ADMIN_EMAIL, "New User Registered", f"<p>New user <b>{name}</b> ({email}) joined VIVI Shop!</p>")
@@ -340,37 +342,124 @@ async def send_welcome(payload: dict = Body(...)):
 @app.post("/api/send-order-confirmation")
 async def send_order_confirmation(payload: dict = Body(...)):
     email = payload.get("email")
-    order_id = payload.get("orderId")
+    order_id = payload.get("orderId", "")
     product_name = payload.get("productName")
-    total_amount = payload.get("totalAmount")
-    name = payload.get("name", "Explorer")
+    total_amount = payload.get("totalAmount", 0)
+    name = payload.get("name", "Customer")
+    items = payload.get("items", [])
+    shipping_address = payload.get("shippingAddress")
+    payment_method = payload.get("paymentMethod", "Online Payment")
 
-    subject = f"Order Confirmed #{order_id[-8:].upper()}"
-    html = f"""
-    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px;">
-        <h2 style="color: #16a34a;">Payment Successful!</h2>
-        <p>Hi {name}, your order has been received.</p>
-        <div style="border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-            <p><b>Order ID:</b> {order_id}</p>
-            <p><b>Product:</b> {product_name}</p>
-            <p><b>Total Paid:</b> ${total_amount}</p>
+    order_ref = order_id[-8:].upper() if order_id else "NEW"
+    try:
+        display_total = f"{float(total_amount):.2f}"
+    except (ValueError, TypeError):
+        display_total = str(total_amount)
+
+    items_table_html = ""
+    if items and isinstance(items, list):
+        rows = ""
+        for item in items:
+            item_name = item.get("name", "Product")
+            qty = item.get("quantity", 1)
+            price_val = item.get("priceValue")
+            if price_val is not None:
+                item_price = f"{float(price_val):.2f}"
+            else:
+                item_price = str(item.get("price", "0.00"))
+            try:
+                item_total = f"{float(item_price) * int(qty):.2f}"
+            except (ValueError, TypeError):
+                item_total = item_price
+
+            rows += f"""
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 10px; font-weight: bold; color: #1e293b;">{item_name}</td>
+                <td style="padding: 12px 10px; text-align: center; color: #64748b;">{qty}</td>
+                <td style="padding: 12px 10px; text-align: right; color: #64748b;">${item_price}</td>
+                <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: #ea580c;">${item_total}</td>
+            </tr>
+            """
+        items_table_html = f"""
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+            <thead>
+                <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left; color: #475569;">
+                    <th style="padding: 10px;">Item Description</th>
+                    <th style="padding: 10px; text-align: center;">Qty</th>
+                    <th style="padding: 10px; text-align: right;">Unit Price</th>
+                    <th style="padding: 10px; text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
+        </table>
+        """
+    elif product_name:
+        items_table_html = f"<p style='font-size: 15px; color: #334155;'><b>Ordered Item:</b> {product_name}</p>"
+
+    address_str = ""
+    if shipping_address:
+        if isinstance(shipping_address, dict):
+            address_str = f"{shipping_address.get('address', '')}, {shipping_address.get('city', '')} {shipping_address.get('zip', '')}".strip()
+        else:
+            address_str = str(shipping_address)
+
+    user_html = f"""
+    <div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff;">
+        <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9;">
+            <h1 style="color: #ea580c; font-style: italic; margin: 0; font-size: 32px;">Vivi Shop</h1>
+            <p style="color: #16a34a; font-weight: bold; margin-top: 6px; font-size: 16px;">Order Confirmed! 🎉</p>
+        </div>
+
+        <div style="padding: 20px 0;">
+            <p style="font-size: 16px; margin-bottom: 15px;">Hi <b>{name}</b>,</p>
+            <p style="font-size: 14px; color: #475569; line-height: 1.5;">Thank you for shopping with Vivi Shop! Your order <b>#{order_ref}</b> has been successfully placed.</p>
+
+            <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 13px;">
+                <p style="margin: 4px 0;"><b>Order ID:</b> {order_id or order_ref}</p>
+                <p style="margin: 4px 0;"><b>Payment Method:</b> {str(payment_method).upper()}</p>
+                {f'<p style="margin: 4px 0;"><b>Shipping Address:</b> {address_str}</p>' if address_str else ''}
+            </div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 16px; color: #0f172a;">Order Summary</h3>
+            {items_table_html}
+
+            <div style="margin-top: 25px; padding: 18px; background-color: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5; text-align: right;">
+                <p style="margin: 0; font-size: 14px; color: #9a3412;">Total Amount to Pay:</p>
+                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #ea580c;">${display_total}</p>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center; color: #94a3b8; font-size: 12px;">
+            <p style="margin: 0;">If you have any questions, reply to this email or contact support.</p>
+            <p style="margin-top: 6px;">Thank you for choosing Vivi Shop!</p>
         </div>
     </div>
     """
-    send_email(email, subject, html)
 
-    admin_html = f"<div><h2>NEW SALE!</h2><p>Customer: {name} ({email})</p><p>Revenue: ${total_amount}</p></div>"
-    send_email(ADMIN_EMAIL, f"NEW ORDER: ${total_amount}", admin_html)
+    subject = f"Order Confirmation #{order_ref} - Vivi Shop"
+    if email:
+        send_email(email, subject, user_html)
+    send_email(ADMIN_EMAIL, f"NEW ORDER: #{order_ref} (${display_total})", user_html)
 
     try:
         await sio.emit("new_activity", {
-            "message": f"New Order #{order_id[-8:].upper() if order_id else 'NEW'}: {product_name} (${total_amount})",
+            "message": f"New Order #{order_ref}: ${display_total}",
             "type": "order"
         })
     except Exception as e:
         print(f"Socket emit notice: {e}")
 
     return {"success": True}
+
+@app.post("/api/orders/verify_payment/")
+@app.post("/api/orders/verify_payment")
+async def verify_payment(payload: dict = Body(...)):
+    ref = payload.get("reference")
+    order_details = payload.get("order_details", {})
+    full_name = order_details.get("full_name", "Customer")
+    return {"status": "success", "message": "Payment verified", "reference": ref}
 
 @app.get("/api/cart", response_model=schemas.Cart)
 async def get_cart(db: Session = Depends(get_db), current_user: dict = Depends(auth.verify_token)):

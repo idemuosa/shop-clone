@@ -437,23 +437,28 @@ app.post("/api/verify-otp", async (req, res, next) => {
 
 app.post("/api/send-welcome", async (req, res, next) => {
   try {
-    const { email, name, verificationLink } = req.body || {};
+    const { email, name } = req.body || {};
     const resendClient = getResend();
 
     if (resendClient && email) {
       try {
-        const link = verificationLink || `${process.env.APP_URL || 'http://localhost:5173'}/verify?email=${encodeURIComponent(email)}`;
         await sendResendEmail(resendClient, {
           to: [email],
-          subject: "Verify your VIVI Shop account",
+          subject: "Welcome to VIVI Shop!",
           html: `
-    <h2>Welcome to VIVI Shop</h2>
-    <p>Please verify your account by clicking the link below.</p>
-    <a href="${link}">Verify Account</a>
-  `,
+            <div style="font-family: sans-serif; padding: 20px; color: #333; max-width: 500px; margin: auto; border: 1px solid #eee; border-radius: 16px;">
+              <h2 style="color: #ea580c; text-align: center; margin-bottom: 20px;">Welcome to VIVI Shop</h2>
+              <p style="font-size: 16px; line-height: 1.5;">Hi <strong>${name || 'Customer'}</strong>,</p>
+              <p style="font-size: 14px; line-height: 1.5; color: #555;">Thank you for registering with VIVI Shop! Your account is active and ready to go.</p>
+              <p style="font-size: 14px; line-height: 1.5; color: #555;">You can now log in anytime to explore our collection, manage your wallet, and track your orders.</p>
+              <div style="text-align: center; margin-top: 30px;">
+                <a href="${process.env.APP_URL || 'http://localhost:5173'}" style="background-color: #ea580c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Start Shopping</a>
+              </div>
+            </div>
+          `,
         });
       } catch (err) {
-        console.error("Welcome/Verification Email Error:", err);
+        console.error("Welcome Email Error:", err);
       }
     }
 
@@ -465,27 +470,104 @@ app.post("/api/send-welcome", async (req, res, next) => {
 
 app.post("/api/send-order-confirmation", async (req, res, next) => {
   try {
-    const { email, phone, orderId, productName, totalAmount, shippingAddress, name } = req.body || {};
+    const { email, phone, orderId, productName, totalAmount, shippingAddress, name, items, paymentMethod } = req.body || {};
     const resendClient = getResend();
+
+    const orderRef = (orderId || '').slice(-8).toUpperCase() || 'NEW';
+    const displayTotal = typeof totalAmount === 'number' ? totalAmount.toFixed(2) : (totalAmount || '0.00');
 
     // Broadcast real-time order activity via Socket.IO
     io.emit("new_activity", {
-      message: `New Order #${orderId ? orderId.slice(-6).toUpperCase() : 'NEW'}: ${productName} ($${totalAmount})`,
+      message: `New Order #${orderRef}: $${displayTotal}`,
       type: "order"
     });
 
     if (resendClient && email) {
       try {
+        let itemsTableHtml = '';
+        if (Array.isArray(items) && items.length > 0) {
+          const rows = items.map((item: any) => {
+            const itemPrice = item.priceValue ? Number(item.priceValue).toFixed(2) : (item.price || '0.00');
+            const qty = item.quantity || 1;
+            const itemTotal = (parseFloat(itemPrice) * qty).toFixed(2);
+            return `
+              <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 10px; font-weight: bold; color: #1e293b;">${item.name || 'Product'}</td>
+                <td style="padding: 12px 10px; text-align: center; color: #64748b;">${qty}</td>
+                <td style="padding: 12px 10px; text-align: right; color: #64748b;">$${itemPrice}</td>
+                <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: #ea580c;">$${itemTotal}</td>
+              </tr>
+            `;
+          }).join('');
+
+          itemsTableHtml = `
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px;">
+              <thead>
+                <tr style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left; color: #475569;">
+                  <th style="padding: 10px;">Item Description</th>
+                  <th style="padding: 10px; text-align: center;">Qty</th>
+                  <th style="padding: 10px; text-align: right;">Unit Price</th>
+                  <th style="padding: 10px; text-align: right;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          `;
+        } else if (productName) {
+          itemsTableHtml = `<p style="font-size: 15px; color: #334155;"><strong>Ordered Item:</strong> ${productName}</p>`;
+        }
+
+        const addressString = shippingAddress
+          ? typeof shippingAddress === 'string'
+            ? shippingAddress
+            : `${shippingAddress.address || ''}, ${shippingAddress.city || ''} ${shippingAddress.zip || ''}`.trim()
+          : '';
+
+        const userHtml = `
+          <div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff;">
+            <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9;">
+              <h1 style="color: #ea580c; font-style: italic; margin: 0; font-size: 32px;">Vivi Shop</h1>
+              <p style="color: #16a34a; font-weight: bold; margin-top: 6px; font-size: 16px;">Order Confirmed! 🎉</p>
+            </div>
+
+            <div style="padding: 20px 0;">
+              <p style="font-size: 16px; margin-bottom: 15px;">Hi <strong>${name || 'Valued Customer'}</strong>,</p>
+              <p style="font-size: 14px; color: #475569; line-height: 1.5;">Thank you for shopping with Vivi Shop! Your order <strong>#${orderRef}</strong> has been successfully placed.</p>
+
+              <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 13px;">
+                <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderId || orderRef}</p>
+                <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${(paymentMethod || 'Online Payment').toUpperCase()}</p>
+                ${addressString ? `<p style="margin: 4px 0;"><strong>Shipping Address:</strong> ${addressString}</p>` : ''}
+              </div>
+
+              <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 16px; color: #0f172a;">Order Summary</h3>
+              ${itemsTableHtml}
+
+              <div style="margin-top: 25px; padding: 18px; background-color: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5; text-align: right;">
+                <p style="margin: 0; font-size: 14px; color: #9a3412;">Total Amount to Pay:</p>
+                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #ea580c;">$${displayTotal}</p>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center; color: #94a3b8; font-size: 12px;">
+              <p style="margin: 0;">If you have any questions, reply to this email or contact support.</p>
+              <p style="margin-top: 6px;">Thank you for choosing Vivi Shop!</p>
+            </div>
+          </div>
+        `;
+
         const userEmail = sendResendEmail(resendClient, {
           to: [email],
-          subject: `Order Confirmation #${(orderId || '').slice(-8).toUpperCase()}`,
-          html: `<div style="font-family: sans-serif; padding: 20px;"><h1>Order Confirmed!</h1><p>Hi ${name || 'Customer'}, your order for ${productName} ($${totalAmount}) has been placed.</p></div>`,
+          subject: `Order Confirmation #${orderRef} - Vivi Shop`,
+          html: userHtml,
         });
 
         const adminNotif = sendResendEmail(resendClient, {
           to: [adminEmail || 'idemudiawisdom27@gmail.com'],
-          subject: `NEW ORDER: #${(orderId || '').slice(-8).toUpperCase()}`,
-          html: `<div><h2>New Order Received</h2><p>Customer: ${email}</p><p>Amount: $${totalAmount}</p></div>`,
+          subject: `NEW ORDER: #${orderRef} ($${displayTotal})`,
+          html: userHtml,
         });
 
         await Promise.all([userEmail, adminNotif]);
@@ -494,7 +576,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
       }
     }
 
-    if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${(orderId || '').slice(-8).toUpperCase()}.`);
+    if (phone) console.log(`[SMS SIMULATION] Order confirmed for ${name}. Order #${orderRef}.`);
 
     res.json({ success: true });
   } catch (error: any) {

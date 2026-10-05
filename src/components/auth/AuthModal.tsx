@@ -135,14 +135,12 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       });
 
       // Send welcome email
-      const verificationLink = `${window.location.origin}/verify?email=${encodeURIComponent(email)}`;
       fetch(`${API_URL}/api/send-welcome`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email,
-          name: name,
-          verificationLink
+          name: name
         }),
       }).catch(console.error);
 
