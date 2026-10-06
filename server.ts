@@ -15,7 +15,7 @@ const httpServer = http.createServer(app);
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 // Configure CORS origin
-const corsOriginEnv = process.env.CORE_ORIGIN || process.env.CLIENT_ORIGIN;
+const corsOriginEnv = process.env.CORS_ORIGINS || process.env.CORE_ORIGIN || process.env.CLIENT_ORIGIN;
 const allowedOrigins = corsOriginEnv
   ? corsOriginEnv.includes(",")
     ? corsOriginEnv.split(",").map((origin) => origin.trim())
