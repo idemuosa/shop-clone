@@ -154,26 +154,35 @@ export default function AdminDashboard() {
     try {
       const timestamp = Date.now();
 
-      // Fetch Products from Python API with cache busting
-      const pRes = await fetch(`${API_URL}/products/?t=${timestamp}`);
-      if (!pRes.ok) throw new Error('Failed to fetch products');
-      const productsData = await pRes.json();
+      let mappedProducts: any[] = [];
+      // Fetch Products safely
+      try {
+        const pRes = await fetch(`${API_URL}/products/?t=${timestamp}`);
+        if (pRes.ok) {
+          const productsData = await pRes.json();
+          mappedProducts = Array.isArray(productsData) ? productsData.map((p: any) => ({
+            ...p,
+            price: p.price?.toString() || '0',
+            oldPrice: p.old_price ? p.old_price.toString() : undefined,
+            stock: p.stock || 0,
+            sold: p.sold || 0,
+            category: p.category_name || 'General'
+          })) : [];
+          setProducts(mappedProducts);
+        }
+      } catch (pErr) {
+        console.warn("Products fetch error:", pErr);
+      }
 
-      const mappedProducts = Array.isArray(productsData) ? productsData.map((p: any) => ({
-        ...p,
-        price: p.price?.toString() || '0',
-        oldPrice: p.old_price ? p.old_price.toString() : undefined,
-        stock: p.stock || 0,
-        sold: p.sold || 0,
-        category: p.category_name || 'General'
-      })) : [];
-      setProducts(mappedProducts);
-
-      // Fetch Categories from Python API
-      const cRes = await fetch(`${API_URL}/categories/`);
-      if (cRes.ok) {
-        const categoriesData = await cRes.json();
-        setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+      // Fetch Categories safely
+      try {
+        const cRes = await fetch(`${API_URL}/categories/`);
+        if (cRes.ok) {
+          const categoriesData = await cRes.json();
+          setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+        }
+      } catch (cErr) {
+        console.warn("Categories fetch error:", cErr);
       }
 
       // Orders and Notifications still in Firestore
