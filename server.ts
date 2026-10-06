@@ -668,6 +668,43 @@ app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], 
   res.json(categoriesStore);
 });
 
+app.post(["/categories", "/categories/", "/api/categories", "/api/categories/"], (req, res) => {
+  const { name, image } = req.body;
+  if (!name) {
+    return res.status(400).json({ error: "Category name is required" });
+  }
+  const newCategory = {
+    id: categoriesStore.length > 0 ? Math.max(...categoriesStore.map(c => c.id)) + 1 : 1,
+    name,
+    image: image || "",
+    products: []
+  };
+  categoriesStore.push(newCategory);
+  res.status(201).json(newCategory);
+});
+
+app.put(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], (req, res) => {
+  const catId = Number(req.params.id);
+  const index = categoriesStore.findIndex(c => c.id === catId);
+  if (index === -1) {
+    return res.status(404).json({ error: "Category not found" });
+  }
+  const { name, image } = req.body;
+  if (name !== undefined) categoriesStore[index].name = name;
+  if (image !== undefined) categoriesStore[index].image = image;
+  res.json(categoriesStore[index]);
+});
+
+app.delete(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], (req, res) => {
+  const catId = Number(req.params.id);
+  const index = categoriesStore.findIndex(c => c.id === catId);
+  if (index === -1) {
+    return res.status(404).json({ error: "Category not found" });
+  }
+  const deleted = categoriesStore.splice(index, 1)[0];
+  res.json({ message: "Category deleted successfully", category: deleted });
+});
+
 app.get(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
   const { category_id } = req.query;
   if (category_id) {
@@ -684,6 +721,66 @@ app.get(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/
     return res.status(404).json({ error: "Product not found" });
   }
   res.json(product);
+});
+
+app.post(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
+  const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
+  const category = categoriesStore.find(c => c.id === Number(category_id));
+  const newProduct = {
+    id: productsStore.length > 0 ? Math.max(...productsStore.map(p => p.id)) + 1 : 1,
+    name: name || "Unnamed Product",
+    description: description || "",
+    price: Number(price) || 0,
+    old_price: old_price !== undefined && old_price !== null ? Number(old_price) : null,
+    image: image || "",
+    category_id: Number(category_id) || 1,
+    category_name: category ? category.name : "General",
+    tag: tag || "",
+    stock: stock !== undefined ? Number(stock) : 100,
+    sold: sold !== undefined ? Number(sold) : 0,
+    is_available: is_available !== undefined ? Boolean(is_available) : true,
+    rating: 5.0,
+    reviews_count: 0
+  };
+  productsStore.push(newProduct);
+  res.status(201).json(newProduct);
+});
+
+app.put(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
+  const prodId = Number(req.params.id);
+  const index = productsStore.findIndex(p => p.id === prodId);
+  if (index === -1) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
+  if (category_id !== undefined) {
+    const category = categoriesStore.find(c => c.id === Number(category_id));
+    productsStore[index].category_id = Number(category_id);
+    if (category) {
+      productsStore[index].category_name = category.name;
+    }
+  }
+  if (name !== undefined) productsStore[index].name = name;
+  if (description !== undefined) productsStore[index].description = description;
+  if (price !== undefined) productsStore[index].price = Number(price);
+  if (old_price !== undefined) productsStore[index].old_price = old_price !== null ? Number(old_price) : null;
+  if (image !== undefined) productsStore[index].image = image;
+  if (tag !== undefined) productsStore[index].tag = tag;
+  if (stock !== undefined) productsStore[index].stock = Number(stock);
+  if (sold !== undefined) productsStore[index].sold = Number(sold);
+  if (is_available !== undefined) productsStore[index].is_available = Boolean(is_available);
+
+  res.json(productsStore[index]);
+});
+
+app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
+  const prodId = Number(req.params.id);
+  const index = productsStore.findIndex(p => p.id === prodId);
+  if (index === -1) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  const deleted = productsStore.splice(index, 1)[0];
+  res.json({ message: "Product deleted successfully", product: deleted });
 });
 
 // Reviews Endpoints
