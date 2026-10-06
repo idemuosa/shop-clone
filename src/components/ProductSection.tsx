@@ -102,7 +102,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   const [deliveryZip, setDeliveryZip] = useState("");
   const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
   const [saveCard, setSaveCard] = useState(false);
-  const [recentBoughVisible, setRecentBoughVisible] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
   const [newReviewRating, setNewReviewRating] = useState(5);
   const [newReviewComment, setNewReviewComment] = useState("");
@@ -136,11 +135,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       }
     });
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => setRecentBoughVisible(true), 3000);
-    return () => clearTimeout(timer);
-  }, []);
 
   useEffect(() => {
     if (!user || checkoutStep !== 'payment') return;
@@ -518,39 +512,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   return (
     <section className="py-12 bg-[#f5f5f5]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <AnimatePresence>
-          {recentBoughVisible && (
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-6 bg-gradient-to-r from-orange-600 to-orange-500 p-[1px] rounded-2xl shadow-lg shadow-orange-100 overflow-hidden"
-            >
-              <div className="bg-white p-4 rounded-[15px] flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="bg-green-100 rounded-full p-2">
-                    <Truck className="h-5 w-5 text-orange-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-gray-800">
-                      <span className="text-orange-600 font-black">VIVO PRICE ALERT:</span> 124 people bought this in the last hour!
-                    </p>
-                    <p className="text-[10px] text-gray-500 font-medium">Free express shipping available for your area <span className="font-bold underline cursor-pointer">Check Zip</span></p>
-                  </div>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 text-gray-400 hover:text-orange-600 hover:bg-green-50"
-                  onClick={() => setRecentBoughVisible(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
