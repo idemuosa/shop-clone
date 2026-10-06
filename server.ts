@@ -626,6 +626,52 @@ app.all([
     res.status(response.status).json(data);
   } catch (error: any) {
     console.error(`Proxy error for ${url}:`, error.message);
+    if (req.method === "GET") {
+      if (req.path.startsWith("/categories")) {
+        return res.json([
+          { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
+          { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
+          { id: 3, name: "Home & Decor", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop", products: [] },
+          { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
+        ]);
+      }
+      if (req.path.startsWith("/products") || req.path.startsWith("/api/products")) {
+        return res.json([
+          {
+            id: 1,
+            name: "Samsung Galaxy S24 Ultra",
+            description: "Experience the ultimate smartphone with AI camera features.",
+            price: 1299.99,
+            old_price: 1399.99,
+            image: "https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
+            category_id: 1,
+            category_name: "Electronics",
+            tag: "New Arrival",
+            stock: 50,
+            sold: 120,
+            is_available: true,
+            rating: 4.8,
+            reviews_count: 12
+          },
+          {
+            id: 2,
+            name: "Adidas Ultraboost Light",
+            description: "The most responsive Ultraboost ever.",
+            price: 180.00,
+            old_price: 220.00,
+            image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
+            category_id: 4,
+            category_name: "Footwear",
+            tag: "Best Seller",
+            stock: 100,
+            sold: 500,
+            is_available: true,
+            rating: 4.9,
+            reviews_count: 34
+          }
+        ]);
+      }
+    }
     res.status(503).json({
       error: "Product Service Unavailable",
       details: "The Python backend (port 8000) might not be running.",
