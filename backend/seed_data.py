@@ -1,8 +1,9 @@
 import requests
 import json
 import time
+import os
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = os.getenv("PYTHON_API") or os.getenv("VITE_PYTHON_API_URL") or "http://127.0.0.1:8000"
 
 categories = [
     {"name": "Electronics", "image": "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop"},

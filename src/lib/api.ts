@@ -3,14 +3,11 @@ export const getApiUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
 
-  // If we're in production and no API URL is provided,
-  // assume the API is at the same origin
-  if (import.meta.env.PROD) {
+  if (typeof window !== 'undefined' && window.location.origin) {
     return window.location.origin;
   }
 
-  // Default to localhost for development
-  return 'http://localhost:3000';
+  return '';
 };
 
 export const API_URL = getApiUrl();

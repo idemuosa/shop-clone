@@ -15,7 +15,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     // Connect to Node.js Socket.IO backend
-    const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000');
+    const rawSocketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? window.location.origin : '');
 
     if (rawSocketUrl === 'none' || rawSocketUrl === 'disabled') {
       console.log('Real-time Socket.IO disabled by configuration');
