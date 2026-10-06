@@ -24,19 +24,5 @@ services:
         value: production
       - key: PORT
         value: 3000
-      - key: PYTHON_API
-        value: https://vivi-shop-fastapi.onrender.com
       - key: CORE_ORIGIN
         value: https://vivi-shop-frontend.onrender.com,https://vivi-shop.vercel.app
-
-  # Python FastAPI Backend Service
-  - type: web
-    name: vivi-shop-fastapi
-    runtime: python
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.0
-      - key: PYTHONPATH
-        value: backend
