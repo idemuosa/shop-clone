@@ -625,9 +625,10 @@ app.all([
 
     res.status(response.status).json(data);
   } catch (error: any) {
-    console.error(`Proxy error for ${url}:`, error.message);
+    console.error(`Proxy error for ${url}: ${error.message}. Ensure Python backend on ${PYTHON_API} is running.`);
     if (req.method === "GET") {
-      if (req.path.startsWith("/categories")) {
+      const cleanPath = req.path.replace(/\/$/, "");
+      if (cleanPath === "/categories" || cleanPath.startsWith("/categories/")) {
         return res.json([
           { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
           { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
@@ -635,7 +636,7 @@ app.all([
           { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
         ]);
       }
-      if (req.path.startsWith("/products") || req.path.startsWith("/api/products")) {
+      if (cleanPath === "/products" || cleanPath.startsWith("/products/") || cleanPath === "/api/products" || cleanPath.startsWith("/api/products/")) {
         return res.json([
           {
             id: 1,
@@ -674,7 +675,7 @@ app.all([
     }
     res.status(503).json({
       error: "Product Service Unavailable",
-      details: "The Python backend (port 8000) might not be running.",
+      details: `The Python backend at ${PYTHON_API} is unreachable (${error.message}). Please start the Python backend (e.g. 'cd backend && python main.py' or 'RUN_SHOP.bat').`,
       url: url
     });
   }
