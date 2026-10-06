@@ -2,8 +2,8 @@ services:
   # Static Frontend Site (Render Static Site)
   - type: web
     name: vivi-shop-frontend
-    env: static
-    buildCommand: npm run build
+    runtime: static
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     routes:
       - type: rewrite
