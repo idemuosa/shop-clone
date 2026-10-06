@@ -40,6 +40,40 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const { user } = useAuth();
 
+  const getFirebaseErrorMessage = (error: any): string => {
+    const code = error?.code || '';
+    switch (code) {
+      case 'auth/invalid-credential':
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+        return 'Invalid email or password. Please check your credentials.';
+      case 'auth/email-already-in-use':
+        return 'An account with this email address already exists. Please log in instead.';
+      case 'auth/invalid-email':
+        return 'Please enter a valid email address.';
+      case 'auth/weak-password':
+        return 'Password is too weak. Please use at least 8 characters.';
+      case 'auth/user-disabled':
+        return 'This account has been disabled. Please contact support.';
+      case 'auth/too-many-requests':
+        return 'Too many failed attempts. Please wait a moment and try again.';
+      case 'auth/popup-closed-by-user':
+        return 'Google sign-in popup was closed before completing.';
+      case 'auth/popup-blocked':
+        return 'Google sign-in popup was blocked by your browser. Please allow popups for this site.';
+      case 'auth/cancelled-popup-request':
+        return 'Google sign-in request was cancelled.';
+      case 'auth/unauthorized-domain':
+        return 'This domain is not authorized for Google sign-in in your Firebase console.';
+      case 'auth/operation-not-allowed':
+        return 'Google sign-in or password authentication is not enabled in your Firebase project.';
+      case 'auth/network-request-failed':
+        return 'Network connection failed. Please check your internet connection.';
+      default:
+        return error?.message || 'Authentication failed. Please try again.';
+    }
+  };
+
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
@@ -64,7 +98,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       toast.success("Signed in with Google!");
       onClose();
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(getFirebaseErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -88,11 +122,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       toast.success("Welcome Back!");
       onClose();
     } catch (error: any) {
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        toast.error("Invalid email or password.");
-      } else {
-        toast.error(error.message || "Login failed.");
-      }
+      toast.error(getFirebaseErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
@@ -147,13 +177,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       toast.success("Registration Successful!");
       onClose();
     } catch (error: any) {
-      if (error.code === 'auth/email-already-in-use') {
-        toast.error("An account with this email already exists. Please log in.");
-      } else {
-        toast.error(error.message || "Registration failed", {
-          style: { color: 'black' }
-        });
-      }
+      toast.error(getFirebaseErrorMessage(error));
     } finally {
       setIsLoading(false);
     }

@@ -12,9 +12,11 @@ export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 async function testConnection() {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration. The client appears to be offline.");
+      console.warn("Firebase client appears to be offline or network is disconnected.");
+    } else {
+      console.warn("Firebase initial connection test:", error?.message || error);
     }
   }
 }

@@ -263,7 +263,7 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                   </Button>
                 )}
                 <Button 
-                  onClick={() => signOut(auth).then(() => onClose())}
+                  onClick={() => signOut(auth).then(() => onClose()).catch((err) => toast.error(err?.message || "Logout failed."))}
                   className="bg-black hover:bg-zinc-800 text-white font-bold rounded-xl px-6 h-11"
                 >
                   <LogOut className="h-4 w-4 mr-2" /> Log Out
