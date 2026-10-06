@@ -4,8 +4,13 @@ from fastapi import Header, HTTPException, status
 import os
 import json
 
-# Try to get credentials from an environment variable (as a JSON string)
-# or from a file path
+# Try to get credentials from environment variables:
+# 1. Individual env vars (FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY)
+# 2. FIREBASE_SERVICE_ACCOUNT_JSON string
+# 3. FIREBASE_SERVICE_ACCOUNT_KEY path or fallback file path
+project_id = os.getenv("FIREBASE_PROJECT_ID")
+client_email = os.getenv("FIREBASE_CLIENT_EMAIL")
+private_key = os.getenv("FIREBASE_PRIVATE_KEY")
 firebase_json = os.getenv("FIREBASE_SERVICE_ACCOUNT_JSON")
 cred_path = os.getenv("FIREBASE_SERVICE_ACCOUNT_KEY")
 
@@ -17,6 +22,21 @@ def initialize_firebase():
         return
     except ValueError:
         pass
+
+    if project_id and client_email and private_key:
+        try:
+            cert_dict = {
+                "type": "service_account",
+                "project_id": project_id,
+                "client_email": client_email,
+                "private_key": private_key.replace("\\n", "\n")
+            }
+            cred = credentials.Certificate(cert_dict)
+            firebase_admin.initialize_app(cred)
+            print("Successfully initialized Firebase Admin using individual environment variables.")
+            return
+        except Exception as e:
+            print(f"Error initializing Firebase Admin from individual env vars: {e}")
 
     if firebase_json:
         try:
