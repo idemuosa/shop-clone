@@ -75,7 +75,7 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL } from '@/lib/api';
+import { API_URL, handleApiResponse } from '@/lib/api';
 import { cn, uploadToCloudinary } from '@/lib/utils';
 
 export default function AdminDashboard() {
@@ -306,10 +306,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ name: newCategoryName, image: imageUrl }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || errorData.message || 'Failed to create category');
-      }
+      await handleApiResponse(response);
 
       toast.success('Category created successfully!');
       setShowCategoryDialog(false);
@@ -437,7 +434,7 @@ export default function AdminDashboard() {
          body: JSON.stringify(updatedProduct),
        });
 
-       if (!response.ok) throw new Error('Update failed. Check backend endpoint.');
+      await handleApiResponse(response);
 
       toast.success('Product updated successfully!');
       setEditingProduct(null);
@@ -552,10 +549,7 @@ export default function AdminDashboard() {
         body: JSON.stringify(newProduct),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || errorData.message || 'Failed to create product');
-      }
+      await handleApiResponse(response);
 
       toast.success('Product added successfully!');
       form.reset();
@@ -585,10 +579,7 @@ export default function AdminDashboard() {
         }
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'Failed to delete product');
-      }
+      await handleApiResponse(response);
 
       toast.success('Product deleted successfully!');
       await fetchData();

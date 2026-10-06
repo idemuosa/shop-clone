@@ -587,6 +587,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 app.all([
   "/products", "/products/", "/products/*",
   "/categories", "/categories/", "/categories/*",
+  "/api/seed", "/api/seed/",
   "/api/cart", "/api/cart/*",
   "/api/products", "/api/products/*",
   "/api/reviews", "/api/reviews/*",
