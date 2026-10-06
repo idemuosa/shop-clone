@@ -64,7 +64,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       case 'auth/cancelled-popup-request':
         return 'Google sign-in request was cancelled.';
       case 'auth/unauthorized-domain':
-        return 'This domain is not authorized for Google sign-in in your Firebase console.';
+        return 'This domain is not authorized for authentication in Firebase Console. Please add your domain (e.g., localhost or your app domain) under Firebase Console > Authentication > Settings > Authorized domains.';
       case 'auth/operation-not-allowed':
         return 'Google sign-in or password authentication is not enabled in your Firebase project.';
       case 'auth/network-request-failed':
