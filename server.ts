@@ -64,14 +64,34 @@ app.get("/health", (req, res) => {
 
 // Initialize Firebase Admin safely
 const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+const projectId = process.env.FIREBASE_PROJECT_ID;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
 let isFirebaseAdminInitialized = false;
 
-if (serviceAccountPath) {
-  try {
-    let serviceAccount;
+try {
+  let serviceAccount: any = null;
+
+  if (serviceAccountJson) {
+    serviceAccount = JSON.parse(serviceAccountJson);
+    if (serviceAccount && serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+    }
+  } else if (projectId && clientEmail && privateKey) {
+    serviceAccount = {
+      projectId,
+      clientEmail,
+      privateKey: privateKey.replace(/\\n/g, "\n"),
+    };
+  } else if (serviceAccountPath) {
     // Check if the value is a JSON string or a file path
     if (serviceAccountPath.trim().startsWith('{')) {
       serviceAccount = JSON.parse(serviceAccountPath);
+      if (serviceAccount && serviceAccount.private_key) {
+        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+      }
     } else {
       const resolvedPath = path.isAbsolute(serviceAccountPath)
         ? serviceAccountPath
@@ -81,17 +101,17 @@ if (serviceAccountPath) {
         serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
       }
     }
-
-    if (serviceAccount && (!admin.apps || admin.apps.length === 0)) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
-      isFirebaseAdminInitialized = true;
-      console.log("Firebase Admin initialized successfully");
-    }
-  } catch (err: any) {
-    console.error("Firebase Admin initialization error:", err.message);
   }
+
+  if (serviceAccount && (!admin.apps || admin.apps.length === 0)) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    isFirebaseAdminInitialized = true;
+    console.log("Firebase Admin initialized successfully");
+  }
+} catch (err: any) {
+  console.error("Firebase Admin initialization error:", err.message);
 }
 
 if (!isFirebaseAdminInitialized) {
