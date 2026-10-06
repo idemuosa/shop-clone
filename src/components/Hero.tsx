@@ -157,18 +157,6 @@ export default function Hero() {
               }}
             />
             
-            {/* Floating Offer Tag */}
-            <motion.div 
-              animate={{
-                y: [0, -10, 0],
-                rotate: [12, 15, 12]
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute -top-6 -right-6 bg-yellow-400 text-black p-6 rounded-full font-black text-center shadow-xl border-4 border-white"
-            >
-              <div className="text-sm leading-none">ONLY</div>
-              <div className="text-3xl leading-none">{formatPrice(1.99)}</div>
-            </motion.div>
           </motion.div>
           
           {/* Decorative elements */}
