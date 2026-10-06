@@ -129,9 +129,12 @@ def send_email(to_email, subject, html_content):
         return False
 
 # Configure CORS
+cors_origins_env = os.getenv("CORS_ORIGINS", os.getenv("CORE_ORIGIN", "*"))
+cors_origins = [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()] if cors_origins_env != "*" else ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
