@@ -12,7 +12,8 @@ dotenv.config();
 
 const app = express();
 const httpServer = http.createServer(app);
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
+const HOST = "0.0.0.0";
 
 // Configure CORS origin
 const corsOriginEnv = process.env.CORS_ORIGINS || process.env.CORE_ORIGIN || process.env.CLIENT_ORIGIN;
@@ -59,7 +60,10 @@ app.use(cors({
 
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+  res.status(200).json({
+    status: "ok",
+    message: "Backend is running"
+  });
 });
 
 // Initialize Firebase Admin safely
@@ -728,8 +732,8 @@ async function startServer() {
     }
   });
 
-  httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`Node.js Express & Socket.IO server running on http://localhost:${PORT}`);
+  httpServer.listen(PORT, HOST, () => {
+    console.log(`Node.js Express & Socket.IO server running on ${HOST}:${PORT}`);
   });
 }
 
