@@ -746,6 +746,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 export default app;
 
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   startServer();
 }
