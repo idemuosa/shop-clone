@@ -15,8 +15,16 @@ export const getApiUrl = () => {
 
 export const API_URL = getApiUrl();
 
-// Direct access to Python backend if needed, defaulting to API_URL so requests route through Express proxy if Python URL not specified
-export const PYTHON_API_URL = import.meta.env.VITE_PYTHON_API_URL || API_URL;
+// Direct access to Python backend if needed; defaults to API_URL so requests route through Express gateway proxy
+export const getPythonApiUrl = () => {
+  const envUrl = import.meta.env.VITE_PYTHON_API_URL;
+  if (!envUrl || envUrl === 'http://localhost:8000') {
+    return API_URL;
+  }
+  return envUrl;
+};
+
+export const PYTHON_API_URL = getPythonApiUrl();
 
 /**
  * Safely parses API responses, handling both valid JSON and non-JSON text/HTML error responses.

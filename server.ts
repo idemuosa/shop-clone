@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import admin from "firebase-admin";
 import fs from "fs";
 import cors from "cors";
+import { spawn } from "child_process";
 
 dotenv.config();
 
@@ -160,6 +161,8 @@ async function sendResendEmail(resendClient: Resend, payload: { to: string[]; su
 
 const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+
+let lastProxyErrorLogTime = 0;
 
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
@@ -625,7 +628,12 @@ app.all([
 
     res.status(response.status).json(data);
   } catch (error: any) {
-    console.error(`Proxy error for ${url}: ${error.message}. Ensure Python backend on ${PYTHON_API} is running.`);
+    const now = Date.now();
+    if (now - lastProxyErrorLogTime > 10000) {
+      console.warn(`[Proxy Warning] Python backend at ${PYTHON_API} unreachable (${error.message}). Using fallback responses.`);
+      lastProxyErrorLogTime = now;
+    }
+
     if (req.method === "GET") {
       const cleanPath = req.path.replace(/\/$/, "");
       if (cleanPath === "/categories" || cleanPath.startsWith("/categories/")) {
@@ -672,7 +680,23 @@ app.all([
           }
         ]);
       }
+      if (cleanPath === "/api/cart" || cleanPath.startsWith("/api/cart/")) {
+        return res.json({ id: 1, items: [] });
+      }
+      if (cleanPath === "/api/reviews" || cleanPath.startsWith("/api/reviews/")) {
+        return res.json([]);
+      }
+      if (cleanPath === "/api/orders" || cleanPath.startsWith("/api/orders/")) {
+        return res.json([]);
+      }
+      if (cleanPath === "/api/profile" || cleanPath.startsWith("/api/profile/")) {
+        return res.json({ email: "", name: "Guest User", points: 0 });
+      }
+      if (cleanPath === "/api/merchants" || cleanPath.startsWith("/api/merchants/")) {
+        return res.json([]);
+      }
     }
+
     res.status(503).json({
       error: "Product Service Unavailable",
       details: `The Python backend at ${PYTHON_API} is unreachable (${error.message}). Please start the Python backend (e.g. 'cd backend && python main.py' or 'RUN_SHOP.bat').`,
@@ -681,7 +705,62 @@ app.all([
   }
 });
 
+async function ensurePythonBackend() {
+  if (!PYTHON_API.includes("localhost") && !PYTHON_API.includes("127.0.0.1")) {
+    return;
+  }
+  try {
+    const res = await fetch(`${PYTHON_API}/health`);
+    if (res.ok) {
+      console.log(`[Python Backend] Connected successfully at ${PYTHON_API}`);
+      return;
+    }
+  } catch (e) {
+    console.log(`[Python Backend] Not running on ${PYTHON_API}. Attempting to start automatically...`);
+  }
+
+  const isWin = process.platform === "win32";
+  const venvPython = isWin
+    ? path.join(process.cwd(), "backend", "venv", "Scripts", "python.exe")
+    : path.join(process.cwd(), "backend", "venv", "bin", "python3");
+
+  let pythonCmd = isWin ? "python" : "python3";
+  if (fs.existsSync(venvPython)) {
+    pythonCmd = venvPython;
+  }
+
+  const backendDir = path.join(process.cwd(), "backend");
+  console.log(`[Python Backend] Starting Python backend using '${pythonCmd}' in ${backendDir}...`);
+
+  try {
+    const pyProcess = spawn(pythonCmd, ["main.py"], {
+      cwd: backendDir,
+      stdio: "inherit",
+      shell: true,
+    });
+
+    pyProcess.on("error", (err) => {
+      console.error("[Python Backend] Failed to start process:", err.message);
+    });
+  } catch (err: any) {
+    console.error("[Python Backend] Spawn error:", err.message);
+  }
+
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 600));
+    try {
+      const check = await fetch(`${PYTHON_API}/health`);
+      if (check.ok) {
+        console.log(`[Python Backend] Python backend is up and running on ${PYTHON_API}!`);
+        return;
+      }
+    } catch (_) {}
+  }
+  console.warn(`[Python Backend] Backend on ${PYTHON_API} did not respond within timeout, proceeding with Express gateway fallback.`);
+}
+
 async function startServer() {
+  await ensurePythonBackend();
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
