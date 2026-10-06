@@ -550,11 +550,20 @@ def get_merchants():
 
 @app.post("/products/", response_model=schemas.Product)
 def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
-    db_product = models.Product(**product.dict())
-    db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+    try:
+        cat = db.query(models.Category).filter(models.Category.id == product.category_id).first()
+        if not cat:
+            raise HTTPException(status_code=400, detail=f"Category with ID {product.category_id} does not exist.")
+        db_product = models.Product(**product.dict())
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Failed to create product: {str(e)}")
 
 @app.put("/products/{product_id}", response_model=schemas.Product)
 def update_product(product_id: int, product: schemas.ProductCreate, db: Session = Depends(get_db)):
@@ -562,21 +571,28 @@ def update_product(product_id: int, product: schemas.ProductCreate, db: Session 
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    for key, value in product.dict().items():
-        setattr(db_product, key, value)
-
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+    try:
+        for key, value in product.dict().items():
+            setattr(db_product, key, value)
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Failed to update product: {str(e)}")
 
 @app.delete("/products/{product_id}")
 def delete_product(product_id: int, db: Session = Depends(get_db)):
     db_product = db.query(models.Product).filter(models.Product.id == product_id).first()
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")
-    db.delete(db_product)
-    db.commit()
-    return {"message": "Product deleted"}
+    try:
+        db.delete(db_product)
+        db.commit()
+        return {"message": "Product deleted"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Failed to delete product: {str(e)}")
 
 @app.get("/categories/", response_model=List[schemas.Category])
 def get_categories(db: Session = Depends(get_db)):
@@ -584,11 +600,18 @@ def get_categories(db: Session = Depends(get_db)):
 
 @app.post("/categories/", response_model=schemas.Category)
 def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    db_category = models.Category(**category.dict())
-    db.add(db_category)
-    db.commit()
-    db.refresh(db_category)
-    return db_category
+    try:
+        existing = db.query(models.Category).filter(models.Category.name.ilike(category.name)).first()
+        if existing:
+            return existing
+        db_category = models.Category(**category.dict())
+        db.add(db_category)
+        db.commit()
+        db.refresh(db_category)
+        return db_category
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"Failed to create category: {str(e)}")
 
 @app.get("/users/me")
 async def read_users_me(current_user: dict = Depends(auth.verify_token)):
