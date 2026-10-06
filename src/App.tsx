@@ -425,13 +425,13 @@ function MainContent() {
               onProductView={handleProductView}
             />
             
-            <section className="py-10">
-              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="relative bg-orange-500 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
+            <section className="py-4">
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative bg-orange-500 rounded-2xl p-5 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
-                    <p className="font-bold mb-2  tracking-widest opacity-80">Smart Tech</p>
-                    <h3 className="text-3xl font-black mb-6 leading-tight">The Best Smart <br /> Watch under <br /> $20</h3>
-                    <button className="bg-white text-orange-600 px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
+                    <p className="font-bold mb-1 text-xs tracking-widest opacity-80">Smart Tech</p>
+                    <h3 className="text-xl font-black mb-3 leading-tight">The Best Smart <br /> Watch under <br /> $20</h3>
+                    <button className="bg-white text-orange-600 px-5 py-2 rounded-full text-xs font-black shadow-md hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
                     src={getOptimizedImageUrl("https://images.unsplash.com/photo-1508685096489-723f0119762e", 1000)}
@@ -443,11 +443,11 @@ function MainContent() {
                     }}
                   />
                 </div>
-                <div className="relative bg-zinc-900 rounded-3xl p-10 overflow-hidden group cursor-pointer text-white">
+                <div className="relative bg-zinc-900 rounded-2xl p-5 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
-                    <p className="text-orange-500 font-bold mb-2  tracking-widest">Limited Edition</p>
-                    <h3 className="text-3xl font-black mb-6 leading-tight">Meet your new <br /> Trending Furniture <br /> Design</h3>
-                    <button className="bg-orange-500 text-white px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-transform">Shop Now</button>
+                    <p className="text-orange-500 font-bold mb-1 text-xs tracking-widest">Limited Edition</p>
+                    <h3 className="text-xl font-black mb-3 leading-tight">Meet your new <br /> Trending Furniture <br /> Design</h3>
+                    <button className="bg-orange-500 text-white px-5 py-2 rounded-full text-xs font-black shadow-md hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
                     src={getOptimizedImageUrl("https://images.unsplash.com/photo-1567016432779-094069958ea5", 1000)}
