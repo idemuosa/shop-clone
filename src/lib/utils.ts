@@ -20,11 +20,24 @@ export function getOptimizedImageUrl(url: string, width: number = 800) {
 }
 
 export async function uploadToCloudinary(file: File | string): Promise<string> {
-  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ml_default';
+  const cloudName = import.meta.env?.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env?.VITE_CLOUDINARY_UPLOAD_PRESET || 'ml_default';
+
+  const fileToDataUrl = (fileObj: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(fileObj);
+    });
+  };
 
   if (!cloudName) {
-    throw new Error("Cloudinary cloud name is not configured");
+    console.warn("Cloudinary cloud name is not configured. Falling back to local data URL / image string.");
+    if (typeof file === 'string') {
+      return file;
+    }
+    return fileToDataUrl(file);
   }
 
   const formData = new FormData();
@@ -41,14 +54,17 @@ export async function uploadToCloudinary(file: File | string): Promise<string> {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error?.message || "Failed to upload image to Cloudinary");
     }
 
     const data = await response.json();
     return data.secure_url;
   } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    throw error;
+    console.error("Cloudinary upload error, falling back to image string:", error);
+    if (typeof file === 'string') {
+      return file;
+    }
+    return fileToDataUrl(file);
   }
 }
