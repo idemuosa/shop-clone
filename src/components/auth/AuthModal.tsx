@@ -64,7 +64,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       toast.success("Signed in with Google!");
       onClose();
     } catch (error: any) {
-      toast.error(error.message);
+      if (error?.code === 'auth/unauthorized-domain') {
+        toast.error("Domain unauthorized. Add current domain in Firebase Console > Auth > Settings > Authorized domains.");
+      } else {
+        toast.error(error.message || "Google sign-in failed.");
+      }
     } finally {
       setIsLoading(false);
     }
