@@ -880,13 +880,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             </AnimatePresence>
           </div>
         ) : (
-          <div className="py-20 text-center bg-white rounded-2xl shadow-sm">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-50 mb-6">
-              <Filter className="h-10 w-10 text-gray-200" />
+          <div className="py-8 md:py-10 text-center bg-white rounded-2xl shadow-sm">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 mb-3">
+              <Filter className="h-6 w-6 text-gray-200" />
             </div>
-            <h3 className="text-xl font-black  tracking-tighter mb-2">No results found</h3>
-            <p className="text-gray-400 mb-8 font-medium">Try adjusting your filters or search terms.</p>
-            <Button onClick={resetFilters} variant="outline" className="rounded-full px-8 border-2 border-orange-600 text-orange-600 font-black hover:bg-orange-600 hover:text-white">
+            <h3 className="text-lg font-black tracking-tighter mb-1">No results found</h3>
+            <p className="text-xs md:text-sm text-gray-400 mb-4 font-medium">Try adjusting your filters or search terms.</p>
+            <Button onClick={resetFilters} variant="outline" className="rounded-full h-9 px-6 text-xs border-2 border-orange-600 text-orange-600 font-black hover:bg-orange-600 hover:text-white">
               Clear all filters
             </Button>
           </div>
