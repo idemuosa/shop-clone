@@ -26,7 +26,7 @@ import {
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL, PYTHON_API_URL, handleApiResponse } from '@/lib/api';
+import { API_URL, handleApiResponse } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
 import { toast } from 'sonner';

@@ -43,7 +43,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
-import { API_URL, PYTHON_API_URL } from "@/lib/api";
+import { API_URL } from "@/lib/api";
 import { cn, getOptimizedImageUrl } from "@/lib/utils";
 
 interface Product {
@@ -161,7 +161,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
     const fetchReviews = async () => {
       try {
-        const response = await fetch(`${PYTHON_API_URL}/api/reviews/?product_id=${selectedProduct.id}`);
+        const response = await fetch(`${API_URL}/api/reviews/?product_id=${selectedProduct.id}`);
         if (response.ok) {
           const data = await response.json();
           setReviews(data.map((r: any) => ({
@@ -194,7 +194,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
     setIsSubmittingReview(true);
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${PYTHON_API_URL}/api/reviews/`, {
+      const response = await fetch(`${API_URL}/api/reviews/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -234,7 +234,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
     try {
       const token = await user.getIdToken();
-      const response = await fetch(`${PYTHON_API_URL}/api/wishlist/add_to_wishlist/`, {
+      const response = await fetch(`${API_URL}/api/wishlist/add_to_wishlist/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

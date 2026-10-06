@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
-import { PYTHON_API_URL } from './api';
+import { API_URL } from './api';
 
 export interface CartItem {
   id: string;
@@ -43,7 +43,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (user) {
         try {
           const token = await user.getIdToken();
-          await fetch(`${PYTHON_API_URL}/api/cart/sync`, {
+          await fetch(`${API_URL}/api/cart/sync`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -73,7 +73,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = await user.getIdToken();
 
       // 1. Fetch backend cart
-      const response = await fetch(`${PYTHON_API_URL}/api/cart`, {
+      const response = await fetch(`${API_URL}/api/cart`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -105,7 +105,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           setItems(mergedItems);
 
-          await fetch(`${PYTHON_API_URL}/api/cart/sync`, {
+          await fetch(`${API_URL}/api/cart/sync`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

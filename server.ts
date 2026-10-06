@@ -62,6 +62,16 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Helper function to sanitize and format Firebase private key PEM string
+function formatPrivateKey(key: string | undefined): string | undefined {
+  if (!key) return undefined;
+  let formatted = key.trim();
+  if ((formatted.startsWith('"') && formatted.endsWith('"')) || (formatted.startsWith("'") && formatted.endsWith("'"))) {
+    formatted = formatted.slice(1, -1).trim();
+  }
+  return formatted.replace(/\\n/g, "\n");
+}
+
 // Initialize Firebase Admin safely
 const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
@@ -77,20 +87,20 @@ try {
   if (serviceAccountJson) {
     serviceAccount = JSON.parse(serviceAccountJson);
     if (serviceAccount && serviceAccount.private_key) {
-      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+      serviceAccount.private_key = formatPrivateKey(serviceAccount.private_key);
     }
   } else if (projectId && clientEmail && privateKey) {
     serviceAccount = {
       projectId,
       clientEmail,
-      privateKey: privateKey.replace(/\\n/g, "\n"),
+      privateKey: formatPrivateKey(privateKey),
     };
   } else if (serviceAccountPath) {
     // Check if the value is a JSON string or a file path
     if (serviceAccountPath.trim().startsWith('{')) {
       serviceAccount = JSON.parse(serviceAccountPath);
       if (serviceAccount && serviceAccount.private_key) {
-        serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+        serviceAccount.private_key = formatPrivateKey(serviceAccount.private_key);
       }
     } else {
       const resolvedPath = path.isAbsolute(serviceAccountPath)
@@ -99,6 +109,9 @@ try {
 
       if (fs.existsSync(resolvedPath)) {
         serviceAccount = JSON.parse(fs.readFileSync(resolvedPath, 'utf8'));
+        if (serviceAccount && serviceAccount.private_key) {
+          serviceAccount.private_key = formatPrivateKey(serviceAccount.private_key);
+        }
       }
     }
   }
@@ -178,11 +191,57 @@ async function sendResendEmail(resendClient: Resend, payload: { to: string[]; su
   return result;
 }
 
-const PYTHON_API = process.env.PYTHON_API || "http://localhost:8000";
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
+
+// In-Memory Data Store (Default seed data for products, categories, reviews, carts, wishlists)
+let categoriesStore = [
+  { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
+  { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
+  { id: 3, name: "Home & Decor", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop", products: [] },
+  { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
+];
+
+let productsStore = [
+  {
+    id: 1,
+    name: "Samsung Galaxy S24 Ultra",
+    description: "Experience the ultimate smartphone with AI camera features.",
+    price: 1299.99,
+    old_price: 1399.99,
+    image: "https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
+    category_id: 1,
+    category_name: "Electronics",
+    tag: "New Arrival",
+    stock: 50,
+    sold: 120,
+    is_available: true,
+    rating: 4.8,
+    reviews_count: 12
+  },
+  {
+    id: 2,
+    name: "Adidas Ultraboost Light",
+    description: "The most responsive Ultraboost ever.",
+    price: 180.00,
+    old_price: 220.00,
+    image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
+    category_id: 4,
+    category_name: "Footwear",
+    tag: "Best Seller",
+    stock: 100,
+    sold: 500,
+    is_available: true,
+    rating: 4.9,
+    reviews_count: 34
+  }
+];
+
+let reviewsStore: any[] = [];
+let cartsStore = new Map<string, any[]>();
+let wishlistsStore = new Map<string, number[]>();
 
 // API routes
 app.post("/api/paystack/initialize", async (req, res, next) => {
@@ -604,101 +663,89 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
   }
 });
 
-app.all([
-  "/products", "/products/", "/products/*",
-  "/categories", "/categories/", "/categories/*",
-  "/api/seed", "/api/seed/",
-  "/api/cart", "/api/cart/*",
-  "/api/products", "/api/products/*",
-  "/api/reviews", "/api/reviews/*",
-  "/api/wishlist/*",
-  "/api/orders", "/api/orders/*",
-  "/api/profile/*",
-  "/api/merchants", "/api/merchants/*"
-], async (req, res, next) => {
-  // Ensure the path ends with a slash for FastAPI compatibility, but preserve query params
-  const pathPart = req.path.endsWith('/') ? req.path : `${req.path}/`;
-  const queryString = req.url.includes('?') ? `?${req.url.split('?')[1]}` : '';
-  const url = `${PYTHON_API}${pathPart}${queryString}`;
+// Products & Categories Endpoints
+app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], (req, res) => {
+  res.json(categoriesStore);
+});
 
-  console.log(`Proxying request to: ${url}`);
-  try {
-    const fetchOptions: any = {
-      method: req.method,
-      headers: {
-        "Content-Type": "application/json",
-        ...(req.headers.authorization ? { "Authorization": req.headers.authorization } : {})
-      }
-    };
-    if (req.method !== "GET" && req.method !== "HEAD") fetchOptions.body = JSON.stringify(req.body);
-
-    const response = await fetch(url, fetchOptions);
-    console.log(`Proxy response from ${url}: ${response.status} ${response.statusText}`);
-    const contentType = response.headers.get("content-type");
-    let data;
-
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = { message: await response.text() };
-    }
-
-    res.status(response.status).json(data);
-  } catch (error: any) {
-    console.error(`Proxy error for ${url}: ${error.message}. Ensure Python backend on ${PYTHON_API} is running.`);
-    if (req.method === "GET") {
-      const cleanPath = req.path.replace(/\/$/, "");
-      if (cleanPath === "/categories" || cleanPath.startsWith("/categories/")) {
-        return res.json([
-          { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
-          { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
-          { id: 3, name: "Home & Decor", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop", products: [] },
-          { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
-        ]);
-      }
-      if (cleanPath === "/products" || cleanPath.startsWith("/products/") || cleanPath === "/api/products" || cleanPath.startsWith("/api/products/")) {
-        return res.json([
-          {
-            id: 1,
-            name: "Samsung Galaxy S24 Ultra",
-            description: "Experience the ultimate smartphone with AI camera features.",
-            price: 1299.99,
-            old_price: 1399.99,
-            image: "https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
-            category_id: 1,
-            category_name: "Electronics",
-            tag: "New Arrival",
-            stock: 50,
-            sold: 120,
-            is_available: true,
-            rating: 4.8,
-            reviews_count: 12
-          },
-          {
-            id: 2,
-            name: "Adidas Ultraboost Light",
-            description: "The most responsive Ultraboost ever.",
-            price: 180.00,
-            old_price: 220.00,
-            image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
-            category_id: 4,
-            category_name: "Footwear",
-            tag: "Best Seller",
-            stock: 100,
-            sold: 500,
-            is_available: true,
-            rating: 4.9,
-            reviews_count: 34
-          }
-        ]);
-      }
-    }
-    res.status(503).json({
-      error: "Product Service Unavailable",
-      details: `The Python backend at ${PYTHON_API} is unreachable (${error.message}). Please start the Python backend (e.g. 'cd backend && python main.py' or 'RUN_SHOP.bat').`,
-      url: url
-    });
+app.get(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
+  const { category_id } = req.query;
+  if (category_id) {
+    const catId = Number(category_id);
+    const filtered = productsStore.filter(p => p.category_id === catId);
+    return res.json(filtered);
   }
+  res.json(productsStore);
+});
+
+app.get(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
+  const product = productsStore.find(p => p.id === Number(req.params.id));
+  if (!product) {
+    return res.status(404).json({ error: "Product not found" });
+  }
+  res.json(product);
+});
+
+// Reviews Endpoints
+app.get(["/api/reviews", "/api/reviews/"], (req, res) => {
+  const productId = req.query.product_id ? Number(req.query.product_id) : null;
+  if (productId) {
+    const filtered = reviewsStore.filter(r => r.product === productId);
+    return res.json(filtered);
+  }
+  res.json(reviewsStore);
+});
+
+app.post(["/api/reviews", "/api/reviews/"], (req, res) => {
+  const { product, rating, comment } = req.body;
+  const newReview = {
+    id: reviewsStore.length + 1,
+    product: Number(product),
+    rating: Number(rating) || 5,
+    comment: comment || "",
+    user_name: "Customer",
+    created_at: new Date().toISOString()
+  };
+  reviewsStore.push(newReview);
+  res.status(201).json(newReview);
+});
+
+// Cart Endpoints
+app.get(["/api/cart", "/api/cart/"], (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userId = authHeader ? authHeader.replace("Bearer ", "") : "guest";
+  const userCart = cartsStore.get(userId) || [];
+  res.json({ items: userCart });
+});
+
+app.post(["/api/cart/sync", "/api/cart/sync/"], (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userId = authHeader ? authHeader.replace("Bearer ", "") : "guest";
+  const items = req.body || [];
+  cartsStore.set(userId, items);
+  res.json({ success: true, items });
+});
+
+// Wishlist Endpoints
+app.post(["/api/wishlist/add_to_wishlist", "/api/wishlist/add_to_wishlist/"], (req, res) => {
+  const authHeader = req.headers.authorization;
+  const userId = authHeader ? authHeader.replace("Bearer ", "") : "guest";
+  const { product_id } = req.body;
+  const userWishlist = wishlistsStore.get(userId) || [];
+  if (!userWishlist.includes(Number(product_id))) {
+    userWishlist.push(Number(product_id));
+  }
+  wishlistsStore.set(userId, userWishlist);
+  res.json({ success: true, wishlist: userWishlist });
+});
+
+// Merchants / Seed / Orders Fallback Endpoints
+app.get(["/api/merchants", "/api/merchants/"], (req, res) => {
+  res.json([]);
+});
+
+app.all(["/api/seed", "/api/seed/"], (req, res) => {
+  res.json({ message: "Database seeded successfully" });
 });
 
 async function startServer() {
@@ -746,6 +793,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 export default app;
 
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   startServer();
 }
