@@ -47,3 +47,29 @@ Ensure `CORE_ORIGIN` on your API Gateway (`server.ts`) includes both frontend or
 ```env
 CORE_ORIGIN="https://vivi-shop-frontend.onrender.com,https://vivi-shop.vercel.app"
 ```
+
+---
+
+## Troubleshooting Render Deployment
+
+### Error: `Empty build command; skipping build` & `Publish directory dist does not exist!`
+
+If you see the following log during your Render deployment:
+```text
+==> Empty build command; skipping build
+==> Publish directory dist does not exist!
+==> Build failed 😞
+```
+
+#### Cause
+In the Render Web Dashboard, the **Build Command** field under **Settings** was left empty or cleared. Render skips running `npm run build`, causing the output publish directory `dist` to not be generated.
+
+#### Resolution Steps
+1. Log in to [Render Dashboard](https://dashboard.render.com).
+2. Select your Static Site service (`vivi-shop-frontend`).
+3. Click **Settings** in the left sidebar menu.
+4. Locate the **Build & Deploy** section and configure:
+   - **Build Command:** `npm run build`
+   - **Publish Directory:** `dist`
+5. Click **Save Changes**.
+6. Click **Manual Deploy** -> **Clear build cache & deploy** (or **Deploy latest commit**).

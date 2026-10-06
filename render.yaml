@@ -3,7 +3,7 @@ services:
   - type: web
     name: vivi-shop-frontend
     runtime: static
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build
     staticPublishPath: ./dist
     routes:
       - type: rewrite
@@ -16,7 +16,7 @@ services:
   # Node.js Express Gateway API Server
   - type: web
     name: vivi-shop-express
-    env: node
+    runtime: node
     buildCommand: npm install
     startCommand: npm run start
     envVars:
@@ -32,7 +32,7 @@ services:
   # Python FastAPI Backend Service
   - type: web
     name: vivi-shop-fastapi
-    env: python
+    runtime: python
     buildCommand: pip install -r backend/requirements.txt
     startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
     envVars:
