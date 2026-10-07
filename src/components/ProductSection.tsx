@@ -72,8 +72,7 @@ interface ProductSectionProps {
 
 export default function ProductSection({ title, subtitle, products, isLoading, onAddToWishlist, onProductView }: ProductSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState<number[]>([0, 200]);
-  const [minRating, setMinRating] = useState<string>("0");
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000000]);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [selectedProduct, setInternalSelectedProduct] = useState<Product | null>(null);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
@@ -329,9 +328,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
       const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
       const matchesPrice = price >= priceRange[0] && price <= priceRange[1];
-      const matchesRating = (product.rating || 0) >= parseFloat(minRating || "0");
       
-      return matchesCategory && matchesPrice && matchesRating;
+      return matchesCategory && matchesPrice;
     });
 
     // Apply Sorting
@@ -352,21 +350,19 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           return Number(b.id) - Number(a.id);
       }
     });
-  }, [products, selectedCategory, priceRange, minRating, sortBy]);
+  }, [products, selectedCategory, priceRange, sortBy]);
 
   const resetFilters = () => {
     setSelectedCategory("all");
-    setPriceRange([0, 200]);
-    setMinRating("0");
+    setPriceRange([0, 1000000]);
   };
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (selectedCategory !== "all") count++;
-    if (priceRange[0] !== 0 || priceRange[1] !== 200) count++;
-    if (minRating !== "0") count++;
+    if (priceRange[0] !== 0 || priceRange[1] !== 1000000) count++;
     return count;
-  }, [selectedCategory, priceRange, minRating]);
+  }, [selectedCategory, priceRange]);
 
   const handlePlaceOrder = async (product: Product) => {
     if (!user) {
@@ -625,31 +621,15 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   <div className="space-y-5">
                     <div className="flex justify-between items-center">
                       <label className="text-xs font-black  tracking-widest text-gray-400">Price Range</label>
-                      <span className="text-sm font-black text-orange-600 bg-green-50 px-3 py-1 rounded-full">${priceRange[0]} - ${priceRange[1]}</span>
+                      <span className="text-sm font-black text-orange-600 bg-green-50 px-3 py-1 rounded-full">{formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}</span>
                     </div>
                     <Slider 
                       value={priceRange} 
-                      max={200} 
-                      step={1} 
+                      max={1000000}
+                      step={500}
                       onValueChange={setPriceRange}
                       className="py-4"
                     />
-                  </div>
-
-                  {/* Rating Filter */}
-                  <div className="space-y-3">
-                    <label className="text-xs font-black  tracking-widest text-gray-400">Minimum Rating</label>
-                    <Select value={minRating} onValueChange={setMinRating}>
-                      <SelectTrigger className="bg-gray-50 border-none shadow-none h-12 font-bold rounded-xl">
-                        <SelectValue placeholder="Select Rating" />
-                      </SelectTrigger>
-                      <SelectContent className="rounded-xl">
-                        <SelectItem value="0" className="font-medium">All Ratings</SelectItem>
-                        <SelectItem value="3" className="font-medium">3+ Stars</SelectItem>
-                        <SelectItem value="4" className="font-medium">4+ Stars</SelectItem>
-                        <SelectItem value="4.5" className="font-medium">4.5+ Stars</SelectItem>
-                      </SelectContent>
-                    </Select>
                   </div>
                 </div>
 
@@ -677,36 +657,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           </div>
         </div>
 
-        {/* Rating Quick Filter */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
-          <span className="text-[10px] font-black  text-gray-400 tracking-widest whitespace-nowrap mr-2 flex items-center gap-1.5">
-            <Star className="h-3 w-3" /> Min Rating:
-          </span>
-          {[
-            { label: "All Ratings", value: "0" },
-            { label: "3+ Stars", value: "3" },
-            { label: "4+ Stars", value: "4" },
-            { label: "4.5+ Stars", value: "4.5" }
-          ].map((rating) => (
-            <Button
-              key={rating.value}
-              variant={minRating === rating.value ? "default" : "outline"}
-              size="sm"
-              onClick={() => setMinRating(rating.value)}
-              className={`rounded-full px-4 h-8 text-[11px] font-black  tracking-tighter transition-all border-2 flex-shrink-0 ${
-                minRating === rating.value 
-                  ? "bg-orange-600 border-orange-600 text-white shadow-lg shadow-orange-100"
-                  : "bg-white border-gray-100 text-gray-400 hover:border-orange-200 hover:text-orange-600"
-              }`}
-            >
-              {rating.value !== "0" && (
-                <Star className={`h-3 w-3 mr-1.5 ${minRating === rating.value ? "fill-white text-white" : "fill-orange-500 text-orange-500"}`} />
-              )}
-              {rating.label}
-            </Button>
-          ))}
-        </div>
-
         {/* Active Filters Display */}
         {activeFiltersCount > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
@@ -716,16 +666,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                 <X className="h-3 w-3 cursor-pointer" onClick={() => setSelectedCategory("all")} />
               </Badge>
             )}
-            {(priceRange[0] !== 0 || priceRange[1] !== 200) && (
+            {(priceRange[0] !== 0 || priceRange[1] !== 1000000) && (
               <Badge variant="secondary" className="bg-white border border-green-200 text-orange-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
-                Price: ${priceRange[0]}-${priceRange[1]}
-                <X className="h-3 w-3 cursor-pointer" onClick={() => setPriceRange([0, 200])} />
-              </Badge>
-            )}
-            {minRating !== "0" && (
-              <Badge variant="secondary" className="bg-white border border-green-200 text-orange-600 font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
-                Rating: {minRating}+ Stars
-                <X className="h-3 w-3 cursor-pointer" onClick={() => setMinRating("0")} />
+                Price: {formatPrice(priceRange[0])}-{formatPrice(priceRange[1])}
+                <X className="h-3 w-3 cursor-pointer" onClick={() => setPriceRange([0, 1000000])} />
               </Badge>
             )}
             <Button variant="ghost" size="sm" onClick={resetFilters} className="text-[10px] font-black  text-gray-400 hover:text-orange-600">
