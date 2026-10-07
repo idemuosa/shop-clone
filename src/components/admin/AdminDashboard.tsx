@@ -323,7 +323,10 @@ export default function AdminDashboard() {
       setNewCategoryImage("");
       fetchData();
     } catch (error: any) {
-      toast.error(error.message);
+      const message = error?.message === 'Failed to fetch'
+        ? "Failed to connect to backend server. Please check your network connection."
+        : (error?.message || "Failed to create category");
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
