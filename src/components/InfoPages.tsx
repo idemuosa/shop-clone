@@ -253,16 +253,18 @@ export default function InfoPage({
                   </p>
                 </div>
               </div>
-              <div className="flex items-center shrink-0 relative z-10">
-                <img
-                  src={normalizedTitle === 'new arrivals' ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300&auto=format&fit=crop" : "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=300&auto=format&fit=crop"}
-                  className="w-10 h-10 md:w-12 md:h-12 rounded object-cover shadow-2xs border border-zinc-700"
-                  alt={activePage}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=300&auto=format&fit=crop';
-                  }}
-                />
-              </div>
+              {normalizedTitle === 'new arrivals' && (
+                <div className="flex items-center shrink-0 relative z-10">
+                  <img
+                    src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=300&auto=format&fit=crop"
+                    className="w-10 h-10 md:w-12 md:h-12 rounded object-cover shadow-2xs border border-zinc-700"
+                    alt={activePage}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=300&auto=format&fit=crop';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {filteredDisplayProducts.length > 0 ? (
