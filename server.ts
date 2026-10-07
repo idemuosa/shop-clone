@@ -196,15 +196,15 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 // Store OTPs temporarily
 const otpStore = new Map<string, string>();
 
-// In-Memory Data Store (Default seed data for products, categories, reviews, carts, wishlists)
-let categoriesStore = [
+// Seed data defaults for products and categories
+const defaultCategories = [
   { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
   { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
   { id: 3, name: "Home & Decor", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop", products: [] },
   { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
 ];
 
-let productsStore = [
+const defaultProducts = [
   {
     id: 1,
     name: "Samsung Galaxy S24 Ultra",
@@ -238,6 +238,83 @@ let productsStore = [
     reviews_count: 34
   }
 ];
+
+let categoriesStore: any[] = [...defaultCategories];
+let productsStore: any[] = [...defaultProducts];
+
+async function syncCategoriesFromFirestore() {
+  if (!isFirebaseAdminInitialized) return categoriesStore;
+  try {
+    const snapshot = await admin.firestore().collection('categories').get();
+    if (snapshot.empty) {
+      const batch = admin.firestore().batch();
+      for (const cat of defaultCategories) {
+        const docRef = admin.firestore().collection('categories').doc(String(cat.id));
+        batch.set(docRef, cat);
+      }
+      await batch.commit();
+      categoriesStore = [...defaultCategories];
+    } else {
+      const items: any[] = [];
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        items.push({
+          id: data.id !== undefined ? Number(data.id) : Number(doc.id),
+          name: data.name || '',
+          image: data.image || '',
+          products: data.products || []
+        });
+      });
+      items.sort((a, b) => a.id - b.id);
+      categoriesStore = items;
+    }
+  } catch (err: any) {
+    console.warn("Error syncing categories from Firestore:", err.message);
+  }
+  return categoriesStore;
+}
+
+async function syncProductsFromFirestore() {
+  if (!isFirebaseAdminInitialized) return productsStore;
+  try {
+    const snapshot = await admin.firestore().collection('products').get();
+    if (snapshot.empty) {
+      const batch = admin.firestore().batch();
+      for (const prod of defaultProducts) {
+        const docRef = admin.firestore().collection('products').doc(String(prod.id));
+        batch.set(docRef, prod);
+      }
+      await batch.commit();
+      productsStore = [...defaultProducts];
+    } else {
+      const items: any[] = [];
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        items.push({
+          id: data.id !== undefined ? Number(data.id) : Number(doc.id),
+          name: data.name || '',
+          description: data.description || '',
+          price: Number(data.price) || 0,
+          old_price: data.old_price !== undefined && data.old_price !== null ? Number(data.old_price) : null,
+          image: data.image || '',
+          category_id: Number(data.category_id) || 1,
+          category_name: data.category_name || '',
+          tag: data.tag || '',
+          stock: data.stock !== undefined ? Number(data.stock) : 100,
+          sold: data.sold !== undefined ? Number(data.sold) : 0,
+          is_available: data.is_available !== undefined ? Boolean(data.is_available) : true,
+          rating: Number(data.rating) || 5.0,
+          reviews_count: Number(data.reviews_count) || 0
+        });
+      });
+      items.sort((a, b) => a.id - b.id);
+      productsStore = items;
+    }
+  } catch (err: any) {
+    console.warn("Error syncing products from Firestore:", err.message);
+  }
+  return productsStore;
+}
 
 let reviewsStore: any[] = [];
 let cartsStore = new Map<string, any[]>();
@@ -701,133 +778,285 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 });
 
 // Products & Categories Endpoints
-app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], (_req, res) => {
-  res.json(categoriesStore);
-});
-
-app.post(["/categories", "/categories/", "/api/categories", "/api/categories/"], (req, res) => {
-  const { name, image } = req.body;
-  if (!name) {
-    return res.status(400).json({ error: "Category name is required" });
+app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], async (_req, res, next) => {
+  try {
+    const categories = await syncCategoriesFromFirestore();
+    res.json(categories);
+  } catch (error) {
+    next(error);
   }
-  const newCategory = {
-    id: categoriesStore.length > 0 ? Math.max(...categoriesStore.map(c => c.id)) + 1 : 1,
-    name,
-    image: image || "",
-    products: []
-  };
-  categoriesStore.push(newCategory);
-  res.status(201).json(newCategory);
 });
 
-app.put(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], (req, res) => {
-  const catId = Number(req.params.id);
-  const index = categoriesStore.findIndex(c => c.id === catId);
-  if (index === -1) {
-    return res.status(404).json({ error: "Category not found" });
-  }
-  const { name, image } = req.body;
-  if (name !== undefined) categoriesStore[index].name = name;
-  if (image !== undefined) categoriesStore[index].image = image;
-  res.json(categoriesStore[index]);
-});
-
-app.delete(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], (req, res) => {
-  const catId = Number(req.params.id);
-  const index = categoriesStore.findIndex(c => c.id === catId);
-  if (index === -1) {
-    return res.status(404).json({ error: "Category not found" });
-  }
-  const deleted = categoriesStore.splice(index, 1)[0];
-  res.json({ message: "Category deleted successfully", category: deleted });
-});
-
-app.get(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
-  const { category_id } = req.query;
-  if (category_id) {
-    const catId = Number(category_id);
-    const filtered = productsStore.filter(p => p.category_id === catId);
-    return res.json(filtered);
-  }
-  res.json(productsStore);
-});
-
-app.get(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
-  const product = productsStore.find(p => p.id === Number(req.params.id));
-  if (!product) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-  res.json(product);
-});
-
-app.post(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
-  const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
-  const category = categoriesStore.find(c => c.id === Number(category_id));
-  const newProduct = {
-    id: productsStore.length > 0 ? Math.max(...productsStore.map(p => p.id)) + 1 : 1,
-    name: name || "Unnamed Product",
-    description: description || "",
-    price: Number(price) || 0,
-    old_price: old_price !== undefined && old_price !== null ? Number(old_price) : null,
-    image: image || "",
-    category_id: Number(category_id) || 1,
-    category_name: category ? category.name : "General",
-    tag: tag || "",
-    stock: stock !== undefined ? Number(stock) : 100,
-    sold: sold !== undefined ? Number(sold) : 0,
-    is_available: is_available !== undefined ? Boolean(is_available) : true,
-    rating: 5.0,
-    reviews_count: 0
-  };
-  productsStore.push(newProduct);
-  res.status(201).json(newProduct);
-});
-
-app.put(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
-  const prodId = Number(req.params.id);
-  const index = productsStore.findIndex(p => p.id === prodId);
-  if (index === -1) {
-    return res.status(404).json({ error: "Product not found" });
-  }
-  const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
-  if (category_id !== undefined) {
-    const category = categoriesStore.find(c => c.id === Number(category_id));
-    productsStore[index].category_id = Number(category_id);
-    if (category) {
-      productsStore[index].category_name = category.name;
+app.post(["/categories", "/categories/", "/api/categories", "/api/categories/"], async (req, res, next) => {
+  try {
+    await syncCategoriesFromFirestore();
+    const { name, image } = req.body;
+    if (!name) {
+      return res.status(400).json({ error: "Category name is required" });
     }
+    const newCategory = {
+      id: categoriesStore.length > 0 ? Math.max(...categoriesStore.map(c => c.id)) + 1 : 1,
+      name,
+      image: image || "",
+      products: []
+    };
+    categoriesStore.push(newCategory);
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('categories').doc(String(newCategory.id)).set(newCategory);
+      } catch (fErr: any) {
+        console.warn("Firestore category save error:", fErr.message);
+      }
+    }
+
+    res.status(201).json(newCategory);
+  } catch (error) {
+    next(error);
   }
-  if (name !== undefined) productsStore[index].name = name;
-  if (description !== undefined) productsStore[index].description = description;
-  if (price !== undefined) productsStore[index].price = Number(price);
-  if (old_price !== undefined) productsStore[index].old_price = old_price !== null ? Number(old_price) : null;
-  if (image !== undefined) productsStore[index].image = image;
-  if (tag !== undefined) productsStore[index].tag = tag;
-  if (stock !== undefined) productsStore[index].stock = Number(stock);
-  if (sold !== undefined) productsStore[index].sold = Number(sold);
-  if (is_available !== undefined) productsStore[index].is_available = Boolean(is_available);
-
-  res.json(productsStore[index]);
 });
 
-app.delete(["/products/clear-all", "/products/clear-all/", "/api/products/clear-all", "/api/products/clear-all/"], (_req, res) => {
-  productsStore = [];
-  res.json({ success: true, message: "All inventory products deleted successfully" });
-});
+app.put(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], async (req, res, next) => {
+  try {
+    await syncCategoriesFromFirestore();
+    const catId = Number(req.params.id);
+    const index = categoriesStore.findIndex(c => c.id === catId);
+    if (index === -1) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    const { name, image } = req.body;
+    if (name !== undefined) categoriesStore[index].name = name;
+    if (image !== undefined) categoriesStore[index].image = image;
 
-app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
-  const prodId = Number(req.params.id);
-  const index = productsStore.findIndex(p => p.id === prodId);
-  if (index === -1) {
-    return res.status(404).json({ error: "Product not found" });
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('categories').doc(String(catId)).set(categoriesStore[index], { merge: true });
+      } catch (fErr: any) {
+        console.warn("Firestore category update error:", fErr.message);
+      }
+    }
+
+    res.json(categoriesStore[index]);
+  } catch (error) {
+    next(error);
   }
-  const deleted = productsStore.splice(index, 1)[0];
-  res.json({ message: "Product deleted successfully", product: deleted });
 });
 
-app.delete(["/products", "/products/", "/api/products", "/api/products/"], (_req, res) => {
-  productsStore = [];
-  res.json({ success: true, message: "All inventory products deleted successfully" });
+app.delete(["/categories/:id", "/categories/:id/", "/api/categories/:id", "/api/categories/:id/"], async (req, res, next) => {
+  try {
+    await syncCategoriesFromFirestore();
+    const catId = Number(req.params.id);
+    const index = categoriesStore.findIndex(c => c.id === catId);
+    if (index === -1) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    const deleted = categoriesStore.splice(index, 1)[0];
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('categories').doc(String(catId)).delete();
+      } catch (fErr: any) {
+        console.warn("Firestore category delete error:", fErr.message);
+      }
+    }
+
+    res.json({ message: "Category deleted successfully", category: deleted });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get(["/products", "/products/", "/api/products", "/api/products/"], async (req, res, next) => {
+  try {
+    const products = await syncProductsFromFirestore();
+    const { category_id, search } = req.query;
+    let result = products;
+
+    if (category_id) {
+      const catId = Number(category_id);
+      result = result.filter(p => p.category_id === catId);
+    }
+
+    if (search && typeof search === 'string') {
+      const query = search.toLowerCase();
+      result = result.filter(p =>
+        (p.name && p.name.toLowerCase().includes(query)) ||
+        (p.description && p.description.toLowerCase().includes(query)) ||
+        (p.category_name && p.category_name.toLowerCase().includes(query))
+      );
+    }
+
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], async (req, res, next) => {
+  try {
+    const products = await syncProductsFromFirestore();
+    const product = products.find(p => p.id === Number(req.params.id));
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post(["/products", "/products/", "/api/products", "/api/products/"], async (req, res, next) => {
+  try {
+    await syncProductsFromFirestore();
+    await syncCategoriesFromFirestore();
+
+    const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
+    const category = categoriesStore.find(c => c.id === Number(category_id));
+    const newProduct = {
+      id: productsStore.length > 0 ? Math.max(...productsStore.map(p => p.id)) + 1 : 1,
+      name: name || "Unnamed Product",
+      description: description || "",
+      price: Number(price) || 0,
+      old_price: old_price !== undefined && old_price !== null ? Number(old_price) : null,
+      image: image || "",
+      category_id: Number(category_id) || 1,
+      category_name: category ? category.name : "General",
+      tag: tag || "",
+      stock: stock !== undefined ? Number(stock) : 100,
+      sold: sold !== undefined ? Number(sold) : 0,
+      is_available: is_available !== undefined ? Boolean(is_available) : true,
+      rating: 5.0,
+      reviews_count: 0
+    };
+    productsStore.push(newProduct);
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('products').doc(String(newProduct.id)).set(newProduct);
+      } catch (fErr: any) {
+        console.warn("Firestore product save error:", fErr.message);
+      }
+    }
+
+    res.status(201).json(newProduct);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.put(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], async (req, res, next) => {
+  try {
+    await syncProductsFromFirestore();
+    await syncCategoriesFromFirestore();
+
+    const prodId = Number(req.params.id);
+    const index = productsStore.findIndex(p => p.id === prodId);
+    if (index === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
+    if (category_id !== undefined) {
+      const category = categoriesStore.find(c => c.id === Number(category_id));
+      productsStore[index].category_id = Number(category_id);
+      if (category) {
+        productsStore[index].category_name = category.name;
+      }
+    }
+    if (name !== undefined) productsStore[index].name = name;
+    if (description !== undefined) productsStore[index].description = description;
+    if (price !== undefined) productsStore[index].price = Number(price);
+    if (old_price !== undefined) productsStore[index].old_price = old_price !== null ? Number(old_price) : null;
+    if (image !== undefined) productsStore[index].image = image;
+    if (tag !== undefined) productsStore[index].tag = tag;
+    if (stock !== undefined) productsStore[index].stock = Number(stock);
+    if (sold !== undefined) productsStore[index].sold = Number(sold);
+    if (is_available !== undefined) productsStore[index].is_available = Boolean(is_available);
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('products').doc(String(prodId)).set(productsStore[index], { merge: true });
+      } catch (fErr: any) {
+        console.warn("Firestore product update error:", fErr.message);
+      }
+    }
+
+    res.json(productsStore[index]);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete(["/products/clear-all", "/products/clear-all/", "/api/products/clear-all", "/api/products/clear-all/"], async (_req, res, next) => {
+  try {
+    productsStore = [];
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        const productsRef = admin.firestore().collection('products');
+        const snapshot = await productsRef.get();
+        const batch = admin.firestore().batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      } catch (fErr: any) {
+        console.warn("Firestore products clear error:", fErr.message);
+      }
+    }
+
+    res.json({ success: true, message: "All inventory products deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], async (req, res, next) => {
+  try {
+    await syncProductsFromFirestore();
+
+    const prodId = Number(req.params.id);
+    const index = productsStore.findIndex(p => p.id === prodId);
+    if (index === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    const deleted = productsStore.splice(index, 1)[0];
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('products').doc(String(prodId)).delete();
+      } catch (fErr: any) {
+        console.warn("Firestore product delete error:", fErr.message);
+      }
+    }
+
+    res.json({ message: "Product deleted successfully", product: deleted });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete(["/products", "/products/", "/api/products", "/api/products/"], async (_req, res, next) => {
+  try {
+    productsStore = [];
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        const productsRef = admin.firestore().collection('products');
+        const snapshot = await productsRef.get();
+        const batch = admin.firestore().batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      } catch (fErr: any) {
+        console.warn("Firestore products clear error:", fErr.message);
+      }
+    }
+
+    res.json({ success: true, message: "All inventory products deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Reviews Endpoints
@@ -995,16 +1224,19 @@ app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (_req, res, n
     wishlistsStore.clear();
 
     if (isFirebaseAdminInitialized) {
-      try {
-        const ordersRef = admin.firestore().collection('orders');
-        const snapshot = await ordersRef.get();
-        const batch = admin.firestore().batch();
-        snapshot.docs.forEach((doc) => {
-          batch.delete(doc.ref);
-        });
-        await batch.commit();
-      } catch (fErr) {
-        console.warn("Firestore orders clear error:", fErr);
+      const collectionsToClear = ['orders', 'products', 'categories'];
+      for (const colName of collectionsToClear) {
+        try {
+          const colRef = admin.firestore().collection(colName);
+          const snapshot = await colRef.get();
+          const batch = admin.firestore().batch();
+          snapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          await batch.commit();
+        } catch (fErr: any) {
+          console.warn(`Firestore collection ${colName} clear error:`, fErr.message);
+        }
       }
     }
 
