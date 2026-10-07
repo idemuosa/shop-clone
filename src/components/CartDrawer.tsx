@@ -102,6 +102,18 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                           <div>
                             <h4 className="font-bold text-[10px] md:text-xs leading-tight mb-0.5 line-clamp-1">{item.name}</h4>
                             <p className="text-orange-600 font-black text-sm md:text-base">{formatPrice(item.priceValue * item.quantity)}</p>
+                            {item.orderNumber && (
+                              <p className="text-[8px] md:text-[9px] font-bold text-gray-500 mt-0.5">
+                                Ref: <span className="text-orange-600 font-black">{item.orderNumber}</span>
+                              </p>
+                            )}
+                            {(item.customerName || item.phone) && (
+                              <p className="text-[8px] md:text-[9px] text-gray-400 font-medium">
+                                {item.customerName && <span>Name: {item.customerName}</span>}
+                                {item.customerName && item.phone && <span> | </span>}
+                                {item.phone && <span>Phone: {item.phone}</span>}
+                              </p>
+                            )}
                           </div>
                           
                           <div className="flex items-center justify-between mt-auto">

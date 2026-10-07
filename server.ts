@@ -829,15 +829,15 @@ app.post("/api/send-welcome", async (req, res, next) => {
 
 app.post("/api/send-order-confirmation", async (req, res, next) => {
   try {
-    const { email, phone, orderId, productName, totalAmount, shippingAddress, name, items, paymentMethod } = req.body || {};
+    const { email, phone, orderId, orderNumber, productName, totalAmount, shippingAddress, name, items, paymentMethod } = req.body || {};
     const resendClient = getResend();
 
-    const orderRef = (orderId || '').slice(-8).toUpperCase() || 'NEW';
+    const orderRef = orderNumber || (orderId || '').slice(-8).toUpperCase() || 'NEW';
     const displayTotal = typeof totalAmount === 'number' ? totalAmount.toFixed(2) : (totalAmount || '0.00');
 
     // Broadcast real-time order activity via Socket.IO
     io.emit("new_activity", {
-      message: `New Order #${orderRef}: ₦${displayTotal}`,
+      message: `New Order #${orderRef} (${name || 'Customer'} - ${phone || 'N/A'}): ₦${displayTotal}`,
       type: "order"
     });
 
@@ -896,7 +896,9 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
               <p style="font-size: 14px; color: #475569; line-height: 1.5;">Thank you for shopping with Vivi Shop! Your order <strong>#${orderRef}</strong> has been successfully placed.</p>
 
               <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 13px;">
-                <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderId || orderRef}</p>
+                <p style="margin: 4px 0;"><strong>Order Number:</strong> ${orderRef}</p>
+                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${name || 'Valued Customer'}</p>
+                ${phone ? `<p style="margin: 4px 0;"><strong>Phone Number:</strong> ${phone}</p>` : ''}
                 <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${(paymentMethod || 'Online Payment').toUpperCase()}</p>
                 ${addressString ? `<p style="margin: 4px 0;"><strong>Shipping Address:</strong> ${addressString}</p>` : ''}
               </div>

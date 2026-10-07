@@ -9,6 +9,9 @@ export interface CartItem {
   priceValue: number;
   image: string;
   quantity: number;
+  orderNumber?: string;
+  customerName?: string;
+  phone?: string;
 }
 
 interface CartContextType {
@@ -123,13 +126,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addToCart = (product: Omit<CartItem, 'quantity'>, quantity = 1) => {
+    const generatedOrderNumber = product.orderNumber || `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+    const cartProduct = {
+      ...product,
+      orderNumber: generatedOrderNumber,
+    };
     setItems(prev => {
       const existing = prev.find(i => i.id === product.id);
       let newItems;
       if (existing) {
-        newItems = prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + quantity } : i);
+        newItems = prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + quantity, orderNumber: existing.orderNumber || generatedOrderNumber, customerName: product.customerName || existing.customerName, phone: product.phone || existing.phone } : i);
       } else {
-        newItems = [...prev, { ...product, quantity }];
+        newItems = [...prev, { ...cartProduct, quantity }];
       }
       return newItems;
     });
