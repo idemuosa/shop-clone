@@ -7,13 +7,5 @@ coverage/
 .env*
 !.env.example
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-venv/
-.venv/
-*.db
-
 # Firebase
 service-account.json
