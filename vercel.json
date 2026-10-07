@@ -6,11 +6,11 @@
       "destination": "/api/index"
     },
     {
-      "source": "/products/(.*)",
+      "source": "/products(.*)",
       "destination": "/api/index"
     },
     {
-      "source": "/categories/(.*)",
+      "source": "/categories(.*)",
       "destination": "/api/index"
     },
     {

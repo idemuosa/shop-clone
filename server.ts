@@ -1015,7 +1015,11 @@ app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (_req, res, n
 });
 
 async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
+  const distIndexHtml = path.join(process.cwd(), "dist", "index.html");
+  if (process.env.NODE_ENV !== "production" || !fs.existsSync(distIndexHtml)) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn("[Server] Production mode requested but dist/index.html not found. Falling back to Vite development server mode.");
+    }
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1026,7 +1030,7 @@ async function startServer() {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.sendFile(distIndexHtml);
     });
   }
 
