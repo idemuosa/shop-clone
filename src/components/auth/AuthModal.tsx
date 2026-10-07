@@ -480,7 +480,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                          </p>
                       </div>
 
-                      <Button type="submit" disabled={isLoading} className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 shadow-2xl shadow-zinc-200 text-lg transition-all active:scale-95">
+                      <Button type="submit" disabled={isLoading} className="w-4/5 mx-auto flex bg-black hover:bg-zinc-800 text-white font-black rounded-xl h-11 shadow-lg shadow-zinc-200 text-xs transition-all active:scale-95">
                         {isLoading ? 'Creating Account...' : (registerWithFingerprint ? 'Create Account & Register Fingerprint' : 'Create Account & Join')}
                       </Button>
 
