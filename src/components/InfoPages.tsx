@@ -64,15 +64,15 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       case 'flash sales':
         return (
           <div className="space-y-3">
-            <div className="bg-orange-600 rounded-xl p-3.5 md:p-4 text-white relative overflow-hidden">
+            <div className="bg-orange-600 rounded-lg p-2.5 md:p-3 text-white relative overflow-hidden">
               <div className="relative z-10">
-                <div className="bg-white/20 w-fit p-1.5 rounded-lg mb-2 backdrop-blur-md">
-                   <Zap className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                <div className="bg-white/20 w-fit p-1 rounded-md mb-1 backdrop-blur-md">
+                   <Zap className="h-3 w-3 text-yellow-400 fill-yellow-400" />
                 </div>
-                <h2 className="text-lg md:text-xl font-black uppercase italic tracking-tighter mb-1">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
-                <p className="text-orange-100 text-[10px] md:text-xs max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
+                <h2 className="text-sm md:text-base font-black uppercase italic tracking-tighter mb-0.5">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
+                <p className="text-orange-100 text-[9px] md:text-[10px] max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
               </div>
-              <Zap className="absolute right-[-15px] bottom-[-15px] h-24 w-24 text-white/10 rotate-12" />
+              <Zap className="absolute right-[-15px] bottom-[-15px] h-20 w-20 text-white/10 rotate-12" />
             </div>
 
             <ProductSection
@@ -168,13 +168,13 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       case 'best sellers':
         return (
           <div className="space-y-3">
-            <div className="bg-zinc-900 rounded-xl p-3.5 md:p-4 text-white flex flex-col md:flex-row items-center justify-between gap-3 overflow-hidden relative">
+            <div className="bg-zinc-900 rounded-lg p-2.5 md:p-3 text-white flex flex-col md:flex-row items-center justify-between gap-2 overflow-hidden relative">
               <div className="relative z-10 max-w-sm">
-                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-1 font-bold uppercase tracking-widest px-2 py-0.2 text-[8px]">{title}</Badge>
-                <h2 className="text-lg md:text-xl font-black uppercase italic tracking-tighter mb-1">Shop the Latest <span className="text-orange-600">Trends</span></h2>
-                <p className="text-zinc-400 text-[10px] md:text-xs">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
+                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-0.5 font-bold uppercase tracking-widest px-1.5 py-0 text-[7.5px]">{title}</Badge>
+                <h2 className="text-sm md:text-base font-black uppercase italic tracking-tighter mb-0.5">Shop the Latest <span className="text-orange-600">Trends</span></h2>
+                <p className="text-zinc-400 text-[9px] md:text-[10px]">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
               </div>
-              <div className="relative z-10 w-20 h-20 md:w-24 md:h-24 bg-orange-600 rounded-xl overflow-hidden shadow-md rotate-2 shrink-0">
+              <div className="relative z-10 w-16 h-16 md:w-20 md:h-20 bg-orange-600 rounded-lg overflow-hidden shadow-sm rotate-2 shrink-0">
                  <img
                     src={normalizedTitle === 'new arrivals' ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" : "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"}
                     className="w-full h-full object-cover"
@@ -207,15 +207,15 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       case 'clearance':
         return (
           <div className="space-y-3">
-            <div className="bg-red-600 rounded-xl p-3.5 md:p-4 text-white text-center relative overflow-hidden">
+            <div className="bg-red-600 rounded-lg p-2.5 md:p-3 text-white text-center relative overflow-hidden">
                <div className="relative z-10">
-                  <h2 className="text-lg md:text-xl font-black uppercase italic tracking-tighter mb-1">Clearance <span className="text-red-200">Sale</span></h2>
-                  <p className="text-red-100 text-[10px] md:text-xs max-w-sm mx-auto">Last chance to grab these items. Everything must go with prices up to 80% off!</p>
-                  <div className="mt-2 flex justify-center gap-1.5">
-                     <Badge className="bg-white text-red-600 px-2.5 py-0.5 rounded-full font-bold text-[10px] shadow-sm animate-bounce">80% OFF</Badge>
+                  <h2 className="text-sm md:text-base font-black uppercase italic tracking-tighter mb-0.5">Clearance <span className="text-red-200">Sale</span></h2>
+                  <p className="text-red-100 text-[9px] md:text-[10px] max-w-sm mx-auto">Last chance to grab these items. Everything must go with prices up to 80% off!</p>
+                  <div className="mt-1.5 flex justify-center gap-1">
+                     <Badge className="bg-white text-red-600 px-2 py-0.2 rounded-full font-bold text-[9px] shadow-xs">80% OFF</Badge>
                   </div>
                </div>
-               <ShieldAlert className="absolute right-[-10px] top-[-10px] h-24 w-24 text-white/5 -rotate-12" />
+               <ShieldAlert className="absolute right-[-10px] top-[-10px] h-20 w-20 text-white/5 -rotate-12" />
             </div>
 
             {filteredDisplayProducts.length > 0 && (
