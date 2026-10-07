@@ -20,7 +20,8 @@ import {
   Ticket,
   Headset,
   LayoutDashboard,
-  Fingerprint
+  Fingerprint,
+  Star
 } from 'lucide-react';
 import {
   isFingerprintSupported,
@@ -419,8 +420,17 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                           </div>
                           <div className="flex gap-4">
                             {order.status === 'delivered' && (
-                              <Button variant="ghost" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest text-orange-600 hover:bg-orange-600 hover:text-white border-2 border-orange-600 px-6 transition-all" onClick={onClose}>
-                                 REVIEW
+                              <Button
+                                variant="ghost"
+                                className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest text-orange-600 hover:bg-orange-600 hover:text-white border-2 border-orange-600 px-6 transition-all flex items-center gap-1.5"
+                                onClick={() => {
+                                  onClose();
+                                  toast.info(`Rate and review ${order.productName || 'your item'} with 5-star feedback!`, {
+                                    icon: <Star className="h-4 w-4 fill-orange-500 text-orange-500" />
+                                  });
+                                }}
+                              >
+                                 <Star className="h-3 w-3 fill-orange-500 text-orange-500" /> REVIEW
                               </Button>
                             )}
                             <Button variant="outline" className="h-10 rounded-xl font-black uppercase text-[10px] tracking-widest border-2 border-zinc-900 bg-zinc-900 text-white hover:bg-zinc-800 px-6 transition-all active:scale-95 shadow-md shadow-zinc-100" onClick={onClose}>
