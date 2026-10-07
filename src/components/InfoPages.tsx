@@ -102,25 +102,25 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
         );
       case 'help':
         return (
-          <div className="max-w-lg mx-auto space-y-1.5">
-            <div className="text-center space-y-0.5 mb-1.5">
-              <h2 className="text-xs md:text-sm font-black uppercase italic tracking-tighter">How can we <span className="text-orange-600">help?</span></h2>
-              <p className="text-gray-400 font-bold uppercase text-[7px] tracking-widest">Support is available 24/7 for the Vivi community</p>
+          <div className="max-w-md mx-auto space-y-1">
+            <div className="text-center space-y-0.5 mb-1">
+              <h2 className="text-[11px] md:text-xs font-black uppercase italic tracking-tighter">How can we <span className="text-orange-600">help?</span></h2>
+              <p className="text-gray-400 font-bold uppercase text-[6.5px] tracking-widest">Support is available 24/7 for the Vivi community</p>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {faqs.map((faq, i) => (
                 <div
                   key={i}
-                  className={`bg-white rounded-md border transition-all overflow-hidden ${expandedFaq === i ? 'border-orange-500 shadow-2xs' : 'border-gray-100 hover:border-orange-200'}`}
+                  className={`bg-white rounded border transition-all overflow-hidden ${expandedFaq === i ? 'border-orange-500 shadow-2xs' : 'border-gray-100 hover:border-orange-200'}`}
                 >
                   <button
                     onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                    className="w-full p-2 flex items-center justify-between text-left group"
+                    className="w-full p-1.5 flex items-center justify-between text-left group"
                   >
-                    <span className={`text-[10px] font-bold tracking-tight ${expandedFaq === i ? 'text-orange-600' : 'text-gray-700'}`}>{faq.q}</span>
+                    <span className={`text-[9px] font-bold tracking-tight ${expandedFaq === i ? 'text-orange-600' : 'text-gray-700'}`}>{faq.q}</span>
                     <div className={`p-0.5 rounded transition-colors ${expandedFaq === i ? 'bg-orange-600 text-white' : 'bg-gray-50 text-gray-400 group-hover:text-orange-600'}`}>
-                      {expandedFaq === i ? <ChevronUp className="h-2.5 w-2.5" /> : <ChevronDown className="h-2.5 w-2.5" />}
+                      {expandedFaq === i ? <ChevronUp className="h-2 w-2" /> : <ChevronDown className="h-2 w-2" />}
                     </div>
                   </button>
 
@@ -132,7 +132,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.15, ease: "easeInOut" }}
                       >
-                        <div className="px-2 pb-2 text-gray-500 font-medium text-[9px] leading-relaxed border-t border-gray-50 pt-1 mt-0.5 mx-2 italic">
+                        <div className="px-1.5 pb-1.5 text-gray-500 font-medium text-[8px] leading-relaxed border-t border-gray-50 pt-0.5 mt-0.5 mx-1.5 italic">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -142,22 +142,22 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
               ))}
             </div>
 
-            <div className="bg-black rounded-lg p-2.5 text-white flex flex-row items-center justify-between gap-2 relative overflow-hidden group mt-2">
-              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:rotate-12 transition-transform">
-                <Headset className="h-10 w-10" />
+            <div className="bg-black rounded-md p-2 text-white flex flex-row items-center justify-between gap-1.5 relative overflow-hidden group mt-1.5">
+              <div className="absolute top-0 right-0 p-1.5 opacity-10 group-hover:rotate-12 transition-transform">
+                <Headset className="h-8 w-8" />
               </div>
-              <div className="flex items-center gap-2 relative z-10">
-                <div className="bg-zinc-800 p-1.5 rounded-md shadow-xs">
-                  <Headset className="h-3.5 w-3.5 text-orange-500" />
+              <div className="flex items-center gap-1.5 relative z-10">
+                <div className="bg-zinc-800 p-1 rounded shadow-xs">
+                  <Headset className="h-3 w-3 text-orange-500" />
                 </div>
                 <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-tight italic">Need direct assistance?</h4>
-                  <p className="text-zinc-400 text-[8px] font-medium">Contact our expert support team now.</p>
+                  <h4 className="text-[9px] font-black uppercase tracking-tight italic">Need direct assistance?</h4>
+                  <p className="text-zinc-400 text-[7px] font-medium">Contact our expert support team now.</p>
                 </div>
               </div>
               <Button
                 onClick={handleStartChat}
-                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded px-2.5 h-6 shadow-2xs transition-all active:scale-95 text-[9px]"
+                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded px-2 h-5 shadow-2xs transition-all active:scale-95 text-[8px]"
               >
                 GET IN TOUCH
               </Button>
@@ -167,14 +167,14 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       case 'new arrivals':
       case 'best sellers':
         return (
-          <div className="space-y-2">
-            <div className="bg-zinc-900 rounded-lg p-2 md:p-2.5 text-white flex flex-row items-center justify-between gap-2 overflow-hidden relative">
-              <div className="relative z-10 max-w-[70%]">
-                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-0.5 font-bold uppercase tracking-widest px-1 py-0 text-[7px]">{title}</Badge>
-                <h2 className="text-xs md:text-sm font-black uppercase italic tracking-tighter mb-0.5">Shop the Latest <span className="text-orange-600">Trends</span></h2>
-                <p className="text-zinc-400 text-[8px] md:text-[9px]">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
+          <div className="space-y-1.5">
+            <div className="bg-zinc-900 rounded-md p-1.5 md:p-2 text-white flex flex-row items-center justify-between gap-1.5 overflow-hidden relative">
+              <div className="relative z-10 max-w-[75%]">
+                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-0.5 font-bold uppercase tracking-widest px-1 py-0 text-[6.5px]">{title}</Badge>
+                <h2 className="text-[11px] md:text-xs font-black uppercase italic tracking-tighter mb-0.5">Shop the Latest <span className="text-orange-600">Trends</span></h2>
+                <p className="text-zinc-400 text-[7.5px] md:text-[8px]">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
               </div>
-              <div className="relative z-10 w-12 h-12 md:w-16 md:h-16 bg-orange-600 rounded-md overflow-hidden shadow-2xs rotate-2 shrink-0">
+              <div className="relative z-10 w-10 h-10 md:w-12 md:h-12 bg-orange-600 rounded overflow-hidden shadow-2xs rotate-2 shrink-0">
                  <img
                     src={normalizedTitle === 'new arrivals' ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" : "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"}
                     className="w-full h-full object-cover"
@@ -184,7 +184,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                     }}
                  />
               </div>
-              <div className="absolute top-[-20px] left-[-20px] w-24 h-24 bg-orange-600/10 rounded-full blur-xl"></div>
+              <div className="absolute top-[-20px] left-[-20px] w-20 h-20 bg-orange-600/10 rounded-full blur-xl"></div>
             </div>
 
             {filteredDisplayProducts.length > 0 ? (
