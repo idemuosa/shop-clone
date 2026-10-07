@@ -487,28 +487,28 @@ function MainContent() {
         )}
 
         {/* Features Section */}
-        <section className="py-20 bg-white border-t border-gray-100">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-12">
+        <section className="py-8 bg-white border-t border-gray-100">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
-                <Truck className="h-8 w-8 text-orange-600" />
+              <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-2">
+                <Truck className="h-5 w-5 text-orange-600" />
               </div>
-              <h4 className="text-lg font-bold mb-2  tracking-wider">Free and Fast Delivery</h4>
-              <p className="text-sm text-gray-500">Free delivery for all orders over $140</p>
+              <h4 className="text-xs font-bold mb-0.5 tracking-wider">Free and Fast Delivery</h4>
+              <p className="text-[10px] text-gray-500">Free delivery for all orders over $140</p>
             </div>
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
-                <Headset className="h-8 w-8 text-orange-600" />
+              <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-2">
+                <Headset className="h-5 w-5 text-orange-600" />
               </div>
-              <h4 className="text-lg font-bold mb-2  tracking-wider">24/7 Customer Service</h4>
-              <p className="text-sm text-gray-500">Friendly 24/7 customer support</p>
+              <h4 className="text-xs font-bold mb-0.5 tracking-wider">24/7 Customer Service</h4>
+              <p className="text-[10px] text-gray-500">Friendly 24/7 customer support</p>
             </div>
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-6">
-                <ShieldCheck className="h-8 w-8 text-orange-600" />
+              <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-2">
+                <ShieldCheck className="h-5 w-5 text-orange-600" />
               </div>
-              <h4 className="text-lg font-bold mb-2  tracking-wider">Money Back Guarantee</h4>
-              <p className="text-sm text-gray-500">We return money within 30 days</p>
+              <h4 className="text-xs font-bold mb-0.5 tracking-wider">Money Back Guarantee</h4>
+              <p className="text-[10px] text-gray-500">We return money within 30 days</p>
             </div>
           </div>
         </section>

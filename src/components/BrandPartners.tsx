@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 
-const brands = [
+export const BRANDS = [
   { name: "Apple", logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" },
   { name: "Samsung", logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" },
   { name: "Nike", logo: "https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg" },
@@ -19,7 +19,7 @@ export default function BrandPartners() {
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-2.5 md:gap-5">
-          {brands.map((brand, i) => (
+          {BRANDS.map((brand, i) => (
             <motion.div
               key={brand.name}
               initial={{ opacity: 0, y: 5 }}
