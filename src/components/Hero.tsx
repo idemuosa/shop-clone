@@ -34,7 +34,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-white overflow-hidden border-b border-gray-100">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex flex-col md:flex-row items-center gap-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 flex flex-col md:flex-row items-center gap-4 md:gap-6">
         {/* Text Content */}
         <motion.div
           initial="hidden"
@@ -56,24 +56,24 @@ export default function Hero() {
               hidden: { opacity: 0, x: -20 },
               visible: { opacity: 1, x: 0 }
             }}
-            className="flex flex-col md:flex-row items-center gap-4 mb-6"
+            className="flex flex-col md:flex-row items-center gap-2 mb-3"
           >
             <div
-              className="inline-flex items-center gap-2 bg-orange-600 text-white px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest border-2 border-green-100"
+              className="inline-flex items-center gap-1.5 bg-orange-600 text-white px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100"
             >
-              <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              <Zap className="h-3 w-3 fill-yellow-400 text-yellow-400" />
               Vivi Store
             </div>
             
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-orange-600" />
-              <div className="flex gap-1">
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3 w-3 text-orange-600" />
+              <div className="flex gap-0.5">
                 {[timeLeft.hours, timeLeft.minutes, timeLeft.seconds].map((unit, i) => (
                   <div key={i} className="flex items-center">
-                    <div className="bg-black text-white px-2 py-1 rounded text-xs font-black min-w-[30px] text-center">
+                    <div className="bg-black text-white px-1.5 py-0.5 rounded text-[10px] font-black min-w-[22px] text-center">
                       {unit.toString().padStart(2, '0')}
                     </div>
-                    {i < 2 && <span className="text-black font-black mx-0.5">:</span>}
+                    {i < 2 && <span className="text-black font-black mx-0.5 text-[10px]">:</span>}
                   </div>
                 ))}
               </div>
@@ -85,10 +85,10 @@ export default function Hero() {
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 }
             }}
-            className="text-2xl md:text-4xl font-black text-black leading-tight mb-4 md:mb-6 uppercase italic tracking-tighter"
+            className="text-lg md:text-2xl font-black text-black leading-tight mb-2 md:mb-3 uppercase italic tracking-tighter"
           >
             UP TO <span className="text-orange-600">90% OFF</span> <br />
-            ON ALL <span className="underline decoration-yellow-400 decoration-8 underline-offset-4">TRENDING</span> ITEMS
+            ON ALL <span className="underline decoration-yellow-400 decoration-4 underline-offset-2">TRENDING</span> ITEMS
           </motion.h1>
           
           <motion.p 
@@ -96,9 +96,9 @@ export default function Hero() {
               hidden: { opacity: 0, y: 20 },
               visible: { opacity: 1, y: 0 }
             }}
-            className="text-gray-500 max-w-lg mb-6 md:mb-8 text-sm md:text-lg font-medium"
+            className="text-gray-500 max-w-lg mb-3 md:mb-4 text-xs md:text-sm font-medium"
           >
-            Don't miss out on the biggest deals of the season. High-quality products at unbeatable prices. Shop the latest gadgets, fashion, and home essentials.
+            Don't miss out on the biggest deals of the season. High-quality products at unbeatable prices.
           </motion.p>
           
           <motion.div 
@@ -106,13 +106,13 @@ export default function Hero() {
               hidden: { opacity: 0, scale: 0.9 },
               visible: { opacity: 1, scale: 1 }
             }}
-            className="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4"
+            className="flex flex-wrap justify-center md:justify-start gap-2"
           >
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black shadow-xl shadow-orange-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter">
-              <ShoppingBag className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Shop Deals Now
+            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-4 md:px-6 py-2 rounded-xl text-xs font-black shadow-md shadow-orange-100 transition-all hover:scale-105 active:scale-95 uppercase tracking-tighter h-9">
+              <ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Shop Deals Now
             </Button>
-            <Button variant="outline" className="border-2 border-gray-100 px-6 md:px-10 py-5 md:py-7 rounded-2xl text-sm md:text-lg font-black transition-all hover:bg-gray-50 uppercase tracking-tighter">
-              <Gift className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Claim Coupon
+            <Button variant="outline" className="border border-gray-200 px-4 md:px-6 py-2 rounded-xl text-xs font-black transition-all hover:bg-gray-50 uppercase tracking-tighter h-9">
+              <Gift className="mr-1.5 h-3.5 w-3.5" /> Claim Coupon
             </Button>
           </motion.div>
 
@@ -122,35 +122,35 @@ export default function Hero() {
               hidden: { opacity: 0 },
               visible: { opacity: 0.6 }
             }}
-            className="mt-10 flex flex-wrap justify-center md:justify-start gap-6"
+            className="mt-4 flex flex-wrap justify-center md:justify-start gap-4"
           >
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Verified Sellers</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+              <span className="text-[9px] font-black uppercase tracking-widest">Verified Sellers</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Secure Payment</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+              <span className="text-[9px] font-black uppercase tracking-widest">Secure Payment</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-[10px] font-black uppercase tracking-widest">Easy Returns</span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
+              <span className="text-[9px] font-black uppercase tracking-widest">Easy Returns</span>
             </div>
           </motion.div>
         </motion.div>
 
-        {/* Image Content - Reduced image size by using lower width in URL */}
-        <div className="flex-1 relative w-full max-w-lg md:max-w-none">
+        {/* Image Content */}
+        <div className="flex-1 relative w-full max-w-sm md:max-w-none">
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative z-10 bg-green-50 rounded-[40px] p-4 md:p-8"
+            className="relative z-10 bg-green-50 rounded-2xl p-2 md:p-4"
           >
             <img 
               src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800&auto=format&fit=crop"
               alt="Fashion Trends" 
-              className="w-full h-auto rounded-[32px] object-cover shadow-2xl max-h-[500px]"
+              className="w-full h-auto rounded-xl object-cover shadow-lg max-h-[260px]"
               referrerPolicy="no-referrer"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?q=80&w=800&auto=format&fit=crop';

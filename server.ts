@@ -773,6 +773,11 @@ app.put(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/
   res.json(productsStore[index]);
 });
 
+app.delete(["/products/clear-all", "/products/clear-all/", "/api/products/clear-all", "/api/products/clear-all/"], (req, res) => {
+  productsStore = [];
+  res.json({ success: true, message: "All inventory products deleted successfully" });
+});
+
 app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/:id/"], (req, res) => {
   const prodId = Number(req.params.id);
   const index = productsStore.findIndex(p => p.id === prodId);
@@ -781,6 +786,11 @@ app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/produc
   }
   const deleted = productsStore.splice(index, 1)[0];
   res.json({ message: "Product deleted successfully", product: deleted });
+});
+
+app.delete(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
+  productsStore = [];
+  res.json({ success: true, message: "All inventory products deleted successfully" });
 });
 
 // Reviews Endpoints
@@ -834,6 +844,51 @@ app.post(["/api/wishlist/add_to_wishlist", "/api/wishlist/add_to_wishlist/"], (r
   }
   wishlistsStore.set(userId, userWishlist);
   res.json({ success: true, wishlist: userWishlist });
+});
+
+// User Management Endpoints
+app.delete("/api/admin/users/:id", async (req, res, next) => {
+  const userId = req.params.id;
+  try {
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('users').doc(userId).delete();
+      } catch (fErr) {
+        console.warn("Firestore user delete error:", fErr);
+      }
+      try {
+        await admin.auth().deleteUser(userId);
+      } catch (aErr) {
+        console.warn("Firebase Auth user delete error:", aErr);
+      }
+    }
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.delete("/api/admin/users", async (req, res, next) => {
+  try {
+    if (isFirebaseAdminInitialized) {
+      const snapshot = await admin.firestore().collection('users').get();
+      const batch = admin.firestore().batch();
+      for (const docSnap of snapshot.docs) {
+        const uData = docSnap.data();
+        const isPrimaryAdmin = uData.email === 'idemudiawisdom27@gmail.com' || uData.email === process.env.ADMIN_EMAIL;
+        if (!isPrimaryAdmin) {
+          batch.delete(docSnap.ref);
+          try {
+            await admin.auth().deleteUser(docSnap.id);
+          } catch (e) {}
+        }
+      }
+      await batch.commit();
+    }
+    res.json({ success: true, message: "All non-admin users cleared successfully" });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Merchants / Seed / Orders Fallback Endpoints
