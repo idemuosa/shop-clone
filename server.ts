@@ -201,6 +201,83 @@ let categoriesStore: any[] = [];
 
 let productsStore: any[] = [];
 
+let categoriesStore: any[] = [...defaultCategories];
+let productsStore: any[] = [...defaultProducts];
+
+async function syncCategoriesFromFirestore() {
+  if (!isFirebaseAdminInitialized) return categoriesStore;
+  try {
+    const snapshot = await admin.firestore().collection('categories').get();
+    if (snapshot.empty) {
+      const batch = admin.firestore().batch();
+      for (const cat of defaultCategories) {
+        const docRef = admin.firestore().collection('categories').doc(String(cat.id));
+        batch.set(docRef, cat);
+      }
+      await batch.commit();
+      categoriesStore = [...defaultCategories];
+    } else {
+      const items: any[] = [];
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        items.push({
+          id: data.id !== undefined ? Number(data.id) : Number(doc.id),
+          name: data.name || '',
+          image: data.image || '',
+          products: data.products || []
+        });
+      });
+      items.sort((a, b) => a.id - b.id);
+      categoriesStore = items;
+    }
+  } catch (err: any) {
+    console.warn("Error syncing categories from Firestore:", err.message);
+  }
+  return categoriesStore;
+}
+
+async function syncProductsFromFirestore() {
+  if (!isFirebaseAdminInitialized) return productsStore;
+  try {
+    const snapshot = await admin.firestore().collection('products').get();
+    if (snapshot.empty) {
+      const batch = admin.firestore().batch();
+      for (const prod of defaultProducts) {
+        const docRef = admin.firestore().collection('products').doc(String(prod.id));
+        batch.set(docRef, prod);
+      }
+      await batch.commit();
+      productsStore = [...defaultProducts];
+    } else {
+      const items: any[] = [];
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        items.push({
+          id: data.id !== undefined ? Number(data.id) : Number(doc.id),
+          name: data.name || '',
+          description: data.description || '',
+          price: Number(data.price) || 0,
+          old_price: data.old_price !== undefined && data.old_price !== null ? Number(data.old_price) : null,
+          image: data.image || '',
+          category_id: Number(data.category_id) || 1,
+          category_name: data.category_name || '',
+          tag: data.tag || '',
+          stock: data.stock !== undefined ? Number(data.stock) : 100,
+          sold: data.sold !== undefined ? Number(data.sold) : 0,
+          is_available: data.is_available !== undefined ? Boolean(data.is_available) : true,
+          rating: Number(data.rating) || 5.0,
+          reviews_count: Number(data.reviews_count) || 0
+        });
+      });
+      items.sort((a, b) => a.id - b.id);
+      productsStore = items;
+    }
+  } catch (err: any) {
+    console.warn("Error syncing products from Firestore:", err.message);
+  }
+  return productsStore;
+}
+
 let reviewsStore: any[] = [];
 let cartsStore = new Map<string, any[]>();
 let wishlistsStore = new Map<string, number[]>();
