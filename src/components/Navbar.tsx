@@ -83,7 +83,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
   return (
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       {/* Top bar */}
-      <div className="bg-orange-600 text-white py-2 px-4 text-center text-xs font-bold  tracking-widest">
+      <div className="bg-orange-600 text-white py-1 px-3 text-center text-[10px] md:text-xs font-bold tracking-widest">
         <span className="flex items-center justify-center gap-2">
           {storeSettings?.bannerMessage || 'Welcome to Vivi - Enjoy Free Shipping on Orders Over $140!'}
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
@@ -91,8 +91,8 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
       </div>
 
       {/* Main Navbar */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20 gap-2 md:gap-4">
+      <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 md:h-20 gap-2 md:gap-4">
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-1 md:gap-2 cursor-pointer" onClick={() => {
             if (showAdmin) onToggleAdmin();
