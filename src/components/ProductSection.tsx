@@ -120,20 +120,35 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   }, []);
 
   const handleAddToCart = (product: Product, quantity: number = 1) => {
+    const orderNumber = `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+    const customerName = profile?.displayName || profile?.display_name || user?.displayName || user?.email?.split('@')[0] || 'Customer';
+    const customerPhone = (profile as any)?.phone || user?.phoneNumber || '07045108847 or 09053091235';
+
     addToCart({
       id: product.id.toString(),
       name: product.name,
       price: product.price.toString(),
       priceValue: typeof product.price === 'number' ? product.price : parseFloat(product.price.toString().replace(/[^\d.]/g, '')),
-      image: product.image
+      image: product.image,
+      orderNumber,
+      customerName,
+      phone: customerPhone
     }, quantity);
-    toast.success(`${product.name} added to cart!`, {
-      icon: <ShoppingCart className="h-4 w-4 text-orange-600" />,
-      action: {
-        label: "View Cart",
-        onClick: () => setIsOpen(true)
+
+    toast.success(
+      <div>
+        <p className="font-bold">{product.name} added to cart!</p>
+        <p className="text-[10px] text-gray-500 font-bold mt-0.5">Order #: <span className="text-orange-600">{orderNumber}</span></p>
+        <p className="text-[10px] text-gray-500 font-bold">Name: {customerName} | Phone: {customerPhone}</p>
+      </div>,
+      {
+        icon: <ShoppingCart className="h-4 w-4 text-orange-600" />,
+        action: {
+          label: "View Cart",
+          onClick: () => setIsOpen(true)
+        }
       }
-    });
+    );
   };
 
   useEffect(() => {
@@ -414,13 +429,23 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       const unitPrice = typeof product.price === 'number' ? product.price : parseFloat(product.price.toString().replace(/[^\d.]/g, ''));
       const totalAmount = unitPrice * quantity;
 
+      const generatedOrderNumber = `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
+      const customerName = profile?.displayName || profile?.display_name || user.displayName || user.email?.split('@')[0] || 'Customer';
+      const customerPhone = (profile as any)?.phone || user.phoneNumber || '07045108847 or 09053091235';
+
       const orderData = {
         userId: user.uid,
+        orderId: generatedOrderNumber,
+        orderNumber: generatedOrderNumber,
         customerEmail: user.email,
+        customerName: customerName,
+        name: customerName,
+        phone: customerPhone,
+        phoneNumber: customerPhone,
         productName: product.name,
         productImage: product.image,
         quantity: quantity,
-        items: [{ id: product.id, name: product.name, price: product.price, quantity }],
+        items: [{ id: product.id, name: product.name, price: product.price, quantity, orderNumber: generatedOrderNumber }],
         totalAmount: totalAmount,
         shippingAddress: {
           address: deliveryAddress,
@@ -441,10 +466,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold">Order Placed Successfully!</p>
-          <p className="text-[10px]  font-black tracking-widest text-orange-600">
+          <p className="text-[10px] font-bold text-gray-700">Order #: <span className="text-orange-600 font-black">{generatedOrderNumber}</span></p>
+          <p className="text-[10px] font-bold text-gray-700">Name: {customerName} | Phone: {customerPhone}</p>
+          <p className="text-[10px] font-black tracking-widest text-orange-600">
             Vivi Reward: You saved ${(unitPrice * quantity * 0.9).toFixed(2)} today!
           </p>
-          <Button variant="link" className="p-0 h-auto text-[10px] text-blue-600 font-bold  tracking-tighter">
+          <Button variant="link" className="p-0 h-auto text-[10px] text-blue-600 font-bold tracking-tighter">
             Share with friends for a ₦20 Coupon 🎁
           </Button>
         </div>,
@@ -455,8 +482,11 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       await addDoc(collection(db, 'notifications'), {
         type: 'order_notification',
         orderId: orderRef.id,
+        orderNumber: generatedOrderNumber,
         userId: user.uid,
         email: user.email,
+        name: customerName,
+        phone: customerPhone,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
@@ -468,7 +498,9 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             email: user.email, 
-            orderId: orderRef.id,
+            phone: customerPhone,
+            orderId: generatedOrderNumber,
+            orderNumber: generatedOrderNumber,
             productName: product.name,
             totalAmount: totalAmount.toFixed(2),
             shippingAddress: {
@@ -476,7 +508,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
               city: deliveryCity,
               zipCode: deliveryZip
             },
-            name: user.displayName
+            name: customerName
           }),
         });
       } catch (emailErr) {
