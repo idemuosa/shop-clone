@@ -26,7 +26,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { API_URL } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
 import { ShieldCheck, Mail, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff, Fingerprint } from 'lucide-react';
-import { isFingerprintSupported, authenticateWithFingerprint } from '@/lib/fingerprintAuth';
+import { isFingerprintSupported, authenticateWithFingerprint, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -39,6 +39,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [fingerprintSupported, setFingerprintSupported] = useState(false);
+  const [registerWithFingerprint, setRegisterWithFingerprint] = useState(false);
   const { user } = useAuth();
 
   React.useEffect(() => {
@@ -185,6 +186,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         role: isAdminEmail ? 'admin' : 'user',
         createdAt: serverTimestamp(),
       });
+
+      // Register fingerprint credential if option selected or enabled
+      if (fingerprintSupported && registerWithFingerprint) {
+        try {
+          await registerFingerprintCredential(userCredential.user.uid, email);
+          toast.success("Fingerprint registered successfully for fast biometric sign-in!");
+        } catch (fpErr: any) {
+          console.warn("Fingerprint registration skipped or failed:", fpErr);
+          toast.info("Account created. You can enable fingerprint sign-in in your Profile settings anytime.");
+        }
+      }
 
       // Send welcome email
       fetch(`${API_URL}/api/send-welcome`, {
@@ -441,6 +453,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         </div>
                       </div>
 
+                      {fingerprintSupported && (
+                        <div className="bg-orange-50 p-3.5 rounded-2xl border border-orange-200 flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="bg-orange-100 p-2 rounded-xl text-orange-600">
+                              <Fingerprint className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-black text-gray-900 leading-tight">Enable Fingerprint Registration</p>
+                              <p className="text-[9px] text-gray-500 font-bold">Sign in with Touch ID / Biometrics</p>
+                            </div>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={registerWithFingerprint}
+                            onChange={(e) => setRegisterWithFingerprint(e.target.checked)}
+                            className="h-5 w-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500 cursor-pointer"
+                          />
+                        </div>
+                      )}
+
                       <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100 flex gap-3">
                          <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                          <p className="text-[10px] text-blue-700 font-bold leading-relaxed  tracking-tight">
@@ -449,7 +481,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       </div>
 
                       <Button type="submit" disabled={isLoading} className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 shadow-2xl shadow-zinc-200 text-lg transition-all active:scale-95">
-                        {isLoading ? 'Creating Account...' : 'Create Account & Join'}
+                        {isLoading ? 'Creating Account...' : (registerWithFingerprint ? 'Create Account & Register Fingerprint' : 'Create Account & Join')}
                       </Button>
 
                       {fingerprintSupported && (
