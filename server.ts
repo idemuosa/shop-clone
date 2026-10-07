@@ -845,6 +845,33 @@ app.all(["/api/seed", "/api/seed/"], (req, res) => {
   res.json({ message: "Database seeded successfully" });
 });
 
+app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (req, res, next) => {
+  try {
+    productsStore = [];
+    reviewsStore = [];
+    cartsStore.clear();
+    wishlistsStore.clear();
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        const ordersRef = admin.firestore().collection('orders');
+        const snapshot = await ordersRef.get();
+        const batch = admin.firestore().batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      } catch (fErr) {
+        console.warn("Firestore orders clear error:", fErr);
+      }
+    }
+
+    res.json({ success: true, message: "Store data cleared successfully" });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
     const { createServer: createViteServer } = await import("vite");
