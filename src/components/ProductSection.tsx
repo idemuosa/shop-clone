@@ -510,17 +510,17 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   };
 
   return (
-    <section className="py-3 bg-[#f5f5f5]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-2 bg-[#f5f5f5]">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2 bg-white p-2.5 md:p-3 rounded-lg shadow-xs border border-gray-100">
-          <div className="flex items-center gap-2">
-            <div className="bg-orange-600 p-1.5 rounded-md shadow-xs shadow-orange-100">
-              <Zap className="h-3.5 w-3.5 text-white fill-white" />
+        <div className="flex flex-row items-center justify-between mb-2 gap-2 bg-white p-2 md:p-2.5 rounded-md shadow-2xs border border-gray-100">
+          <div className="flex items-center gap-1.5">
+            <div className="bg-orange-600 p-1 rounded">
+              <Zap className="h-3 w-3 text-white fill-white" />
             </div>
             <div>
-              <h2 className="text-sm md:text-base font-black text-black tracking-tighter leading-none">{title} <span className="text-orange-600 italic">{subtitle}</span></h2>
-              <p className="text-[7.5px] md:text-[8px] font-bold text-gray-400 tracking-widest mt-0.5">{filteredProducts.length} Products Found</p>
+              <h2 className="text-xs md:text-sm font-black text-black tracking-tighter leading-none">{title} <span className="text-orange-600 italic">{subtitle}</span></h2>
+              <p className="text-[7px] font-bold text-gray-400 tracking-widest mt-0.5">{filteredProducts.length} Products Found</p>
             </div>
           </div>
           
@@ -813,31 +813,31 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     />
                   </div>
 
-                  <div className="p-2 md:p-3">
-                    <h3 className="text-[10px] md:text-xs font-medium text-gray-800 line-clamp-2 h-7 md:h-8 mb-1 md:mb-2 group-hover:text-orange-600 transition-colors">{product.name}</h3>
+                  <div className="p-1.5 md:p-2">
+                    <h3 className="text-[9px] md:text-[10px] font-medium text-gray-800 line-clamp-2 h-6 md:h-7 mb-1 group-hover:text-orange-600 transition-colors">{product.name}</h3>
                     
-                    <div className="flex items-baseline gap-1 md:gap-1.5 mb-1">
-                      <span className="text-sm md:text-lg font-black text-orange-600 leading-none">{formatPrice(product.price)}</span>
+                    <div className="flex items-baseline gap-1 mb-0.5">
+                      <span className="text-xs md:text-sm font-black text-orange-600 leading-none">{formatPrice(product.price)}</span>
                       {product.oldPrice && (
-                        <span className="text-[9px] md:text-[11px] text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
+                        <span className="text-[8px] md:text-[9px] text-gray-400 line-through">{formatPrice(product.oldPrice)}</span>
                       )}
                     </div>
 
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-0.5">
-                        <Star className="h-2.5 w-2.5 md:h-3 md:w-3 fill-orange-500 text-orange-500" />
-                        <span className="text-[9px] md:text-[11px] font-bold text-gray-700">{product.rating}</span>
+                        <Star className="h-2 w-2 md:h-2.5 md:w-2.5 fill-orange-500 text-orange-500" />
+                        <span className="text-[8px] md:text-[9px] font-bold text-gray-700">{product.rating}</span>
                       </div>
                       {product.sold && (
-                        <span className="text-[9px] md:text-[10px] font-bold text-gray-400">{product.sold} sold</span>
+                        <span className="text-[8px] font-bold text-gray-400">{product.sold} sold</span>
                       )}
                     </div>
                     
-                      <div className="flex items-center justify-between mb-3 bg-gray-50 rounded-lg p-1">
+                      <div className="flex items-center justify-between mb-1.5 bg-gray-50 rounded-md p-0.5">
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-5 w-5 rounded hover:bg-white hover:text-orange-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -846,13 +846,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             }));
                           }}
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-2.5 w-2.5" />
                         </Button>
-                        <span className="text-xs font-black w-8 text-center">{productQuantities[product.id] || 1}</span>
+                        <span className="text-[10px] font-black w-6 text-center">{productQuantities[product.id] || 1}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-5 w-5 rounded hover:bg-white hover:text-orange-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -861,17 +861,17 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             }));
                           }}
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-2.5 w-2.5" />
                         </Button>
                       </div>
                         <Button
-                          className="w-full h-8 bg-orange-600 text-white hover:bg-orange-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm gap-2"
+                          className="w-full h-6.5 bg-orange-600 text-white hover:bg-orange-700 border-none text-[9.5px] font-black rounded transition-colors shadow-2xs gap-1"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart(product, productQuantities[product.id] || 1);
                           }}
                         >
-                          <ShoppingCart className="h-3.5 w-3.5" />
+                          <ShoppingCart className="h-3 w-3" />
                           Add to cart
                         </Button>
                   </div>
