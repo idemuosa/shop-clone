@@ -16,7 +16,6 @@ interface CategorySectionProps {
 const iconMap: Record<string, React.ReactNode> = {
   "Electronics": <Smartphone className="h-5 w-5" />,
   "Fashion": <ShoppingBag className="h-5 w-5" />,
-  "Home & Decor": <Box className="h-5 w-5" />,
   "Sports": <Footprints className="h-5 w-5" />,
   "Gadgets": <Smartphone className="h-5 w-5" />,
   "Laptops": <Laptop className="h-5 w-5" />,

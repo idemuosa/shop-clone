@@ -402,7 +402,7 @@ function MainContent() {
                 <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider whitespace-nowrap mr-1">
                   Quick Filter:
                 </span>
-                {["All", "Fashion", "Home & Decor", "Electronics", "Gadgets", "Watches", "Sports"].map((cat) => (
+                {["All", "Fashion", "Electronics", "Gadgets", "Watches", "Audio", "Sports"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => handleSearch(cat === "All" ? "" : cat)}
@@ -438,7 +438,7 @@ function MainContent() {
                 </p>
 
                 <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto mb-6">
-                  {["Fashion", "Home & Decor", "Electronics", "Gadgets", "Watches"].map((cat) => (
+                  {["Fashion", "Electronics", "Gadgets", "Watches", "Audio"].map((cat) => (
                     <Button
                       key={cat}
                       variant="outline"

@@ -118,7 +118,7 @@ export default function InfoPage({
                 </div>
                 <div>
                   <h2 className="text-xs md:text-sm font-black uppercase italic tracking-tighter leading-none">The Vivi <span className="text-yellow-300">Flash Sale</span></h2>
-                  <p className="text-orange-100 text-[8.5px] md:text-[9px] mt-0.5">Price drops up to 90% on electronics, fashion & home. Live for 24 hours.</p>
+                  <p className="text-orange-100 text-[8.5px] md:text-[9px] mt-0.5">Price drops up to 90% on electronics, fashion & gadgets. Live for 24 hours.</p>
                 </div>
               </div>
               <div className="flex items-center shrink-0 relative z-10">

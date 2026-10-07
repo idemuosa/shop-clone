@@ -201,9 +201,142 @@ const fingerprintStore = new Map<string, any>();
 const defaultCategories: any[] = [
   { id: 1, name: 'Electronics', image: '', products: [] },
   { id: 2, name: 'Fashion', image: '', products: [] },
-  { id: 3, name: 'Home & Office', image: '', products: [] }
+  { id: 3, name: 'Gadgets', image: '', products: [] },
+  { id: 4, name: 'Sports', image: '', products: [] },
+  { id: 5, name: 'Watches', image: '', products: [] },
+  { id: 6, name: 'Audio', image: '', products: [] }
 ];
-const defaultProducts: any[] = [];
+
+const defaultProducts: any[] = [
+  {
+    id: 1,
+    name: "Wireless Noise Cancelling Headphones",
+    description: "Premium over-ear wireless headphones with active noise cancellation and crystal clear audio quality.",
+    price: 45000,
+    old_price: 60000,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
+    category_id: 6,
+    category_name: "Audio",
+    tag: "Best Seller",
+    stock: 50,
+    sold: 120,
+    is_available: true,
+    rating: 4.8,
+    reviews_count: 42
+  },
+  {
+    id: 2,
+    name: "Smart Fitness Watch Series 7",
+    description: "Advanced smartwatch with heart rate tracking, GPS, workout modes, and sleek metallic strap.",
+    price: 35000,
+    old_price: 50000,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop",
+    category_id: 5,
+    category_name: "Watches",
+    tag: "Featured",
+    stock: 35,
+    sold: 89,
+    is_available: true,
+    rating: 4.7,
+    reviews_count: 31
+  },
+  {
+    id: 3,
+    name: "Classic Urban Designer Sneakers",
+    description: "Lightweight, breathable, and stylish sneakers for everyday athletic or casual wear.",
+    price: 28000,
+    old_price: 38000,
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop",
+    category_id: 2,
+    category_name: "Fashion",
+    tag: "Popular",
+    stock: 60,
+    sold: 210,
+    is_available: true,
+    rating: 4.9,
+    reviews_count: 58
+  },
+  {
+    id: 4,
+    name: "Ultra-Portable Bluetooth Speaker",
+    description: "Deep bass, 360-degree sound, waterproof design, and 20 hours battery life.",
+    price: 18500,
+    old_price: 25000,
+    image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=800&auto=format&fit=crop",
+    category_id: 6,
+    category_name: "Audio",
+    tag: "Best Seller",
+    stock: 40,
+    sold: 150,
+    is_available: true,
+    rating: 4.6,
+    reviews_count: 24
+  },
+  {
+    id: 5,
+    name: "Pro 4K Ultra HD Drone with Gimbal",
+    description: "High-performance aerial drone featuring 4K HDR camera, obstacle avoidance, and return to home function.",
+    price: 120000,
+    old_price: 150000,
+    image: "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?q=80&w=800&auto=format&fit=crop",
+    category_id: 3,
+    category_name: "Gadgets",
+    tag: "Top Rated",
+    stock: 15,
+    sold: 45,
+    is_available: true,
+    rating: 4.9,
+    reviews_count: 19
+  },
+  {
+    id: 6,
+    name: "Ergonomic Sports Water Bottle",
+    description: "BPA-free leak-proof stainless steel water bottle designed for active outdoors and gym sessions.",
+    price: 8500,
+    old_price: 12000,
+    image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?q=80&w=800&auto=format&fit=crop",
+    category_id: 4,
+    category_name: "Sports",
+    tag: "Trending",
+    stock: 80,
+    sold: 310,
+    is_available: true,
+    rating: 4.5,
+    reviews_count: 37
+  },
+  {
+    id: 7,
+    name: "Minimalist Slim Leather Wallet",
+    description: "Genuine RFID-blocking leather wallet with quick card access mechanism.",
+    price: 12000,
+    old_price: 18000,
+    image: "https://images.unsplash.com/photo-1627123424574-724758594e93?q=80&w=800&auto=format&fit=crop",
+    category_id: 2,
+    category_name: "Fashion",
+    tag: "Hot Deal",
+    stock: 75,
+    sold: 180,
+    is_available: true,
+    rating: 4.8,
+    reviews_count: 29
+  },
+  {
+    id: 8,
+    name: "Next-Gen Gaming Wireless Controller",
+    description: "Multi-platform wireless gamepad with haptic feedback, customizable triggers, and long battery life.",
+    price: 32000,
+    old_price: 42000,
+    image: "https://images.unsplash.com/photo-1600080972464-8e5f35f63d08?q=80&w=800&auto=format&fit=crop",
+    category_id: 1,
+    category_name: "Electronics",
+    tag: "Featured",
+    stock: 25,
+    sold: 95,
+    is_available: true,
+    rating: 4.8,
+    reviews_count: 40
+  }
+];
 
 let categoriesStore: any[] = [...defaultCategories];
 let productsStore: any[] = [...defaultProducts];
