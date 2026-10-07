@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { RadioGroup } from '@/components/ui/radio-group';
 import {
   CreditCard,
   MapPin,
@@ -13,7 +12,6 @@ import {
   ChevronLeft,
   CheckCircle2,
   Plus,
-  User,
   Building,
   Home,
   ShoppingBag,
@@ -26,7 +24,7 @@ import {
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL, handleApiResponse } from '@/lib/api';
+import { API_URL } from '@/lib/api';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, onSnapshot } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -176,10 +174,6 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       const ref = `${refPrefix}-${Math.random().toString(36).slice(-6).toUpperCase()}`;
       await processOrderPlacement(ref);
     }
-  };
-
-  const verifyAndCreateOrder = async (reference: string) => {
-    await processOrderPlacement(reference);
   };
 
   if (items.length === 0 && step !== 'success') {

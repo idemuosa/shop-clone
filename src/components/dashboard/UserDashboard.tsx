@@ -15,16 +15,11 @@ import {
   CreditCard,
   Bell,
   Clock,
-  MapPin,
   Smartphone,
-  Wallet,
-  CheckCircle2,
-  Trash2,
-  X,
-  Plus
+  Wallet
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,14 +28,12 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogDescription,
   DialogFooter
 } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL, getApiUrl } from '@/lib/api';
+import { API_URL } from '@/lib/api';
 import { getOptimizedImageUrl } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -55,7 +48,7 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [_isSearching, setIsSearching] = useState(false);
   const [activeModal, setActiveModal] = useState<'none' | 'track' | 'wallets' | 'alerts' | 'sell'>('none');
 
   useEffect(() => {

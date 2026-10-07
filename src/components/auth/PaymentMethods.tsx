@@ -35,7 +35,6 @@ export default function PaymentMethods() {
     const formData = new FormData(e.currentTarget);
     const cardNumber = formData.get('cardNumber') as string;
     const expiry = formData.get('expiry') as string;
-    const cvc = formData.get('cvc') as string;
     const name = formData.get('name') as string;
 
     try {

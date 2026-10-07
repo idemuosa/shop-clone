@@ -58,7 +58,7 @@ app.use(cors({
 }));
 
 // Health check endpoint
-app.get("/health", (req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
@@ -288,7 +288,7 @@ app.delete(["/api/admin/orders/:id", "/api/admin/orders/:id/"], async (req, res,
   }
 });
 
-app.delete(["/api/admin/orders", "/api/admin/orders/"], async (req, res, next) => {
+app.delete(["/api/admin/orders", "/api/admin/orders/"], async (_req, res, next) => {
   try {
     if (isFirebaseAdminInitialized) {
       try {
@@ -341,7 +341,7 @@ app.post("/api/paystack/webhook", async (req, res, next) => {
   try {
     const event = req.body;
     if (event && event.event === 'charge.success') {
-      const { reference, customer, amount, metadata } = event.data || {};
+      const { reference, customer, amount } = event.data || {};
       console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer?.email}, Amount ${amount}`);
 
       io.emit("new_activity", {
@@ -366,7 +366,7 @@ app.post("/api/paystack/webhook", async (req, res, next) => {
   }
 });
 
-app.get("/api/admin/analytics", async (req, res, next) => {
+app.get("/api/admin/analytics", async (_req, res, next) => {
   if (!isFirebaseAdminInitialized) {
     return res.status(500).json({ error: "Firebase Admin not initialized" });
   }
@@ -406,7 +406,7 @@ app.get("/api/admin/analytics", async (req, res, next) => {
 
 app.post("/api/send-otp", async (req, res, next) => {
   try {
-    const { email, phone, type } = req.body || {};
+    const { email, phone } = req.body || {};
     const resendClient = getResend();
 
     const identifier = (email || phone || "").trim();
@@ -701,7 +701,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 });
 
 // Products & Categories Endpoints
-app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], (req, res) => {
+app.get(["/categories", "/categories/", "/api/categories", "/api/categories/"], (_req, res) => {
   res.json(categoriesStore);
 });
 
@@ -810,7 +810,7 @@ app.put(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/
   res.json(productsStore[index]);
 });
 
-app.delete(["/products/clear-all", "/products/clear-all/", "/api/products/clear-all", "/api/products/clear-all/"], (req, res) => {
+app.delete(["/products/clear-all", "/products/clear-all/", "/api/products/clear-all", "/api/products/clear-all/"], (_req, res) => {
   productsStore = [];
   res.json({ success: true, message: "All inventory products deleted successfully" });
 });
@@ -825,7 +825,7 @@ app.delete(["/products/:id", "/products/:id/", "/api/products/:id", "/api/produc
   res.json({ message: "Product deleted successfully", product: deleted });
 });
 
-app.delete(["/products", "/products/", "/api/products", "/api/products/"], (req, res) => {
+app.delete(["/products", "/products/", "/api/products", "/api/products/"], (_req, res) => {
   productsStore = [];
   res.json({ success: true, message: "All inventory products deleted successfully" });
 });
@@ -905,7 +905,7 @@ app.delete("/api/admin/users/:id", async (req, res, next) => {
   }
 });
 
-app.delete("/api/admin/users", async (req, res, next) => {
+app.delete("/api/admin/users", async (_req, res, next) => {
   try {
     if (isFirebaseAdminInitialized) {
       const snapshot = await admin.firestore().collection('users').get();
@@ -929,11 +929,11 @@ app.delete("/api/admin/users", async (req, res, next) => {
 });
 
 // Merchants / Seed / Orders Fallback Endpoints
-app.get(["/api/merchants", "/api/merchants/"], (req, res) => {
+app.get(["/api/merchants", "/api/merchants/"], (_req, res) => {
   res.json([]);
 });
 
-app.all(["/api/seed", "/api/seed/"], (req, res) => {
+app.all(["/api/seed", "/api/seed/"], (_req, res) => {
   res.json({ message: "Database seeded successfully" });
 });
 
@@ -964,7 +964,7 @@ app.delete(["/api/admin/users/:id", "/api/admin/users/:id/"], async (req, res, n
   }
 });
 
-app.delete(["/api/admin/activities", "/api/admin/activities/"], async (req, res, next) => {
+app.delete(["/api/admin/activities", "/api/admin/activities/"], async (_req, res, next) => {
   try {
     if (isFirebaseAdminInitialized) {
       try {
@@ -986,7 +986,7 @@ app.delete(["/api/admin/activities", "/api/admin/activities/"], async (req, res,
   }
 });
 
-app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (req, res, next) => {
+app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (_req, res, next) => {
   try {
     productsStore = [];
     categoriesStore = [];
@@ -1025,13 +1025,13 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
+    app.get("*", (_req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
   // Global Express Error Handler Middleware
-  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     console.error("[Global Express Error]", err);
     if (!res.headersSent) {
       res.status(err.status || 500).json({
@@ -1047,7 +1047,7 @@ async function startServer() {
 }
 
 // Global Express Error Handler Middleware for exported app (e.g. Vercel serverless)
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error("[Global Express Error]", err);
   if (!res.headersSent) {
     res.status(err.status || 500).json({

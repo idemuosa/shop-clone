@@ -10,7 +10,6 @@ import { auth, db } from "@/lib/firebase";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,8 +30,8 @@ interface NavbarProps {
 
 export const NAV_LINKS = ["New arrivals", "Best sellers", "Clearance", "Brands", "Help"];
 
-export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggleAdmin, onSearch, onOpenInfoPage, showAdmin, wishlistCount }: NavbarProps) {
-  const { user, profile, isAdmin, loading } = useAuth();
+export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenProfile, onToggleAdmin, onSearch, onOpenInfoPage, showAdmin, wishlistCount }: NavbarProps) {
+  const { user, profile, isAdmin } = useAuth();
   const { totalItems } = useCart();
   const { currency, setCurrency } = useCurrency();
   const [categories, setCategories] = useState<any[]>([]);

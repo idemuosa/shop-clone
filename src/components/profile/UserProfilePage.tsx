@@ -1,18 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db, auth } from '@/lib/firebase';
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  onSnapshot, 
-  doc, 
-  updateDoc,
-  addDoc,
-  deleteDoc,
-  serverTimestamp 
-} from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 import { 
   User, 
   Package, 
@@ -20,27 +8,23 @@ import {
   MapPin, 
   Settings, 
   LogOut, 
-  ChevronRight, 
   ShoppingBag,
   Bell,
-  Heart,
   Clock,
   ShieldCheck,
   CheckCircle2,
-  Trash2,
   Plus,
   Zap,
   Trophy,
   Truck,
   Ticket,
   Headset,
-  LayoutDashboard,
-  AlertCircle
+  LayoutDashboard
 } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -57,7 +41,7 @@ import { toast } from 'sonner';
 import { signOut } from 'firebase/auth';
 import PaymentMethods from '@/components/auth/PaymentMethods';
 import { useCurrency } from '@/lib/CurrencyContext';
-import { API_URL, getApiUrl } from '@/lib/api';
+import { getApiUrl } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
 interface UserProfilePageProps {
