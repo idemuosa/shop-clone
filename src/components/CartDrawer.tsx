@@ -28,14 +28,14 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-[90vw] sm:max-w-md p-0 flex flex-col border-l border-gray-100 shadow-2xl h-full">
-        <SheetHeader className="p-4 md:p-6 border-b border-gray-100 bg-white sticky top-0 z-10">
+        <SheetHeader className="p-3 md:p-4 border-b border-gray-100 bg-white sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 md:gap-3">
               <div className="bg-green-100 p-1.5 md:p-2 rounded-xl">
-                <ShoppingBag className="h-5 w-5 md:h-6 md:w-6 text-orange-600" />
+                <ShoppingBag className="h-4 w-4 md:h-5 md:w-5 text-orange-600" />
               </div>
               <div>
-                <SheetTitle className="text-lg md:text-xl font-black tracking-tighter">My <span className="text-orange-600">Cart</span></SheetTitle>
+                <SheetTitle className="text-base md:text-lg font-black tracking-tighter">My <span className="text-orange-600">Cart</span></SheetTitle>
                 <SheetDescription className="text-gray-400 font-bold text-[8px] md:text-[10px] tracking-widest mt-0.5">
                   {totalItems} Items in bag
                 </SheetDescription>
@@ -47,13 +47,13 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                   variant="ghost"
                   size="sm"
                   onClick={clearCart}
-                  className="text-[8px] md:text-[10px] font-black tracking-widest text-red-400 hover:text-red-500 hover:bg-red-50 h-8"
+                  className="text-[8px] md:text-[10px] font-black tracking-widest text-red-400 hover:text-red-500 hover:bg-red-50 h-7"
                 >
                   Clear
                 </Button>
               )}
-              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-gray-100 h-8 w-8">
-                <X className="h-4 w-4 md:h-5 md:w-5" />
+              <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-gray-100 h-7 w-7">
+                <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -61,17 +61,17 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
 
         <div className="flex-1 overflow-hidden bg-gray-50/50">
           <ScrollArea className="h-full">
-            <div className="p-4 md:p-6 space-y-4 md:space-y-6 pb-20">
+            <div className="p-3 md:p-4 space-y-3 pb-8">
               {items.length === 0 ? (
-                <div className="h-[50vh] flex flex-col items-center justify-center text-center px-6">
-                  <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-full flex items-center justify-center shadow-xl shadow-gray-200/50 mb-4 md:mb-6">
-                    <ShoppingCart className="h-8 w-8 md:h-10 md:w-10 text-gray-200" />
+                <div className="py-10 flex flex-col items-center justify-center text-center px-6">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-full flex items-center justify-center shadow-md shadow-gray-200/50 mb-3 md:mb-4">
+                    <ShoppingCart className="h-6 w-6 md:h-8 md:w-8 text-gray-200" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-black tracking-tighter mb-1">Cart is Empty</h3>
-                  <p className="text-gray-400 font-medium mb-6 md:mb-8 text-xs">No items added yet.</p>
+                  <h3 className="text-base md:text-lg font-black tracking-tighter mb-1">Cart is Empty</h3>
+                  <p className="text-gray-400 font-medium mb-4 md:mb-6 text-xs">No items added yet.</p>
                   <Button
                     onClick={onClose}
-                    className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-8 h-10 md:h-12 text-sm"
+                    className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-6 h-9 md:h-10 text-xs md:text-sm"
                   >
                     Start shopping
                   </Button>
@@ -145,12 +145,12 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
         </div>
 
         {items.length > 0 && (
-          <SheetFooter className="p-4 md:p-6 bg-white border-t border-gray-100">
-            <div className="w-full space-y-3">
+          <SheetFooter className="p-3 md:p-4 bg-white border-t border-gray-100">
+            <div className="w-full space-y-2.5">
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[8px] md:text-[10px] font-black text-gray-400 tracking-widest uppercase">Total</p>
-                  <p className="text-xl md:text-3xl font-black text-black tracking-tighter leading-none">
+                  <p className="text-lg md:text-2xl font-black text-black tracking-tighter leading-none">
                     {formatPrice(totalPrice)}
                   </p>
                 </div>
@@ -161,10 +161,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               
               <Button 
                 onClick={onCheckout}
-                className="w-full h-12 md:h-14 bg-orange-600 hover:bg-orange-700 text-white font-black text-sm md:text-lg rounded-xl md:rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 group"
+                className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs md:text-base rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 group"
               >
                 Proceed to Checkout
-                <ArrowRight className="h-4 w-4 md:h-5 md:w-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
           </SheetFooter>
