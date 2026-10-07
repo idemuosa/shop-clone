@@ -224,10 +224,26 @@ export default function AdminDashboard() {
       // Fetch Users
       try {
         const uSnap = await getDocs(query(collection(db, 'users')));
-        setUsers(uSnap.docs.map(d => ({ id: d.id, ...d.data() } as any)));
+        let userDocs = uSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+        if (userDocs.length === 0) {
+          const uRes = await fetch(`${API_URL}/api/admin/users`);
+          if (uRes.ok) {
+            userDocs = await uRes.json();
+          }
+        }
+        setUsers(userDocs);
       } catch (e: any) {
         console.warn("Users fetch permission error:", e);
-        setUsers([]);
+        try {
+          const uRes = await fetch(`${API_URL}/api/admin/users`);
+          if (uRes.ok) {
+            setUsers(await uRes.json());
+          } else {
+            setUsers([]);
+          }
+        } catch {
+          setUsers([]);
+        }
       }
 
       // Fetch Merchant Applications
@@ -1636,25 +1652,26 @@ export default function AdminDashboard() {
 
           <TabsContent value="users">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <CardTitle className="text-xl font-black  tracking-tighter">User & Admin management</CardTitle>
-                  <CardDescription>Grant or revoke administrator privileges</CardDescription>
+                  <CardTitle className="text-xl font-black tracking-tighter">User & Admin management</CardTitle>
+                  <CardDescription>Grant or revoke administrator privileges, or delete registered users</CardDescription>
                 </div>
-                {users.filter(u => u.email !== 'idemudiawisdom27@gmail.com' && u.email !== import.meta.env.VITE_ADMIN_EMAIL).length > 0 && (
+                {users.length > 0 && (
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleClearUsers}
                     disabled={isLoading}
-                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1 shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Clear All Users
                   </Button>
                 )}
               </CardHeader>
               <CardContent className="p-0">
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
                       <TableHead className="font-black  text-[10px] tracking-widest">Admins</TableHead>
@@ -1715,6 +1732,7 @@ export default function AdminDashboard() {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
