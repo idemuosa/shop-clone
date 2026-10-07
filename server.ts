@@ -900,9 +900,59 @@ app.all(["/api/seed", "/api/seed/"], (req, res) => {
   res.json({ message: "Database seeded successfully" });
 });
 
+app.delete(["/api/admin/users/:id", "/api/admin/users/:id/"], async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection("users").doc(id).delete();
+      } catch (fErr) {
+        console.warn("Firestore delete user doc error:", fErr);
+      }
+
+      try {
+        await admin.auth().deleteUser(id);
+      } catch (authErr) {
+        console.warn("Firebase Auth deleteUser error (user might not exist in Auth):", authErr);
+      }
+    }
+
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+app.delete(["/api/admin/activities", "/api/admin/activities/"], async (req, res, next) => {
+  try {
+    if (isFirebaseAdminInitialized) {
+      try {
+        const notifsRef = admin.firestore().collection("notifications");
+        const snapshot = await notifsRef.get();
+        const batch = admin.firestore().batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      } catch (fErr) {
+        console.warn("Firestore notifications clear error:", fErr);
+      }
+    }
+
+    res.json({ success: true, message: "Recent activities cleared successfully" });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
 app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (req, res, next) => {
   try {
     productsStore = [];
+    categoriesStore = [];
     reviewsStore = [];
     cartsStore.clear();
     wishlistsStore.clear();
