@@ -159,29 +159,9 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
 
           {/* User Actions */}
           <div className="flex items-center gap-1.5 sm:gap-6">
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={(props) => (
-                  <button
-                    {...props}
-                    className="flex items-center gap-1 px-1.5 sm:px-3 py-1 bg-gray-50 rounded-full border border-gray-100 hover:border-orange-200 transition-all cursor-pointer group outline-none"
-                  >
-                    <span className="text-[8px] sm:text-[10px] font-black text-gray-400 group-hover:text-orange-600 transition-colors ">{currency}</span>
-                    <ChevronDown className="h-2.5 w-2.5 text-gray-400 group-hover:text-orange-600 transition-colors" />
-                  </button>
-                )}
-              />
-              <DropdownMenuContent className="rounded-xl border-2">
-                {["Usd", "Ngn", "Eur", "Gbp"].map((c) => (
-                  <DropdownMenuItem key={c} onClick={() => {
-                    setCurrency(c.toUpperCase() as any);
-                    toast.info(`Currency changed to ${c}`);
-                  }} className="font-bold text-xs  cursor-pointer">
-                    {c}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-1 px-1.5 sm:px-3 py-1 bg-gray-50 rounded-full border border-gray-100">
+              <span className="text-[8px] sm:text-[10px] font-black text-gray-500">NGN (₦)</span>
+            </div>
 
             {isAdmin && (
               <div className="flex flex-col items-center cursor-pointer group" onClick={onToggleAdmin}>

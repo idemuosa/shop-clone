@@ -851,7 +851,7 @@ export default function AdminDashboard() {
         old_price: oldPriceStr && oldPriceStr.trim() !== "" ? parseFloat(oldPriceStr) : null,
         image: imageUrl,
         category_id: categoryId,
-        tag: formData.get('tag') as string,
+        tag: tag || "",
         stock: stockStr ? parseInt(stockStr) : 0,
         sold: soldStr ? parseInt(soldStr.replace(/[^0-9]/g, '')) : 0,
         is_available: true
@@ -1228,6 +1228,20 @@ export default function AdminDashboard() {
                               {cat.name}
                             </SelectItem>
                           ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-[10px]">Tag (e.g. Best Seller)</Label>
+                      <Select name="tag" defaultValue="">
+                        <SelectTrigger className="rounded-lg border-2 w-full h-10 text-xs">
+                          <SelectValue placeholder="Select Tag (Optional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="None">None</SelectItem>
+                          <SelectItem value="Best Seller">Best Seller</SelectItem>
+                          <SelectItem value="New Arrival">New Arrival</SelectItem>
+                          <SelectItem value="Featured">Featured</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -2031,30 +2045,6 @@ export default function AdminDashboard() {
                            </Button>
                          </div>
 
-                         <div className="space-y-2 pt-2 border-t border-red-200/60">
-                           <p className="text-[10px] font-bold text-red-800">Fill empty shop with demo data</p>
-                           <Button
-                              type="button"
-                              onClick={async () => {
-                                 setIsLoading(true);
-                                 try {
-                                   const res = await fetch(`${API_URL}/api/seed`, { method: 'POST' });
-                                   const data = await res.json();
-                                   toast.success(data.message);
-                                   fetchData();
-                                 } catch (e) {
-                                   toast.error("Failed to seed database");
-                                 } finally {
-                                   setIsLoading(false);
-                                 }
-                              }}
-                              disabled={isLoading}
-                              variant="outline"
-                              className="w-full h-10 rounded-xl font-black text-[10px] uppercase tracking-widest border-red-300 text-red-700 hover:bg-red-100/50"
-                           >
-                              {isLoading ? 'Processing...' : 'Seed Database'}
-                           </Button>
-                         </div>
                       </div>
                   </div>
                </form>

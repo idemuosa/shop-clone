@@ -197,47 +197,9 @@ const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const otpStore = new Map<string, string>();
 
 // In-Memory Data Store (Default seed data for products, categories, reviews, carts, wishlists)
-let categoriesStore = [
-  { id: 1, name: "Electronics", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop", products: [] },
-  { id: 2, name: "Fashion", image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1000&auto=format&fit=crop", products: [] },
-  { id: 3, name: "Home & Decor", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=1000&auto=format&fit=crop", products: [] },
-  { id: 4, name: "Footwear", image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop", products: [] }
-];
+let categoriesStore: any[] = [];
 
-let productsStore = [
-  {
-    id: 1,
-    name: "Samsung Galaxy S24 Ultra",
-    description: "Experience the ultimate smartphone with AI camera features.",
-    price: 1299.99,
-    old_price: 1399.99,
-    image: "https://images.unsplash.com/photo-1707246135650-681966144e5d?q=80&w=1000&auto=format&fit=crop",
-    category_id: 1,
-    category_name: "Electronics",
-    tag: "New Arrival",
-    stock: 50,
-    sold: 120,
-    is_available: true,
-    rating: 4.8,
-    reviews_count: 12
-  },
-  {
-    id: 2,
-    name: "Adidas Ultraboost Light",
-    description: "The most responsive Ultraboost ever.",
-    price: 180.00,
-    old_price: 220.00,
-    image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop",
-    category_id: 4,
-    category_name: "Footwear",
-    tag: "Best Seller",
-    stock: 100,
-    sold: 500,
-    is_available: true,
-    rating: 4.9,
-    reviews_count: 34
-  }
-];
+let productsStore: any[] = [];
 
 let reviewsStore: any[] = [];
 let cartsStore = new Map<string, any[]>();
@@ -345,7 +307,7 @@ app.post("/api/paystack/webhook", async (req, res, next) => {
       console.log(`[PAYSTACK WEBHOOK] Payment Successful: Ref ${reference}, Customer ${customer?.email}, Amount ${amount}`);
 
       io.emit("new_activity", {
-        message: `New payment received: $${amount / 100} from ${customer?.email}`,
+        message: `New payment received: ₦${amount / 100} from ${customer?.email}`,
         type: "payment"
       });
 
@@ -594,7 +556,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 
     // Broadcast real-time order activity via Socket.IO
     io.emit("new_activity", {
-      message: `New Order #${orderRef}: $${displayTotal}`,
+      message: `New Order #${orderRef}: ₦${displayTotal}`,
       type: "order"
     });
 
@@ -610,8 +572,8 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
               <tr style="border-bottom: 1px solid #f1f5f9;">
                 <td style="padding: 12px 10px; font-weight: bold; color: #1e293b;">${item.name || 'Product'}</td>
                 <td style="padding: 12px 10px; text-align: center; color: #64748b;">${qty}</td>
-                <td style="padding: 12px 10px; text-align: right; color: #64748b;">$${itemPrice}</td>
-                <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: #ea580c;">$${itemTotal}</td>
+                <td style="padding: 12px 10px; text-align: right; color: #64748b;">₦${itemPrice}</td>
+                <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: #ea580c;">₦${itemTotal}</td>
               </tr>
             `;
           }).join('');
@@ -663,7 +625,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 
               <div style="margin-top: 25px; padding: 18px; background-color: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5; text-align: right;">
                 <p style="margin: 0; font-size: 14px; color: #9a3412;">Total Amount to Pay:</p>
-                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #ea580c;">$${displayTotal}</p>
+                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #ea580c;">₦${displayTotal}</p>
               </div>
             </div>
 
@@ -682,7 +644,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 
         const adminNotif = sendResendEmail(resendClient, {
           to: [adminEmail || 'idemudiawisdom27@gmail.com'],
-          subject: `NEW ORDER: #${orderRef} ($${displayTotal})`,
+          subject: `NEW ORDER: #${orderRef} (₦${displayTotal})`,
           html: userHtml,
         });
 
@@ -928,13 +890,9 @@ app.delete("/api/admin/users", async (_req, res, next) => {
   }
 });
 
-// Merchants / Seed / Orders Fallback Endpoints
+// Merchants / Orders Fallback Endpoints
 app.get(["/api/merchants", "/api/merchants/"], (_req, res) => {
   res.json([]);
-});
-
-app.all(["/api/seed", "/api/seed/"], (_req, res) => {
-  res.json({ message: "Database seeded successfully" });
 });
 
 app.delete(["/api/admin/users/:id", "/api/admin/users/:id/"], async (req, res, next) => {
