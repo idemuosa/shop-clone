@@ -204,7 +204,7 @@ export default function AdminDashboard() {
         setNotifications([]);
       }
 
-      // Fetch Real Analytics from Python API
+      // Fetch Real Analytics from Express API
       try {
         const aRes = await fetch(`${API_URL}/api/orders/analytics/`);
         if (aRes.ok) {

@@ -7,7 +7,6 @@ This document summarizes the programming languages, frameworks, libraries, and t
 ## 💻 Programming Languages
 
 - **TypeScript (`.ts`, `.tsx`)**: Primary language for the frontend application (`src/`) and the Node.js server (`server.ts`, `api/index.ts`).
-- **Python (`.py`)**: Used for the backend microservice (`backend/`), including FastAPI endpoints, database models, and seed scripts.
 - **HTML & CSS**: Web entry point (`index.html`) and Tailwind CSS styling (`src/index.css`).
 - **Shell & Batch Scripts**: Automation and deployment execution scripts (`DEPLOY.bat`, `RUN_SHOP.bat`, `SEED_DATABASE.bat`, `Dockerfile`, `nginx.conf`).
 
@@ -27,19 +26,12 @@ This document summarizes the programming languages, frameworks, libraries, and t
 
 ### Backend Stack
 
-#### 1. Node.js Gateway / Express Server (`server.ts`)
-- **Express.js**: Web server acting as API gateway and proxy to Python backend.
+#### Express.js Server (`server.ts`)
+- **Express.js**: Web server providing API endpoints for products, categories, orders, reviews, and analytics.
 - **Socket.IO**: Real-time WebSockets for activity feeds and notifications.
 - **Firebase Admin SDK**: Authentication and Firestore database management.
 - **Resend**: Transactional email service for OTPs and order confirmation.
 - **Paystack API**: Payment processing integration.
-
-#### 2. Python Backend Service (`backend/`)
-- **FastAPI**: Asynchronous web framework for high-performance Python APIs.
-- **Uvicorn**: Lightning-fast ASGI web server.
-- **SQLAlchemy**: Python SQL toolkit and ORM.
-- **PostgreSQL (`psycopg2-binary`)**: Database adapter.
-- **Pydantic**: Data validation and setting management.
 
 ---
 

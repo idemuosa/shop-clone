@@ -1,20 +1,12 @@
 @echo off
 echo ==========================================
-echo Seeding Vivi Shop Database...
+echo Seeding Vivi Shop Database via Express API...
 echo ==========================================
-cd backend
 
-if exist venv\Scripts\python.exe (
-    echo Running seed script via virtual environment...
-    venv\Scripts\python.exe seed_data.py
-) else (
-    echo [ERROR] Virtual environment not found. Please run FIX_BACKEND.bat first.
-    pause
-    exit /b
-)
+curl -X POST http://localhost:3000/api/seed
 
 echo.
 echo ==========================================
-echo Seeding Complete!
+echo Seeding Request Sent!
 echo ==========================================
 pause
