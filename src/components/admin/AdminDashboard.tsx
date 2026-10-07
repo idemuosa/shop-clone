@@ -370,6 +370,11 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       await deleteDoc(doc(db, 'users', userId));
+      try {
+        await fetch(`${API_URL}/api/admin/users/${userId}`, { method: 'DELETE' });
+      } catch (e) {
+        console.warn("Backend user delete notice:", e);
+      }
       toast.success("User deleted successfully!");
       fetchData();
     } catch (error: any) {
@@ -387,10 +392,33 @@ export default function AdminDashboard() {
       const nonAdminUsers = users.filter(u => u.email !== 'idemudiawisdom27@gmail.com' && u.email !== primaryAdminEmail);
       const deletePromises = nonAdminUsers.map(u => deleteDoc(doc(db, 'users', u.id)));
       await Promise.all(deletePromises);
+      try {
+        await fetch(`${API_URL}/api/admin/users`, { method: 'DELETE' });
+      } catch (e) {
+        console.warn("Backend bulk user clear notice:", e);
+      }
       toast.success("Users cleared successfully!");
       fetchData();
     } catch (error: any) {
       toast.error(error?.message || "Failed to clear users");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearAllInventory = async () => {
+    if (!confirm("CRITICAL: Are you sure you want to delete ALL inventory products? This action cannot be undone.")) return;
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/api/products/clear-all`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' }
+      });
+      await handleApiResponse(response);
+      toast.success("All inventory products deleted successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete all inventory");
     } finally {
       setIsLoading(false);
     }
@@ -665,6 +693,14 @@ export default function AdminDashboard() {
     const name = String(c.name || "").toLowerCase();
     const queryStr = String(searchQuery || "").toLowerCase();
     return name.includes(queryStr);
+  });
+
+  const filteredUsers = users.filter(u => {
+    const name = String(u.displayName || u.email || "").toLowerCase();
+    const email = String(u.email || "").toLowerCase();
+    const role = String(u.role || "").toLowerCase();
+    const queryStr = String(searchQuery || "").toLowerCase();
+    return name.includes(queryStr) || email.includes(queryStr) || role.includes(queryStr);
   });
 
   const getStatusBadge = (status: string) => {
@@ -1125,8 +1161,19 @@ export default function AdminDashboard() {
 
               {/* Product List */}
               <Card className="lg:col-span-3 rounded-2xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-                <CardHeader className="py-4">
+                <CardHeader className="py-4 flex flex-row items-center justify-between">
                   <CardTitle className="text-lg font-black tracking-tighter">Inventory</CardTitle>
+                  {products.length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleClearAllInventory}
+                      disabled={isLoading}
+                      className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-8 px-3 gap-1"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Clear All Inventory
+                    </Button>
+                  )}
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
@@ -1277,6 +1324,16 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex gap-2">
                   <Badge className="bg-orange-600 font-black  tracking-widest text-[9px] px-3">{products.length} Products</Badge>
+                  {products.length > 0 && (
+                    <Button
+                      variant="outline"
+                      className="rounded-xl border-2 border-red-200 text-red-600 hover:bg-red-50 font-black text-xs px-4 h-11 gap-1.5"
+                      onClick={handleClearAllInventory}
+                      disabled={isLoading}
+                    >
+                      <Trash2 className="h-4 w-4" /> Delete All Inventory
+                    </Button>
+                  )}
                   <Button 
                     variant="outline"
                     className="rounded-xl border-2 font-black text-xs px-6 h-11 border-gray-100 hover:border-orange-200 gap-2"
@@ -1572,7 +1629,7 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((u) => {
+                    {filteredUsers.map((u) => {
                       const isPrimaryAdmin = u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL;
                       return (
                       <TableRow key={u.id}>
@@ -1616,9 +1673,9 @@ export default function AdminDashboard() {
                         </TableCell>
                       </TableRow>
                     )})}
-                    {users.length === 0 && (
+                    {filteredUsers.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center py-10 text-gray-400 font-bold">No users found</TableCell>
+                        <TableCell colSpan={4} className="text-center py-10 text-gray-400 font-bold">No matching users found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
