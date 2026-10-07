@@ -189,7 +189,9 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
         const res = await fetch(`${API_URL}/api/profile/addresses/`, {
            headers: { 'Authorization': `Bearer ${token}` }
         });
-        setAddresses(await res.json());
+        if (res.ok) {
+          setAddresses(await res.json());
+        }
       }
     } catch (error: any) {
       toast.error(error.message);

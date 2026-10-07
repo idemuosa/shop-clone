@@ -69,16 +69,18 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
         ? `${API_URL}/api/products/?search=${encodeURIComponent(search)}`
         : `${API_URL}/api/products/`;
       const response = await fetch(url);
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setProducts(data.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          image: p.image,
-          price: parseFloat(p.price),
-          rating: p.rating || 4.5,
-          tag: p.tag
-        })));
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setProducts(data.map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            image: p.image,
+            price: parseFloat(p.price),
+            rating: p.rating || 4.5,
+            tag: p.tag
+          })));
+        }
       }
     } catch (error) {
       console.error("Dashboard products fetch error:", error);
