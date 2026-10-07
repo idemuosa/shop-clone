@@ -102,25 +102,25 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
         );
       case 'help':
         return (
-          <div className="max-w-3xl mx-auto space-y-12">
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-black uppercase italic tracking-tighter">How can we <span className="text-orange-600">help?</span></h2>
-              <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Support is available 24/7 for the Vivi community</p>
+          <div className="max-w-3xl mx-auto space-y-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-black uppercase italic tracking-tighter">How can we <span className="text-orange-600">help?</span></h2>
+              <p className="text-gray-400 font-bold uppercase text-[9px] tracking-widest">Support is available 24/7 for the Vivi community</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {faqs.map((faq, i) => (
                 <div
                   key={i}
-                  className={`bg-white rounded-3xl border transition-all overflow-hidden ${expandedFaq === i ? 'border-orange-500 shadow-lg shadow-orange-50' : 'border-gray-100 hover:border-orange-200'}`}
+                  className={`bg-white rounded-2xl border transition-all overflow-hidden ${expandedFaq === i ? 'border-orange-500 shadow-md shadow-orange-50' : 'border-gray-100 hover:border-orange-200'}`}
                 >
                   <button
                     onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                    className="w-full p-6 flex items-center justify-between text-left group"
+                    className="w-full p-4 flex items-center justify-between text-left group"
                   >
-                    <span className={`font-black tracking-tight ${expandedFaq === i ? 'text-orange-600' : 'text-gray-700'}`}>{faq.q}</span>
-                    <div className={`p-2 rounded-xl transition-colors ${expandedFaq === i ? 'bg-orange-600 text-white' : 'bg-gray-50 text-gray-400 group-hover:text-orange-600'}`}>
-                      {expandedFaq === i ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    <span className={`text-sm font-black tracking-tight ${expandedFaq === i ? 'text-orange-600' : 'text-gray-700'}`}>{faq.q}</span>
+                    <div className={`p-1.5 rounded-lg transition-colors ${expandedFaq === i ? 'bg-orange-600 text-white' : 'bg-gray-50 text-gray-400 group-hover:text-orange-600'}`}>
+                      {expandedFaq === i ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
                     </div>
                   </button>
 
@@ -132,7 +132,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                       >
-                        <div className="px-6 pb-6 text-gray-500 font-medium text-sm leading-relaxed border-t border-gray-50 pt-4 mt-2 mx-6 italic">
+                        <div className="px-4 pb-4 text-gray-500 font-medium text-xs leading-relaxed border-t border-gray-50 pt-3 mt-1 mx-4 italic">
                           {faq.a}
                         </div>
                       </motion.div>
@@ -142,22 +142,22 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
               ))}
             </div>
 
-            <div className="bg-black rounded-[40px] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform">
-                <Headset className="h-32 w-32" />
+            <div className="bg-black rounded-3xl p-6 text-white flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:rotate-12 transition-transform">
+                <Headset className="h-24 w-24" />
               </div>
-              <div className="flex items-center gap-6 relative z-10">
-                <div className="bg-zinc-800 p-5 rounded-3xl shadow-2xl">
-                  <Headset className="h-10 w-10 text-orange-500" />
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="bg-zinc-800 p-4 rounded-2xl shadow-xl">
+                  <Headset className="h-8 w-8 text-orange-500" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-black uppercase tracking-tight italic">Need direct assistance?</h4>
-                  <p className="text-zinc-400 text-sm font-medium">Contact our expert support team now.</p>
+                  <h4 className="text-base font-black uppercase tracking-tight italic">Need direct assistance?</h4>
+                  <p className="text-zinc-400 text-xs font-medium">Contact our expert support team now.</p>
                 </div>
               </div>
               <Button
                 onClick={handleStartChat}
-                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl px-10 h-16 shadow-xl shadow-orange-900/40 transition-all active:scale-95 text-lg"
+                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-8 h-12 shadow-lg shadow-orange-900/40 transition-all active:scale-95 text-sm"
               >
                 GET IN TOUCH
               </Button>
