@@ -9,7 +9,8 @@ import {
   serverTimestamp,
   deleteDoc,
   doc,
-  updateDoc
+  updateDoc,
+  onSnapshot
 } from 'firebase/firestore';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,7 +116,68 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchData();
     fetchSettings();
+
+    // Real-time stream of customer transactions (orders)
+    const qOrders = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+    const unsubscribeOrders = onSnapshot(qOrders, (snapshot) => {
+      const liveOrders = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setOrders(liveOrders);
+    }, (err) => {
+      console.warn("Real-time orders listener error:", err);
+    });
+
+    return () => unsubscribeOrders();
   }, []);
+
+  // Update stats and chart whenever orders, products, or settings change
+  useEffect(() => {
+    const currentExpenses = settings?.expenses || 0;
+    const totalSales = orders.reduce((acc, curr) => acc + (curr.totalAmount || 0), 0);
+    const uniqueCustomers = new Set(orders.map(o => o.userId)).size;
+    const profit = totalSales - currentExpenses;
+
+    const inStock = products.filter((p: any) => (p.stock || 0) > 0).length;
+    const outOfStock = products.filter((p: any) => (p.stock || 0) <= 0).length;
+    const totalStockIn = products.reduce((acc: number, p: any) => acc + (p.stock || 0), 0);
+    const totalStockOut = products.reduce((acc: number, p: any) => acc + (p.sold || 0), 0);
+
+    setStats({
+      totalSales,
+      totalOrders: orders.length,
+      activeCustomers: uniqueCustomers,
+      avgOrderValue: orders.length > 0 ? totalSales / orders.length : 0,
+      expenses: currentExpenses,
+      profit,
+      inStock,
+      outOfStock,
+      totalStockIn,
+      totalStockOut
+    });
+
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      return d.toLocaleDateString(undefined, { weekday: 'short' });
+    }).reverse();
+
+    const salesByDay = last7Days.map(day => {
+      const dailyOrders = orders.filter(o => {
+        if (!o.createdAt) return false;
+        try {
+          const date = typeof o.createdAt.toDate === 'function' ? o.createdAt.toDate() : new Date(o.createdAt);
+          return date.toLocaleDateString(undefined, { weekday: 'short' }) === day;
+        } catch (e) {
+          return false;
+        }
+      });
+      return {
+        name: day,
+        sales: dailyOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0),
+        orders: dailyOrders.length
+      };
+    });
+    setChartData(salesByDay);
+  }, [orders, products, settings]);
 
   const fetchSettings = async () => {
     try {
@@ -351,6 +413,14 @@ export default function AdminDashboard() {
     setIsLoading(true);
     try {
       await deleteDoc(doc(db, 'orders', orderId));
+      try {
+        await fetch(`${API_URL}/api/admin/orders/${orderId}`, { method: 'DELETE' });
+      } catch (e) {
+        console.warn("Backend order delete error:", e);
+      }
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder(null);
+      }
       toast.success("Order deleted successfully!");
       fetchData();
     } catch (error: any) {
@@ -435,6 +505,14 @@ export default function AdminDashboard() {
       const oSnap = await getDocs(collection(db, 'orders'));
       const deletePromises = oSnap.docs.map(d => deleteDoc(doc(db, 'orders', d.id)));
       await Promise.all(deletePromises);
+      try {
+        await fetch(`${API_URL}/api/admin/orders`, { method: 'DELETE' });
+      } catch (e) {
+        console.warn("Backend clear orders error:", e);
+      }
+      if (selectedOrder) {
+        setSelectedOrder(null);
+      }
       toast.success("All sales orders cleared successfully!");
       fetchData();
     } catch (error: any) {
@@ -1586,14 +1664,14 @@ export default function AdminDashboard() {
                                       </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-dashed flex justify-between items-end">
+                                    <div className="pt-4 border-t border-dashed flex justify-between items-center gap-4">
                                       <div>
-                                        <p className="text-[10px] font-black  text-gray-400 mb-1">Update status</p>
+                                        <p className="text-[10px] font-black text-gray-400 mb-1">Update status</p>
                                         <Select 
                                           value={selectedOrder.status} 
                                           onValueChange={(val) => handleUpdateOrderStatus(selectedOrder.id, val)}
                                         >
-                                          <SelectTrigger className="w-[180px] rounded-xl font-bold">
+                                          <SelectTrigger className="w-[150px] rounded-xl font-bold">
                                             <SelectValue placeholder="Status" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -1605,9 +1683,21 @@ export default function AdminDashboard() {
                                           </SelectContent>
                                         </Select>
                                       </div>
-                                      <div className="text-right">
-                                        <p className="text-xs font-black  text-gray-400">Total paid</p>
-                                        <p className="text-3xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
+                                      <div className="flex items-center gap-3">
+                                        <Button
+                                          type="button"
+                                          variant="outline"
+                                          size="sm"
+                                          onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                          disabled={isLoading}
+                                          className="h-10 rounded-xl font-bold border-2 border-red-200 text-red-600 hover:bg-red-50 text-xs gap-1 transition-colors px-3"
+                                        >
+                                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                                        </Button>
+                                        <div className="text-right">
+                                          <p className="text-xs font-black text-gray-400">Total paid</p>
+                                          <p className="text-2xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
