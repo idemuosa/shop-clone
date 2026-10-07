@@ -36,7 +36,7 @@ function MainContent() {
   const [showCheckout, setShowCheckout] = useState(false);
   const [activeInfoPage, setActiveInfoPage] = useState<string | null>(null);
   const { isOpen: isCartOpen, setIsOpen: setIsCartOpen } = useCart();
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(() => typeof window !== 'undefined' && localStorage.getItem('showAdmin') === 'true');
   const [showProfile, setShowProfile] = useState(false);
   const [showDashboard, setShowDashboard] = useState(false);
   const [products, setProducts] = useState<any[]>([]);

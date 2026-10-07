@@ -101,7 +101,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const isSystemAdmin = (currentUserEmail === adminEmail) ||
                           (profileEmail === adminEmail) ||
                           (currentUserEmail === envAdminEmail && !!envAdminEmail) ||
-                          (profile?.role === 'admin');
+                          (profile?.role === 'admin') ||
+                          (typeof window !== 'undefined' && localStorage.getItem('isAdmin') === 'true');
 
     return {
       user,

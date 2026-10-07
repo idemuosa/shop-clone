@@ -297,6 +297,77 @@ export default function AdminDashboard() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryImage, setNewCategoryImage] = useState("");
 
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editCategoryName, setEditCategoryName] = useState("");
+  const [editCategoryImage, setEditCategoryImage] = useState("");
+  const [showEditCategoryDialog, setShowEditCategoryDialog] = useState(false);
+
+  const handleOpenEditCategory = (category: any) => {
+    setEditingCategory(category);
+    setEditCategoryName(category.name || "");
+    setEditCategoryImage(category.image || "");
+    setShowEditCategoryDialog(true);
+  };
+
+  const handleUpdateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCategory) return;
+    setIsLoading(true);
+
+    try {
+      let imageUrl = editCategoryImage;
+      if (editCategoryImage && editCategoryImage.startsWith('data:')) {
+        toast.loading("Uploading category image...");
+        imageUrl = await uploadToCloudinary(editCategoryImage);
+        toast.dismiss();
+      }
+
+      const response = await fetch(`${API_URL}/categories/${editingCategory.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: editCategoryName, image: imageUrl }),
+      });
+
+      await handleApiResponse(response);
+
+      toast.success('Category updated successfully!');
+      setShowEditCategoryDialog(false);
+      setEditingCategory(null);
+      setEditCategoryName("");
+      setEditCategoryImage("");
+      fetchData();
+    } catch (error: any) {
+      const message = error?.message === 'Failed to fetch'
+        ? "Failed to connect to backend server. Please check your network connection."
+        : (error?.message || "Failed to update category");
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteCategory = async (id: number | string, name: string) => {
+    if (!id) return;
+    if (!confirm(`Are you sure you want to delete the category "${name}"?`)) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/categories/${id}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json' }
+      });
+
+      await handleApiResponse(response);
+
+      toast.success('Category deleted successfully!');
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete category");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -495,6 +566,12 @@ export default function AdminDashboard() {
     const email = String(o.customerEmail || "").toLowerCase();
     const queryStr = String(searchQuery || "").toLowerCase();
     return id.includes(queryStr) || email.includes(queryStr);
+  });
+
+  const filteredCategories = categories.filter(c => {
+    const name = String(c.name || "").toLowerCase();
+    const queryStr = String(searchQuery || "").toLowerCase();
+    return name.includes(queryStr);
   });
 
   const getStatusBadge = (status: string) => {
@@ -749,6 +826,9 @@ export default function AdminDashboard() {
             </TabsTrigger>
             <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Products
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+              Categories
             </TabsTrigger>
             <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Gallery
@@ -1018,6 +1098,81 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="categories" className="space-y-4">
+            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-6 md:p-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <div>
+                  <h2 className="text-2xl font-black tracking-tighter italic">Manage Categories</h2>
+                  <p className="text-xs text-gray-400 font-bold tracking-widest mt-0.5">Edit or remove store categories</p>
+                </div>
+                <Button
+                  onClick={() => setShowCategoryDialog(true)}
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs px-4 gap-1.5 shadow-md"
+                >
+                  <Plus className="h-4 w-4" /> Add New Category
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {filteredCategories.map((cat) => {
+                  const catProductCount = products.filter(
+                    (p) => (p.category_name || p.category) === cat.name || p.category_id === cat.id
+                  ).length;
+
+                  return (
+                    <div
+                      key={cat.id}
+                      className="group relative bg-white rounded-2xl border-2 border-gray-100 hover:border-orange-500 transition-all overflow-hidden shadow-sm hover:shadow-md p-4 flex flex-col justify-between"
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-200">
+                          <img
+                            src={cat.image || 'https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop'}
+                            alt={cat.name}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1000&auto=format&fit=crop';
+                            }}
+                          />
+                        </div>
+                        <div className="overflow-hidden">
+                          <h4 className="font-black text-sm truncate">{cat.name}</h4>
+                          <p className="text-[10px] font-bold text-gray-400">{catProductCount} {catProductCount === 1 ? 'product' : 'products'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 rounded-lg text-blue-600 border-blue-200 hover:bg-blue-50 font-bold text-xs gap-1"
+                          onClick={() => handleOpenEditCategory(cat)}
+                        >
+                          <Edit className="h-3.5 w-3.5" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 px-3 rounded-lg text-red-600 border-red-200 hover:bg-red-50 font-bold text-xs gap-1"
+                          onClick={() => handleDeleteCategory(cat.id, cat.name)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Delete
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {filteredCategories.length === 0 && (
+                <div className="py-16 text-center">
+                  <LayoutGrid className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+                  <p className="text-gray-400 font-bold text-sm">No categories found</p>
+                </div>
+              )}
+            </Card>
           </TabsContent>
 
           <TabsContent value="gallery">
@@ -1572,6 +1727,165 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Edit Category Dialog */}
+        <Dialog open={showEditCategoryDialog} onOpenChange={setShowEditCategoryDialog}>
+          <DialogContent className="rounded-3xl max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black tracking-tighter">Edit category</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleUpdateCategory} className="space-y-3">
+              <div className="space-y-1">
+                <Label htmlFor="edit-cat-name" className="text-[10px]">Name</Label>
+                <Input
+                  id="edit-cat-name"
+                  value={editCategoryName}
+                  onChange={(e) => setEditCategoryName(e.target.value)}
+                  required
+                  className="rounded-xl h-10 text-xs"
+                  placeholder="Category Name"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="edit-cat-image" className="text-[10px]">Image</Label>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    id="edit-cat-image-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setEditCategoryImage(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
+                  />
+                  {editCategoryImage && (
+                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                      <img src={editCategoryImage} className="w-full h-full object-cover" alt="Preview" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <DialogFooter className="gap-2 sm:gap-0 mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl h-10 text-xs font-bold"
+                  onClick={() => setShowEditCategoryDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Saving...' : 'Save changes'}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Product Dialog */}
+        <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
+          <DialogContent className="rounded-3xl max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-black tracking-tighter">Edit product</DialogTitle>
+            </DialogHeader>
+            {editingProduct && (
+              <form onSubmit={handleUpdateProduct} className="space-y-3">
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Product name</Label>
+                  <Input id="edit-name" name="name" defaultValue={editingProduct.name} required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Price ($)</Label>
+                    <Input id="edit-price" name="price" type="number" step="0.01" defaultValue={editingProduct.price} required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Old Price ($)</Label>
+                    <Input id="edit-oldPrice" name="oldPrice" type="number" step="0.01" defaultValue={editingProduct.oldPrice || editingProduct.old_price || ''} className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Stock</Label>
+                    <Input id="edit-stock" name="stock" type="number" defaultValue={editingProduct.stock || 0} required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[10px]">Sold</Label>
+                    <Input id="edit-sold" name="sold" type="text" defaultValue={editingProduct.sold || 0} className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Category</Label>
+                  <Select value={editCategoryId} onValueChange={setEditCategoryId} required>
+                    <SelectTrigger className="rounded-lg border-2 w-full h-10 text-xs">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id.toString()}>
+                          {cat.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Tag</Label>
+                  <Input id="edit-tag" name="tag" defaultValue={editingProduct.tag || ''} className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" placeholder="e.g. Best Seller" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Description</Label>
+                  <Textarea id="edit-description" name="description" defaultValue={editingProduct.description || ''} className="rounded-lg text-xs border-2 focus:border-orange-500 min-h-[60px]" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px]">Image</Label>
+                  <div className="flex flex-col gap-2">
+                    <Input
+                      id="edit-image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, 'edit')}
+                      className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
+                    />
+                    {(editProductImage || editingProduct.image) && (
+                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                        <img src={editProductImage || editingProduct.image} className="w-full h-full object-cover" alt="Product" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <DialogFooter className="gap-2 sm:gap-0 mt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-xl h-10 text-xs font-bold"
+                    onClick={() => setEditingProduct(null)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Saving...' : 'Save product'}
+                  </Button>
+                </DialogFooter>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
