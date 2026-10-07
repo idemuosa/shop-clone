@@ -597,6 +597,40 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (userEmail === 'idemudiawisdom27@gmail.com' || userEmail === import.meta.env.VITE_ADMIN_EMAIL) {
+      toast.error("Primary admin account cannot be deleted.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete user "${userEmail}"?`)) return;
+    setIsLoading(true);
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+      toast.success("User deleted successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error("Failed to delete user: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearNotifications = async () => {
+    if (!confirm("Are you sure you want to clear all activity and email logs?")) return;
+    setIsLoading(true);
+    try {
+      const nSnap = await getDocs(collection(db, 'notifications'));
+      const deletePromises = nSnap.docs.map(d => deleteDoc(doc(db, 'notifications', d.id)));
+      await Promise.all(deletePromises);
+      toast.success("Activity logs cleared successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error("Failed to clear activity logs: " + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const filteredProducts = products.filter(p => {
     const name = String(p.name || "").toLowerCase();
     const category = String(p.category_name || p.category || "").toLowerCase();
@@ -1517,15 +1551,26 @@ export default function AdminDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleToggleAdmin(u.id, u.role)}
-                            className="rounded-lg font-bold text-[10px] "
-                            disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
-                          >
-                            {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
-                          </Button>
+                          <div className="flex justify-end gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleAdmin(u.id, u.role)}
+                              className="rounded-lg font-bold text-[10px]"
+                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL}
+                            >
+                              {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id, u.email)}
+                              className="rounded-lg font-bold text-[10px] text-red-600 hover:bg-red-50"
+                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -1612,8 +1657,19 @@ export default function AdminDashboard() {
 
           <TabsContent value="emails">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl font-black  tracking-tighter">Email notification logs</CardTitle>
+                {notifications.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearNotifications}
+                    disabled={isLoading}
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Clear Logs
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
