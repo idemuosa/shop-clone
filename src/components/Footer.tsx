@@ -57,15 +57,15 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
             <ul className="space-y-2 text-[11px] font-medium text-gray-400">
               <li className="flex items-start gap-2">
                 <MapPin className="h-3.5 w-3.5 text-orange-600 shrink-0 mt-0.5" />
-                <span>{settings?.storeAddress || '123 Fashion Street, Lagos, Nigeria'}</span>
+                <span>{settings?.storeAddress || '20 Musheshe Road Off Upper Sakponba Road, Benin City, Edo State.'}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="h-3.5 w-3.5 text-orange-600 shrink-0" />
-                <span>{settings?.storePhone || '+234 (0) 800-VIVI'}</span>
+                <span>{settings?.storePhone || '07045108847 or 09053091235'}</span>
               </li>
               <li className="flex items-center gap-2" onClick={() => onOpenInfoPage?.('Help')}>
                 <Mail className="h-3.5 w-3.5 text-orange-600 shrink-0" />
-                <span className="cursor-pointer hover:text-orange-600 transition-colors">{settings?.storeEmail || 'support@vivi.co'}</span>
+                <span className="cursor-pointer hover:text-orange-600 transition-colors">{settings?.storeEmail || 'Ekechichidima506@gmail.com'}</span>
               </li>
             </ul>
           </div>
