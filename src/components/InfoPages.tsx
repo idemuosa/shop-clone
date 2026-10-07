@@ -63,16 +63,6 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
     switch (normalizedTitle) {
       case 'flash sales':
         return (
-          <div className="space-y-6">
-            <div className="bg-orange-600 rounded-3xl p-6 md:p-8 text-white relative overflow-hidden">
-              <div className="relative z-10">
-                <div className="bg-white/20 w-fit p-2 rounded-xl mb-3 backdrop-blur-md">
-                   <Zap className="h-6 w-6 text-yellow-400 fill-yellow-400" />
-                </div>
-                <h2 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter mb-2">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
-                <p className="text-orange-100 text-xs md:text-sm max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
-              </div>
-              <Zap className="absolute right-[-20px] bottom-[-20px] h-40 w-40 text-white/10 rotate-12" />
           <div className="space-y-3">
             <div className="bg-orange-600 rounded-lg p-2.5 md:p-3 text-white relative overflow-hidden">
               <div className="relative z-10">
@@ -93,18 +83,6 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
               onProductView={onProductView}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {[
-                { icon: <Clock className="h-5 w-5" />, title: "Limited Time", desc: "Deals expire every midnight. Act fast or miss out." },
-                { icon: <Zap className="h-5 w-5" />, title: "Huge Discounts", desc: "Prices slashed up to 90% off retail value." },
-                { icon: <Star className="h-5 w-5" />, title: "Top Quality", desc: "Only highly-rated products make it to flash sales." }
-              ].map((item, i) => (
-                <div key={i} className="bg-white p-4 md:p-5 rounded-2xl border border-gray-100 shadow-sm">
-                  <div className="bg-orange-50 w-9 h-9 rounded-xl flex items-center justify-center text-orange-600 mb-3">
-                    {item.icon}
-                  </div>
-                  <h4 className="font-black uppercase tracking-tight text-xs mb-1">{item.title}</h4>
-                  <p className="text-xs text-gray-500 font-medium leading-relaxed">{item.desc}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {[
                 { icon: <Clock className="h-4 w-4" />, title: "Limited Time", desc: "Deals expire every midnight. Act fast or miss out." },

@@ -366,10 +366,14 @@ export default function AdminDashboard() {
       toast.error("Cannot delete primary admin account");
       return;
     }
-    if (!confirm(`Are you sure you want to delete user ${email || 'this user'}?`)) return;
+    if (!confirm(`Are you sure you want to delete user "${email || userId}"? This cannot be undone.`)) return;
     setIsLoading(true);
     try {
-      await deleteDoc(doc(db, 'users', userId));
+      try {
+        await deleteDoc(doc(db, 'users', userId));
+      } catch (fErr) {
+        console.warn("Firestore delete user error:", fErr);
+      }
       try {
         await fetch(`${API_URL}/api/admin/users/${userId}`, { method: 'DELETE' });
       } catch (e) {
@@ -457,33 +461,6 @@ export default function AdminDashboard() {
       fetchData();
     } catch (error: any) {
       toast.error(error?.message || "Failed to clear activities");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string, userEmail: string) => {
-    if (!confirm(`Are you sure you want to delete user "${userEmail || userId}"? This cannot be undone.`)) return;
-    setIsLoading(true);
-    try {
-      // Delete in Firestore
-      try {
-        await deleteDoc(doc(db, 'users', userId));
-      } catch (fErr) {
-        console.warn("Firestore delete user error:", fErr);
-      }
-
-      // Delete via API endpoint
-      const response = await fetch(`${API_URL}/api/admin/users/${userId}`, { method: 'DELETE' });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.message || data.error || "Failed to delete user");
-      }
-
-      toast.success(`User "${userEmail || userId}" deleted successfully!`);
-      fetchData();
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete user");
     } finally {
       setIsLoading(false);
     }
@@ -1706,27 +1683,12 @@ export default function AdminDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end gap-1.5">
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleToggleAdmin(u.id, u.role)}
                               className="rounded-lg font-bold text-[10px]"
-                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
-                            >
-                              {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteUser(u.id, u.email)}
-                              className="rounded-lg font-bold text-[10px] text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
-                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
-                            >
-                              <Trash2 className="h-3 w-3 mr-1" /> Delete
-                            </Button>
-                              className="rounded-lg font-bold text-[10px] "
                               disabled={isPrimaryAdmin}
                             >
                               {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
