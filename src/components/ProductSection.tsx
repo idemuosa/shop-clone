@@ -1,4 +1,4 @@
-import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Award, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText } from "lucide-react";
+import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -37,8 +37,8 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { db, auth } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, where, updateDoc, doc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, query, onSnapshot, updateDoc, doc } from "firebase/firestore";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
 import { useCart } from "@/lib/CartContext";

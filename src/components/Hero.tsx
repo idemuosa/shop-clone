@@ -2,11 +2,9 @@ import React, { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { Zap, ShoppingBag, Gift, Clock } from "lucide-react";
-import { useCurrency } from "@/lib/CurrencyContext";
 
 export default function Hero() {
   const [timeLeft, setTimeLeft] = useState({ hours: 14, minutes: 22, seconds: 54 });
-  const { formatPrice } = useCurrency();
 
   useEffect(() => {
     const timer = setInterval(() => {

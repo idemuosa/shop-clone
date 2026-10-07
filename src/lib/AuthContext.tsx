@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { auth, db } from './firebase';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { setupPushNotifications } from './notifications';
 
 interface UserProfile {

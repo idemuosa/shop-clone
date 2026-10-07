@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
-import { Zap, Clock, ArrowRight, Gift } from "lucide-react";
+import { Zap, ArrowRight, Gift } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { db } from "@/lib/firebase";

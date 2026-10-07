@@ -6,7 +6,6 @@ import {
   getDocs, 
   query, 
   orderBy, 
-  serverTimestamp,
   deleteDoc,
   doc,
   updateDoc,
@@ -36,21 +35,16 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  LineChart,
-  Line,
   AreaChart,
   Area
 } from 'recharts';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  FileText,
   LayoutDashboard,
   Wallet,
   TrendingDown,
@@ -58,10 +52,8 @@ import {
   Zap,
   Plus,
   Search,
-  User as UserIcon,
   TrendingUp,
   Package,
-  BarChart3,
   LayoutGrid,
   ShoppingCart,
   Mail,
@@ -1181,7 +1173,7 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {orders.slice(0, 5).map((o, i) => (
+                  {orders.slice(0, 5).map((o) => (
                     <div key={o.id} className="flex items-center gap-4">
                       <div className="bg-green-100 p-2 rounded-lg">
                         <ShoppingCart className="h-4 w-4 text-orange-600" />

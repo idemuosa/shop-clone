@@ -23,10 +23,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
-import { API_URL, handleApiResponse } from '@/lib/api';
+import { API_URL } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
-import { ShieldCheck, Mail, Phone, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { ShieldCheck, Mail, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -35,7 +34,7 @@ interface AuthModalProps {
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [_authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const { user } = useAuth();

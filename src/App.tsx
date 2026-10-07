@@ -13,7 +13,6 @@ const UserProfilePage = lazy(() => import("./components/profile/UserProfilePage"
 const UserDashboard = lazy(() => import("./components/dashboard/UserDashboard"));
 const CheckoutPage = lazy(() => import("./components/CheckoutPage"));
 const InfoPage = lazy(() => import("./components/InfoPages"));
-const SellerDashboard = lazy(() => import("./components/seller/SellerDashboard"));
 
 import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
@@ -21,12 +20,9 @@ import ScrollToTop from "./components/ScrollToTop";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
-import { SocketProvider, useSocket } from "./lib/SocketContext";
+import { SocketProvider } from "./lib/SocketContext";
 import { API_URL } from "./lib/api";
-import { db } from "./lib/firebase";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
-import { Truck, Headset, ShieldCheck, Zap, Search, X, Package } from "lucide-react";
-import { motion } from "motion/react";
+import { Truck, Headset, ShieldCheck, Search, X, Package } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { Button } from "./components/ui/button";
 import { getOptimizedImageUrl } from "./lib/utils";
@@ -47,7 +43,7 @@ function MainContent() {
   const [lastViewedCategory, setLastViewedCategory] = useState<string>(() => {
     return localStorage.getItem('lastViewedCategory') || '';
   });
-  const { user, profile, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading } = useAuth();
 
   // Check for Paystack reference on mount
   useEffect(() => {
