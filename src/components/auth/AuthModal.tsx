@@ -25,7 +25,8 @@ import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { API_URL } from '@/lib/api';
 import PaymentMethods from './PaymentMethods';
-import { ShieldCheck, Mail, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, ArrowRight, CheckCircle2, AlertCircle, Eye, EyeOff, Fingerprint } from 'lucide-react';
+import { isFingerprintSupported, authenticateWithFingerprint } from '@/lib/fingerprintAuth';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -37,7 +38,29 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [_authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [fingerprintSupported, setFingerprintSupported] = useState(false);
   const { user } = useAuth();
+
+  React.useEffect(() => {
+    isFingerprintSupported().then(setFingerprintSupported).catch(() => setFingerprintSupported(false));
+  }, []);
+
+  const handleFingerprintSignIn = async (forAdmin = false) => {
+    setIsLoading(true);
+    try {
+      const targetEmail = forAdmin ? (import.meta.env.VITE_ADMIN_EMAIL || 'idemudiawisdom27@gmail.com') : undefined;
+      const result = await authenticateWithFingerprint(targetEmail);
+      if (forAdmin) {
+        localStorage.setItem('isAdmin', 'true');
+      }
+      toast.success(`Signed in securely with Fingerprint as ${result.userEmail}!`);
+      onClose();
+    } catch (error: any) {
+      toast.error(error?.message || "Fingerprint authentication failed. Please try password or Google sign-in.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getFirebaseErrorMessage = (error: any): string => {
     const code = error?.code || '';
@@ -312,6 +335,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         )}
                       </Button>
 
+                      {fingerprintSupported && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleFingerprintSignIn(false)}
+                          disabled={isLoading}
+                          className="w-full rounded-xl h-12 border-2 border-orange-500/30 text-orange-600 hover:bg-orange-50 font-black text-xs gap-2 transition-all shadow-sm"
+                        >
+                          <Fingerprint className="h-5 w-5 text-orange-600" />
+                          Sign In with Fingerprint
+                        </Button>
+                      )}
+
                       <div className="flex items-center gap-4 py-2">
                         <div className="h-[1px] flex-1 bg-gray-100"></div>
                         <span className="text-[10px] font-black text-gray-300  tracking-widest">Security Link</span>
@@ -468,6 +504,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         <Button type="submit" disabled={isLoading} className="w-full bg-zinc-900 hover:bg-black text-white font-black rounded-2xl h-16 shadow-2xl shadow-zinc-100 transition-all active:scale-95">
                           {isLoading ? 'Authenticating...' : 'Secure Entry'}
                         </Button>
+
+                        {fingerprintSupported && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleFingerprintSignIn(true)}
+                            disabled={isLoading}
+                            className="w-full rounded-2xl h-14 border-2 border-orange-600/50 text-orange-600 hover:bg-orange-50 font-black text-xs gap-2 transition-all shadow-sm"
+                          >
+                            <Fingerprint className="h-5 w-5 text-orange-600" />
+                            Admin Fingerprint Sign In
+                          </Button>
+                        )}
 
                         <div className="flex items-center gap-4 py-2">
                           <div className="h-[1px] flex-1 bg-zinc-200"></div>
