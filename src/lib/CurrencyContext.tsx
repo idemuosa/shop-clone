@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-type Currency = 'USD' | 'NGN' | 'EUR' | 'GBP';
+type Currency = 'NGN';
 
 interface CurrencyContextType {
   currency: Currency;
@@ -12,33 +12,22 @@ interface CurrencyContextType {
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
-const RATES: Record<Currency, number> = {
-  USD: 1,
-  NGN: 1500, // Approximate Naira rate
-  EUR: 0.93, // Approximate Euro rate
-  GBP: 0.79, // Approximate Pound rate
-};
-
 const SYMBOLS: Record<Currency, string> = {
-  USD: '$',
   NGN: '₦',
-  EUR: '€',
-  GBP: '£',
 };
 
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>('NGN');
 
   const convertPrice = (price: number) => {
-    return price * RATES[currency];
+    return price;
   };
 
   const formatPrice = (price: number | string) => {
     const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : price;
     if (isNaN(numericPrice)) return '₦0.00';
 
-    const converted = convertPrice(numericPrice);
-    return `${SYMBOLS[currency]}${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `₦${numericPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   return (
@@ -47,7 +36,7 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
       setCurrency,
       formatPrice,
       convertPrice,
-      symbol: SYMBOLS[currency]
+      symbol: SYMBOLS['NGN']
     }}>
       {children}
     </CurrencyContext.Provider>
