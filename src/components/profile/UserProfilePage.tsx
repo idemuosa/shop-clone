@@ -734,36 +734,36 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
           </TabsContent>
 
           <TabsContent value="help">
-             <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
-               <div className="text-center mb-12">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Headset className="h-10 w-10 text-orange-600" />
+             <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-6 md:p-8">
+               <div className="text-center mb-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                     <Headset className="h-8 w-8 text-orange-600" />
                   </div>
-                  <h2 className="text-4xl font-black uppercase tracking-tighter italic">How can we <span className="text-orange-600">help</span>?</h2>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-2">24/7 Dedicated Support for Shopsy Members</p>
+                  <h2 className="text-2xl font-black uppercase tracking-tighter italic">How can we <span className="text-orange-600">help</span>?</h2>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-1">24/7 Dedicated Support for Shopsy Members</p>
                </div>
 
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   {[
                     { title: 'Track My Order', desc: 'Real-time visibility of your shipment journey', icon: Truck },
                     { title: 'Returns & Refunds', desc: 'Easy 30-day money back guarantee process', icon: ShieldCheck },
                     { title: 'Payments & Safety', desc: 'Secure encryption for all your transactions', icon: CreditCard },
                   ].map((h, i) => (
-                    <div key={i} className="p-8 rounded-[32px] border-2 border-gray-50 hover:border-orange-100 bg-white transition-all text-center cursor-pointer group">
-                       <h.icon className="h-8 w-8 text-orange-600 mx-auto mb-4 group-hover:scale-110 transition-transform" />
-                       <h3 className="font-black uppercase tracking-tighter mb-2">{h.title}</h3>
-                       <p className="text-xs text-gray-500 font-medium leading-relaxed italic">{h.desc}</p>
+                    <div key={i} className="p-5 rounded-2xl border-2 border-gray-50 hover:border-orange-100 bg-white transition-all text-center cursor-pointer group">
+                       <h.icon className="h-6 w-6 text-orange-600 mx-auto mb-3 group-hover:scale-110 transition-transform" />
+                       <h3 className="text-sm font-black uppercase tracking-tighter mb-1">{h.title}</h3>
+                       <p className="text-[11px] text-gray-500 font-medium leading-relaxed italic">{h.desc}</p>
                     </div>
                   ))}
                </div>
 
-               <div className="bg-zinc-900 rounded-[32px] p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 border-4 border-orange-600/20">
+               <div className="bg-zinc-900 rounded-2xl p-6 text-white flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-orange-600/20">
                   <div>
-                     <h3 className="text-2xl font-black uppercase tracking-tighter mb-2 italic">Still need assistance?</h3>
-                     <p className="text-gray-400 text-sm font-medium">Our agents are online and ready to chat with you right now.</p>
+                     <h3 className="text-lg font-black uppercase tracking-tighter mb-1 italic">Still need assistance?</h3>
+                     <p className="text-gray-400 text-xs font-medium">Our agents are online and ready to chat with you right now.</p>
                   </div>
-                  <Button className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl h-16 px-10 text-lg shadow-xl shadow-orange-900 transition-all active:scale-95 flex items-center gap-3">
-                     <Zap className="h-5 w-5 fill-yellow-400 text-yellow-400" /> START LIVE CHAT
+                  <Button className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-12 px-8 text-sm shadow-lg shadow-orange-900 transition-all active:scale-95 flex items-center gap-2">
+                     <Zap className="h-4 w-4 fill-yellow-400 text-yellow-400" /> START LIVE CHAT
                   </Button>
                </div>
              </Card>
