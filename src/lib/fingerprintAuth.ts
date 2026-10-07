@@ -11,6 +11,18 @@ export interface FingerprintCredentialInfo {
 }
 
 /**
+ * Safely computes the RP ID for WebAuthn depending on window location.
+ */
+function getRpId(): string {
+  if (typeof window === 'undefined') return 'localhost';
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'localhost';
+  }
+  return hostname;
+}
+
+/**
  * Checks if WebAuthn / fingerprint authentication is supported in the current environment.
  */
 export async function isFingerprintSupported(): Promise<boolean> {
@@ -79,7 +91,7 @@ export async function registerFingerprintCredential(userId: string, email: strin
     challenge,
     rp: {
       name: 'Vivi Store',
-      id: window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname
+      id: getRpId()
     },
     user: {
       id: userIdBuffer,
@@ -87,20 +99,33 @@ export async function registerFingerprintCredential(userId: string, email: strin
       displayName: normalizedEmail
     },
     pubKeyCredParams: [
-      { alg: -7, type: 'public-key' },  // ES256
-      { alg: -257, type: 'public-key' } // RS256
+      { alg: -7, type: 'public-key' },   // ES256 (most common on phones)
+      { alg: -257, type: 'public-key' },  // RS256
+      { alg: -37, type: 'public-key' },   // PS256
+      { alg: -8, type: 'public-key' }     // Ed25519
     ],
     authenticatorSelection: {
-      authenticatorAttachment: 'platform', // Native fingerprint / TouchID / Windows Hello / Passkey
       userVerification: 'preferred',
       requireResidentKey: false
     },
     timeout: 60000
   };
 
-  const credential = await navigator.credentials.create({
-    publicKey: publicKeyCredentialCreationOptions
-  }) as PublicKeyCredential | null;
+  let credential: PublicKeyCredential | null = null;
+  try {
+    credential = await navigator.credentials.create({
+      publicKey: publicKeyCredentialCreationOptions
+    }) as PublicKeyCredential | null;
+  } catch (err: any) {
+    if (err.name === 'NotAllowedError') {
+      throw new Error("Fingerprint registration timed out, was canceled, or not permitted by browser privacy settings.");
+    } else if (err.name === 'InvalidStateError') {
+      throw new Error("This fingerprint credential is already registered on this device.");
+    } else if (err.name === 'NotSupportedError') {
+      throw new Error("Biometric authentication is not supported on this device or browser configuration.");
+    }
+    throw new Error(err?.message || "Fingerprint registration failed.");
+  }
 
   if (!credential) {
     throw new Error("Fingerprint registration cancelled or failed.");
@@ -112,7 +137,7 @@ export async function registerFingerprintCredential(userId: string, email: strin
     email: normalizedEmail,
     userId,
     createdAt: new Date().toISOString(),
-    deviceName: navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop Device'
+    deviceName: typeof navigator !== 'undefined' && navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop Device'
   };
 
   // Register credential on the server
@@ -176,21 +201,28 @@ export async function authenticateWithFingerprint(targetEmail?: string): Promise
   const publicKeyCredentialRequestOptions: PublicKeyCredentialRequestOptions = {
     challenge,
     timeout: 60000,
-    rpId: window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname,
+    rpId: getRpId(),
     userVerification: 'preferred',
   };
 
   if (enrolledInfo?.credentialId) {
     publicKeyCredentialRequestOptions.allowCredentials = [{
       id: base64UrlToBuffer(enrolledInfo.credentialId),
-      type: 'public-key',
-      transports: ['internal']
+      type: 'public-key'
     }];
   }
 
-  const assertion = await navigator.credentials.get({
-    publicKey: publicKeyCredentialRequestOptions
-  }) as PublicKeyCredential | null;
+  let assertion: PublicKeyCredential | null = null;
+  try {
+    assertion = await navigator.credentials.get({
+      publicKey: publicKeyCredentialRequestOptions
+    }) as PublicKeyCredential | null;
+  } catch (err: any) {
+    if (err.name === 'NotAllowedError') {
+      throw new Error("Fingerprint sign-in timed out, was canceled, or was rejected by your device.");
+    }
+    throw new Error(err?.message || "Fingerprint authentication failed.");
+  }
 
   if (!assertion) {
     throw new Error("Fingerprint authentication cancelled or failed.");
