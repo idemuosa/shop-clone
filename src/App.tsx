@@ -426,7 +426,7 @@ function MainContent() {
                 <div className="relative bg-orange-500 rounded-2xl p-5 overflow-hidden group cursor-pointer text-white">
                   <div className="z-10 relative">
                     <p className="font-bold mb-1 text-xs tracking-widest opacity-80">Smart Tech</p>
-                    <h3 className="text-xl font-black mb-3 leading-tight">The Best Smart <br /> Watch under <br /> $20</h3>
+                    <h3 className="text-xl font-black mb-3 leading-tight">The Best Smart <br /> Watch under <br /> ₦20</h3>
                     <button className="bg-white text-orange-600 px-5 py-2 rounded-full text-xs font-black shadow-md hover:scale-105 transition-transform">Shop Now</button>
                   </div>
                   <img 
@@ -490,7 +490,7 @@ function MainContent() {
                 <Truck className="h-5 w-5 text-orange-600" />
               </div>
               <h4 className="text-xs font-bold mb-0.5 tracking-wider">Free and Fast Delivery</h4>
-              <p className="text-[10px] text-gray-500">Free delivery for all orders over $140</p>
+              <p className="text-[10px] text-gray-500">Free delivery for all orders over ₦140</p>
             </div>
             <div className="flex flex-col items-center text-center">
               <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center mb-2">

@@ -73,7 +73,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
           {/* Account */}
           <div className="space-y-2.5">
             <h3 className="text-xs font-black tracking-widest text-white italic">Account</h3>
-            <ul className="space-y-1.5 text-[11px] font-medium text-gray-400">
+            <ul className="space-y-1.5 text-xs md:text-sm font-medium text-gray-400">
               {["My Account", "Login / Register", "Cart", "Wishlist", "Order History"].map((item) => (
                 <li key={item} className="hover:text-orange-600 transition-colors cursor-pointer">{item}</li>
               ))}
@@ -83,7 +83,7 @@ export default function Footer({ onOpenInfoPage }: FooterProps) {
           {/* Quick Links */}
           <div className="space-y-2.5">
             <h3 className="text-xs font-black tracking-widest text-white italic">Quick Link</h3>
-            <ul className="space-y-1.5 text-[11px] font-medium text-gray-400">
+            <ul className="space-y-1.5 text-xs md:text-sm font-medium text-gray-400">
               {[
                 { label: "New Arrival", target: "New Arrivals" },
                 { label: "Best Seller", target: "Best Sellers" },

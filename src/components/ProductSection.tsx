@@ -445,7 +445,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             Vivi Reward: You saved ${(unitPrice * quantity * 0.9).toFixed(2)} today!
           </p>
           <Button variant="link" className="p-0 h-auto text-[10px] text-blue-600 font-bold  tracking-tighter">
-            Share with friends for a $20 Coupon 🎁
+            Share with friends for a ₦20 Coupon 🎁
           </Button>
         </div>,
         { duration: 6000 }

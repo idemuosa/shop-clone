@@ -193,7 +193,7 @@ export default function AdminDashboard() {
           facebookUrl: "https://facebook.com/vivi",
           twitterUrl: "https://twitter.com/vivi",
           whatsappNumber: "+2348000000000",
-          bannerMessage: "Welcome to Vivi - Enjoy Free Shipping on Orders Over $140!",
+          bannerMessage: "Welcome to Vivi - Enjoy Free Shipping on Orders Over ₦140!",
           logoUrl: "Vivi"
         };
         const ref = await addDoc(collection(db, 'settings'), defaultSettings);
@@ -537,7 +537,7 @@ export default function AdminDashboard() {
   };
 
   const handleClearAllStoreData = async () => {
-    if (!confirm("CRITICAL: Are you sure you want to clear ALL store data?\n\nThis will reset:\n- Sales ($0.00)\n- Expenses ($0.00)\n- Profit ($0.00)\n- Inventory (0/0)")) return;
+    if (!confirm("CRITICAL: Are you sure you want to clear ALL store data?\n\nThis will reset:\n- Sales (₦0.00)\n- Expenses (₦0.00)\n- Profit (₦0.00)\n- Inventory (0/0)")) return;
     setIsLoading(true);
     try {
       // 1. Clear Firestore orders
@@ -966,7 +966,7 @@ export default function AdminDashboard() {
                         className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
                       />
                       {newCategoryImage && (
-                        <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                        <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
                            <img src={newCategoryImage} className="w-full h-full object-cover" />
                         </div>
                       )}
@@ -1099,7 +1099,7 @@ export default function AdminDashboard() {
                           contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                           itemStyle={{ fontWeight: 800 }}
                         />
-                        <Area type="monotone" name="Revenue ($)" dataKey="sales" stroke="#9333ea" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
+                        <Area type="monotone" name="Revenue (₦)" dataKey="sales" stroke="#9333ea" strokeWidth={3} fillOpacity={1} fill="url(#colorSales)" />
                         <Area type="monotone" name="Orders count" dataKey="orders" stroke="#2563eb" strokeWidth={3} fillOpacity={0.1} fill="#dbeafe" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -1208,7 +1208,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
-                        <Label className="text-[10px]">Price ($)</Label>
+                        <Label className="text-[10px]">Price (₦)</Label>
                         <Input id="price" name="price" type="number" step="0.01" required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
                       </div>
                       <div className="space-y-1">
@@ -1242,16 +1242,16 @@ export default function AdminDashboard() {
                           className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
                         />
                         {newProductImage && (
-                          <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                          <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
                              <img src={newProductImage} className="w-full h-full object-cover" />
                              <Button
                                type="button"
                                variant="destructive"
                                size="icon"
-                               className="absolute top-0.5 right-0.5 h-4 w-4 rounded-full"
+                               className="absolute top-1 right-1 h-5 w-5 rounded-full"
                                onClick={() => setNewProductImage("")}
                              >
-                               <Trash2 className="h-2 w-2" />
+                               <Trash2 className="h-3 w-3" />
                              </Button>
                           </div>
                         )}
@@ -1998,7 +1998,7 @@ export default function AdminDashboard() {
                           <Input name="bankHolder" defaultValue={settings?.bankHolder} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
                         </div>
                         <div className="space-y-2">
-                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Monthly Expenses ($)</Label>
+                          <Label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Monthly Expenses (₦)</Label>
                           <Input name="expenses" type="number" step="0.01" defaultValue={settings?.expenses} className="rounded-xl h-11 border-2 focus:border-orange-500 font-bold" />
                         </div>
                       </div>
@@ -2100,7 +2100,7 @@ export default function AdminDashboard() {
                     className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
                   />
                   {editCategoryImage && (
-                    <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                    <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
                       <img src={editCategoryImage} className="w-full h-full object-cover" alt="Preview" />
                     </div>
                   )}
@@ -2141,11 +2141,11 @@ export default function AdminDashboard() {
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label className="text-[10px]">Price ($)</Label>
+                    <Label className="text-[10px]">Price (₦)</Label>
                     <Input id="edit-price" name="price" type="number" step="0.01" defaultValue={editingProduct.price} required className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-[10px]">Old Price ($)</Label>
+                    <Label className="text-[10px]">Old Price (₦)</Label>
                     <Input id="edit-oldPrice" name="oldPrice" type="number" step="0.01" defaultValue={editingProduct.oldPrice || editingProduct.old_price || ''} className="rounded-lg h-10 text-xs border-2 focus:border-orange-500" />
                   </div>
                 </div>
@@ -2193,7 +2193,7 @@ export default function AdminDashboard() {
                       className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
                     />
                     {(editProductImage || editingProduct.image) && (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                      <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
                         <img src={editProductImage || editingProduct.image} className="w-full h-full object-cover" alt="Product" />
                       </div>
                     )}

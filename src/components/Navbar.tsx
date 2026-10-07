@@ -86,7 +86,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
       {/* Top bar */}
       <div className="bg-orange-600 text-white py-1 px-3 text-center text-[10px] md:text-xs font-bold tracking-widest">
         <span className="flex items-center justify-center gap-2">
-          {storeSettings?.bannerMessage || 'Welcome to Vivi - Enjoy Free Shipping on Orders Over $140!'}
+          {storeSettings?.bannerMessage || 'Welcome to Vivi - Enjoy Free Shipping on Orders Over ₦140!'}
           <a href="#" className="underline underline-offset-4 hover:text-yellow-200 transition-colors ml-2">Shop Now</a>
         </span>
       </div>
@@ -255,7 +255,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
                      onOpenInfoPage?.(link);
                      setIsMobileMenuOpen(false);
                    }}
-                   className="text-left px-2.5 py-1 text-[11px] font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-md transition-all"
+                   className="text-left px-2.5 py-1 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-md transition-all"
                  >
                    {link}
                  </button>
@@ -319,7 +319,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
                   e.preventDefault();
                   onOpenInfoPage?.(link);
                 }}
-                className="text-[11px] font-bold text-gray-700 hover:text-orange-600 transition-colors tracking-tight"
+                className="text-xs md:text-sm font-bold text-gray-700 hover:text-orange-600 transition-colors tracking-tight"
               >
                 {link}
               </a>

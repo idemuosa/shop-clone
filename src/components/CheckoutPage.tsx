@@ -564,6 +564,9 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                                       if (v.offer.includes('%')) {
                                          const percentage = parseFloat(v.offer.split('%')[0]) / 100;
                                          setDiscount(totalPrice * percentage);
+                                      } else if (v.offer.includes('₦')) {
+                                         const amount = parseFloat(v.offer.split('₦')[1]);
+                                         setDiscount(Math.min(amount, totalPrice));
                                       } else if (v.offer.includes('$')) {
                                          const amount = parseFloat(v.offer.split('$')[1]);
                                          setDiscount(Math.min(amount, totalPrice));

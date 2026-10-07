@@ -27,7 +27,7 @@ const SYMBOLS: Record<Currency, string> = {
 };
 
 export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [currency, setCurrency] = useState<Currency>('USD');
+  const [currency, setCurrency] = useState<Currency>('NGN');
 
   const convertPrice = (price: number) => {
     return price * RATES[currency];
@@ -35,7 +35,7 @@ export const CurrencyProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const formatPrice = (price: number | string) => {
     const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : price;
-    if (isNaN(numericPrice)) return '$0.00';
+    if (isNaN(numericPrice)) return '₦0.00';
 
     const converted = convertPrice(numericPrice);
     return `${SYMBOLS[currency]}${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
