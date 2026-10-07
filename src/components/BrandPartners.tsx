@@ -11,27 +11,27 @@ const brands = [
 
 export default function BrandPartners() {
   return (
-    <section className="py-20 bg-gray-50 overflow-hidden border-t border-gray-100">
+    <section className="py-8 bg-gray-50 overflow-hidden border-t border-gray-100">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-           <h2 className="text-3xl font-black uppercase tracking-tighter italic italic">Official <span className="text-orange-600">Store</span> Partners</h2>
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">100% Authentic Brands Guaranteed</p>
+        <div className="text-center mb-6">
+           <h2 className="text-xl font-black uppercase tracking-tighter italic">Official <span className="text-orange-600">Store</span> Partners</h2>
+           <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-1">100% Authentic Brands Guaranteed</p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8">
           {brands.map((brand, i) => (
             <motion.div
               key={brand.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 0.4, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              whileHover={{ opacity: 1, scale: 1.1 }}
-              className="w-24 md:w-32 grayscale hover:grayscale-0 transition-all cursor-pointer"
+              transition={{ delay: i * 0.05 }}
+              whileHover={{ opacity: 1, scale: 1.05 }}
+              className="w-16 md:w-24 grayscale hover:grayscale-0 transition-all cursor-pointer"
             >
               <img 
                 src={brand.logo} 
                 alt={brand.name} 
-                className="w-full h-auto object-contain max-h-12" 
+                className="w-full h-auto object-contain max-h-8"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://placehold.co/150?text=' + brand.name;

@@ -236,17 +236,17 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-50 space-y-4 animate-in slide-in-from-top duration-300">
+          <div className="md:hidden py-2 border-t border-gray-50 space-y-2 animate-in slide-in-from-top duration-300">
             <form onSubmit={(e) => { handleSearch(e); setIsMobileMenuOpen(false); }} className="relative px-2">
-               <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+               <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
                <Input
                  placeholder="Search..."
                  value={searchTerm}
                  onChange={(e) => setSearchTerm(e.target.value)}
-                 className="pl-10 h-10 rounded-xl bg-gray-100 border-none"
+                 className="pl-9 h-9 rounded-lg bg-gray-100 border-none text-xs"
                />
             </form>
-            <div className="flex flex-col gap-1 px-2">
+            <div className="flex flex-col gap-0.5 px-2">
                {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
                  <button
                    key={link}
@@ -254,16 +254,16 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                      onOpenInfoPage?.(link);
                      setIsMobileMenuOpen(false);
                    }}
-                   className="text-left px-4 py-3 text-sm font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition-all"
+                   className="text-left px-3 py-1.5 text-xs font-bold text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all"
                  >
                    {link}
                  </button>
                ))}
             </div>
-            <div className="px-4 pt-2">
+            <div className="px-2 pt-1">
                <Button
                  onClick={() => { onSearch?.(""); setIsMobileMenuOpen(false); }}
-                 className="w-full bg-orange-600 text-white rounded-xl font-bold h-11"
+                 className="w-full bg-orange-600 text-white rounded-lg font-bold h-9 text-xs"
                >
                  View All Products
                </Button>
@@ -277,31 +277,31 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
               render={(props) => (
                 <button
                   {...props}
-                  className="flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-md cursor-pointer hover:bg-green-100 transition-colors border border-green-100 active:scale-95 outline-none"
+                  className="flex items-center gap-1.5 bg-green-50 text-green-700 px-3 py-1.5 rounded-md cursor-pointer hover:bg-green-100 transition-colors border border-green-100 active:scale-95 outline-none"
                 >
-                  <Menu className="h-4 w-4" />
-                  <span className="text-sm font-bold  tracking-wide">All categories</span>
-                  <ChevronDown className="h-4 w-4" />
+                  <Menu className="h-3.5 w-3.5" />
+                  <span className="text-xs font-bold tracking-wide">All categories</span>
+                  <ChevronDown className="h-3.5 w-3.5" />
                 </button>
               )}
             />
-            <DropdownMenuContent className="w-56 rounded-2xl border-2 p-2 shadow-xl shadow-orange-100/50">
+            <DropdownMenuContent className="w-52 rounded-xl border-2 p-1.5 shadow-xl shadow-orange-100/50">
                {Array.isArray(categories) && categories.length > 0 ? categories.map((cat) => (
                  <DropdownMenuItem
                     key={cat.id}
                     onClick={() => onSearch?.(cat.name || "")}
-                    className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer hover:bg-green-50 hover:text-orange-600 transition-all gap-3"
+                    className="rounded-lg h-9 font-bold text-xs tracking-tighter cursor-pointer hover:bg-green-50 hover:text-orange-600 transition-all gap-2"
                  >
-                   <Box className="h-4 w-4 text-orange-600" />
+                   <Box className="h-3.5 w-3.5 text-orange-600" />
                    {cat.name}
                  </DropdownMenuItem>
                )) : (
-                 <p className="p-4 text-center text-[10px] font-black  text-gray-400">No categories found</p>
+                 <p className="p-3 text-center text-[10px] font-bold text-gray-400">No categories found</p>
                )}
-               <div className="border-t border-gray-100 mt-2 pt-2">
+               <div className="border-t border-gray-100 mt-1.5 pt-1.5">
                  <DropdownMenuItem
                    onClick={() => onSearch?.("")}
-                   className="rounded-xl h-11 font-black  text-xs tracking-tighter cursor-pointer bg-orange-600 text-white hover:bg-orange-700"
+                   className="rounded-lg h-9 font-bold text-xs tracking-tighter cursor-pointer bg-orange-600 text-white hover:bg-orange-700"
                  >
                    View all products
                  </DropdownMenuItem>
@@ -309,7 +309,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
               <a 
                 key={link} 
@@ -318,7 +318,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                   e.preventDefault();
                   onOpenInfoPage?.(link);
                 }}
-                className="text-sm font-bold text-gray-700 hover:text-orange-600 transition-colors  tracking-tight"
+                className="text-xs font-bold text-gray-700 hover:text-orange-600 transition-colors tracking-tight"
               >
                 {link}
               </a>

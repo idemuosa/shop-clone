@@ -510,31 +510,31 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   };
 
   return (
-    <section className="py-12 bg-[#f5f5f5]">
+    <section className="py-6 bg-[#f5f5f5]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-600 p-2 md:p-2.5 rounded-xl shadow-lg shadow-orange-100">
-              <Zap className="h-4 w-4 md:h-5 md:w-5 text-white fill-white" />
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-3 bg-white p-3 md:p-4 rounded-xl shadow-sm border border-gray-100">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-orange-600 p-2 rounded-lg shadow-md shadow-orange-100">
+              <Zap className="h-4 w-4 text-white fill-white" />
             </div>
             <div>
-              <h2 className="text-lg md:text-2xl font-black text-black  tracking-tighter leading-none">{title} <span className="text-orange-600 italic">{subtitle}</span></h2>
-              <p className="text-[9px] md:text-[10px] font-bold text-gray-400  tracking-widest mt-1">{filteredProducts.length} Products Found</p>
+              <h2 className="text-base md:text-lg font-black text-black tracking-tighter leading-none">{title} <span className="text-orange-600 italic">{subtitle}</span></h2>
+              <p className="text-[8px] md:text-[9px] font-bold text-gray-400 tracking-widest mt-0.5">{filteredProducts.length} Products Found</p>
             </div>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {/* Sorting Dropdown */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[140px] md:w-[180px] bg-white border-2 border-gray-100 rounded-xl h-11 font-bold text-xs">
+              <SelectTrigger className="w-[130px] md:w-[160px] bg-white border border-gray-100 rounded-lg h-9 font-bold text-xs">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-2">
-                <SelectItem value="newest" className="font-medium">Newest First</SelectItem>
-                <SelectItem value="price-low" className="font-medium">Price: Low to High</SelectItem>
-                <SelectItem value="price-high" className="font-medium">Price: High to Low</SelectItem>
-                <SelectItem value="rating" className="font-medium">Top Rated</SelectItem>
+              <SelectContent className="rounded-xl border">
+                <SelectItem value="newest" className="font-medium text-xs">Newest First</SelectItem>
+                <SelectItem value="price-low" className="font-medium text-xs">Price: Low to High</SelectItem>
+                <SelectItem value="price-high" className="font-medium text-xs">Price: High to Low</SelectItem>
+                <SelectItem value="rating" className="font-medium text-xs">Top Rated</SelectItem>
               </SelectContent>
             </Select>
 
@@ -545,14 +545,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   <button
                     {...props}
                     className={cn(
-                      "inline-flex items-center justify-center gap-2 border-2 rounded-xl h-11 px-4 text-sm font-bold transition-all bg-white hover:bg-muted hover:text-foreground border-gray-100 hover:border-orange-200",
+                      "inline-flex items-center justify-center gap-1.5 border rounded-lg h-9 px-3 text-xs font-bold transition-all bg-white hover:bg-muted hover:text-foreground border-gray-100 hover:border-orange-200",
                       activeFiltersCount > 0 && "bg-green-50 border-orange-500 text-orange-600"
                     )}
                   >
-                    <SlidersHorizontal className="h-4 w-4" />
+                    <SlidersHorizontal className="h-3.5 w-3.5" />
                     Filter Options
                     {activeFiltersCount > 0 && (
-                      <span className="ml-1 bg-orange-600 text-white h-5 w-5 p-0 flex items-center justify-center rounded-full text-[10px]">
+                      <span className="ml-1 bg-orange-600 text-white h-4 w-4 p-0 flex items-center justify-center rounded-full text-[9px]">
                         {activeFiltersCount}
                       </span>
                     )}
