@@ -440,6 +440,55 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleClearActivities = async () => {
+    if (!confirm("Are you sure you want to clear all recent activities and notifications?")) return;
+    setIsLoading(true);
+    try {
+      // Clear in Firestore
+      const nSnap = await getDocs(collection(db, 'notifications'));
+      const deletePromises = nSnap.docs.map(d => deleteDoc(doc(db, 'notifications', d.id)));
+      await Promise.all(deletePromises);
+
+      // Clear via backend API
+      await fetch(`${API_URL}/api/admin/activities`, { method: 'DELETE' });
+
+      toast.success("Recent activities cleared successfully!");
+      setNotifications([]);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to clear activities");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    if (!confirm(`Are you sure you want to delete user "${userEmail || userId}"? This cannot be undone.`)) return;
+    setIsLoading(true);
+    try {
+      // Delete in Firestore
+      try {
+        await deleteDoc(doc(db, 'users', userId));
+      } catch (fErr) {
+        console.warn("Firestore delete user error:", fErr);
+      }
+
+      // Delete via API endpoint
+      const response = await fetch(`${API_URL}/api/admin/users/${userId}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || data.error || "Failed to delete user");
+      }
+
+      toast.success(`User "${userEmail || userId}" deleted successfully!`);
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleClearAllStoreData = async () => {
     if (!confirm("CRITICAL: Are you sure you want to clear ALL store data?\n\nThis will reset:\n- Sales ($0.00)\n- Expenses ($0.00)\n- Profit ($0.00)\n- Inventory (0/0)")) return;
     setIsLoading(true);
@@ -454,7 +503,7 @@ export default function AdminDashboard() {
         await updateDoc(doc(db, 'settings', settings.id), { expenses: 0 });
       }
 
-      // 3. Reset backend products, reviews, carts, wishlists
+      // 3. Reset backend products, categories, reviews, carts, wishlists
       await fetch(`${API_URL}/api/reset-store-data`, { method: 'POST' });
 
       toast.success("All store metrics (Sales, Expenses, Profit, Inventory) cleared successfully!");
@@ -1032,8 +1081,17 @@ export default function AdminDashboard() {
               </Card>
 
               <Card className="lg:col-span-1 rounded-3xl border-none shadow-xl shadow-gray-200/50">
-                <CardHeader>
-                  <CardTitle className="text-xl font-black  tracking-tighter">Recent activities</CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="text-xl font-black tracking-tighter">Recent activities</CardTitle>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleClearActivities}
+                    disabled={isLoading}
+                    className="h-8 px-2 text-[10px] font-bold text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" /> Clear
+                  </Button>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Top Product Spotlight */}
@@ -1648,11 +1706,26 @@ export default function AdminDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
+                          <div className="flex justify-end gap-1.5">
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleToggleAdmin(u.id, u.role)}
+                              className="rounded-lg font-bold text-[10px]"
+                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
+                            >
+                              {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id, u.email)}
+                              className="rounded-lg font-bold text-[10px] text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                              disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
+                            >
+                              <Trash2 className="h-3 w-3 mr-1" /> Delete
+                            </Button>
                               className="rounded-lg font-bold text-[10px] "
                               disabled={isPrimaryAdmin}
                             >
