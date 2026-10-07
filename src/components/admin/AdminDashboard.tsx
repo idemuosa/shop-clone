@@ -346,6 +346,49 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleClearOrders = async () => {
+    if (!confirm("Are you sure you want to delete all customer orders? This will reset Sales & Profit.")) return;
+    setIsLoading(true);
+    try {
+      const oSnap = await getDocs(collection(db, 'orders'));
+      const deletePromises = oSnap.docs.map(d => deleteDoc(doc(db, 'orders', d.id)));
+      await Promise.all(deletePromises);
+      toast.success("All sales orders cleared successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to clear orders");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearAllStoreData = async () => {
+    if (!confirm("CRITICAL: Are you sure you want to clear ALL store data?\n\nThis will reset:\n- Sales ($0.00)\n- Expenses ($0.00)\n- Profit ($0.00)\n- Inventory (0/0)")) return;
+    setIsLoading(true);
+    try {
+      // 1. Clear Firestore orders
+      const oSnap = await getDocs(collection(db, 'orders'));
+      const deletePromises = oSnap.docs.map(d => deleteDoc(doc(db, 'orders', d.id)));
+      await Promise.all(deletePromises);
+
+      // 2. Clear expenses in Firestore settings
+      if (settings?.id) {
+        await updateDoc(doc(db, 'settings', settings.id), { expenses: 0 });
+      }
+
+      // 3. Reset backend products, reviews, carts, wishlists
+      await fetch(`${API_URL}/api/reset-store-data`, { method: 'POST' });
+
+      toast.success("All store metrics (Sales, Expenses, Profit, Inventory) cleared successfully!");
+      await fetchSettings();
+      await fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to clear all store data");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleDeleteCategory = async (id: number | string, name: string) => {
     if (!id) return;
     if (!confirm(`Are you sure you want to delete the category "${name}"?`)) return;
@@ -1273,6 +1316,17 @@ export default function AdminDashboard() {
                   <CardTitle className="text-xl font-black  tracking-tighter">Sales orders</CardTitle>
                   <CardDescription>Real-time stream of customer transactions</CardDescription>
                 </div>
+                {orders.length > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearOrders}
+                    disabled={isLoading}
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Clear All Orders
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -1697,30 +1751,49 @@ export default function AdminDashboard() {
                         </Button>
                      </div>
 
-                     <div className="w-full md:w-80 p-6 bg-red-50 rounded-[32px] border-2 border-red-100">
-                         <h4 className="text-sm font-black text-red-900 mb-2 uppercase tracking-tighter">System Tools</h4>
-                         <p className="text-[10px] text-red-700 font-bold mb-4 italic leading-tight">Fill empty shop with demo data.</p>
-                         <Button
-                            type="button"
-                            onClick={async () => {
-                               setIsLoading(true);
-                               try {
-                                 const res = await fetch(`${API_URL}/api/seed`, { method: 'POST' });
-                                 const data = await res.json();
-                                 toast.success(data.message);
-                                 fetchData();
-                               } catch (e) {
-                                 toast.error("Failed to seed database");
-                               } finally {
-                                 setIsLoading(false);
-                               }
-                            }}
-                            disabled={isLoading}
-                            variant="destructive"
-                            className="w-full h-11 rounded-xl font-black text-[10px] uppercase tracking-widest"
-                         >
-                            {isLoading ? 'Processing...' : 'Seed Database'}
-                         </Button>
+                     <div className="w-full md:w-80 p-6 bg-red-50 rounded-[32px] border-2 border-red-100 space-y-4">
+                         <div>
+                           <h4 className="text-sm font-black text-red-900 mb-1 uppercase tracking-tighter">System Tools</h4>
+                           <p className="text-[10px] text-red-700 font-bold italic leading-tight">Manage and reset store data metrics.</p>
+                         </div>
+
+                         <div className="space-y-2 pt-2 border-t border-red-200/60">
+                           <p className="text-[10px] font-bold text-red-800">Clear All Store Metrics & Data</p>
+                           <Button
+                              type="button"
+                              onClick={handleClearAllStoreData}
+                              disabled={isLoading}
+                              variant="destructive"
+                              className="w-full h-10 rounded-xl font-black text-[10px] uppercase tracking-widest bg-red-600 hover:bg-red-700"
+                           >
+                              {isLoading ? 'Resetting...' : 'Clear All Store Data'}
+                           </Button>
+                         </div>
+
+                         <div className="space-y-2 pt-2 border-t border-red-200/60">
+                           <p className="text-[10px] font-bold text-red-800">Fill empty shop with demo data</p>
+                           <Button
+                              type="button"
+                              onClick={async () => {
+                                 setIsLoading(true);
+                                 try {
+                                   const res = await fetch(`${API_URL}/api/seed`, { method: 'POST' });
+                                   const data = await res.json();
+                                   toast.success(data.message);
+                                   fetchData();
+                                 } catch (e) {
+                                   toast.error("Failed to seed database");
+                                 } finally {
+                                   setIsLoading(false);
+                                 }
+                              }}
+                              disabled={isLoading}
+                              variant="outline"
+                              className="w-full h-10 rounded-xl font-black text-[10px] uppercase tracking-widest border-red-300 text-red-700 hover:bg-red-100/50"
+                           >
+                              {isLoading ? 'Processing...' : 'Seed Database'}
+                           </Button>
+                         </div>
                       </div>
                   </div>
                </form>
