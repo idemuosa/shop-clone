@@ -29,6 +29,8 @@ interface NavbarProps {
   wishlistCount: number;
 }
 
+export const NAV_LINKS = ["New arrivals", "Best sellers", "Clearance", "Brands", "Help"];
+
 export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggleAdmin, onSearch, onOpenInfoPage, showAdmin, wishlistCount }: NavbarProps) {
   const { user, profile, isAdmin, loading } = useAuth();
   const { totalItems } = useCart();
@@ -247,7 +249,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
                />
             </form>
             <div className="flex flex-col gap-0.5 px-2">
-               {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+               {NAV_LINKS.map((link) => (
                  <button
                    key={link}
                    onClick={() => {
@@ -310,7 +312,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile, onToggle
           </DropdownMenu>
 
           <div className="flex items-center gap-4">
-            {["New arrivals", "Best sellers", "Clearance", "Brands", "Help"].map((link) => (
+            {NAV_LINKS.map((link) => (
               <a 
                 key={link} 
                 href="#" 
