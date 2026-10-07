@@ -346,6 +346,56 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to delete this order?")) return;
+    setIsLoading(true);
+    try {
+      await deleteDoc(doc(db, 'orders', orderId));
+      toast.success("Order deleted successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete order");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, email?: string) => {
+    const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'idemudiawisdom27@gmail.com';
+    if (email === 'idemudiawisdom27@gmail.com' || email === primaryAdminEmail) {
+      toast.error("Cannot delete primary admin account");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete user ${email || 'this user'}?`)) return;
+    setIsLoading(true);
+    try {
+      await deleteDoc(doc(db, 'users', userId));
+      toast.success("User deleted successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete user");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClearUsers = async () => {
+    if (!confirm("Are you sure you want to delete all non-admin users?")) return;
+    setIsLoading(true);
+    try {
+      const primaryAdminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'idemudiawisdom27@gmail.com';
+      const nonAdminUsers = users.filter(u => u.email !== 'idemudiawisdom27@gmail.com' && u.email !== primaryAdminEmail);
+      const deletePromises = nonAdminUsers.map(u => deleteDoc(doc(db, 'users', u.id)));
+      await Promise.all(deletePromises);
+      toast.success("Users cleared successfully!");
+      fetchData();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to clear users");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleClearOrders = async () => {
     if (!confirm("Are you sure you want to delete all customer orders? This will reset Sales & Profit.")) return;
     setIsLoading(true);
@@ -1362,6 +1412,15 @@ export default function AdminDashboard() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDeleteOrder(o.id)}
+                                  disabled={isLoading}
+                                  className="h-8 rounded-lg font-bold border-2 border-red-200 text-red-600 hover:bg-red-50 text-xs gap-1 transition-colors px-3"
+                                >
+                                  <Trash2 className="h-3 w-3" /> Delete
+                                </Button>
                                 <Dialog onOpenChange={(open) => !open && setSelectedOrder(null)}>
                                   <DialogTrigger
                                     render={(props) => (
@@ -1485,9 +1544,22 @@ export default function AdminDashboard() {
 
           <TabsContent value="users">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader>
-                <CardTitle className="text-xl font-black  tracking-tighter">User & Admin management</CardTitle>
-                <CardDescription>Grant or revoke administrator privileges</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="text-xl font-black  tracking-tighter">User & Admin management</CardTitle>
+                  <CardDescription>Grant or revoke administrator privileges</CardDescription>
+                </div>
+                {users.filter(u => u.email !== 'idemudiawisdom27@gmail.com' && u.email !== import.meta.env.VITE_ADMIN_EMAIL).length > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleClearUsers}
+                    disabled={isLoading}
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" /> Clear All Users
+                  </Button>
+                )}
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
@@ -1500,7 +1572,9 @@ export default function AdminDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((u) => (
+                    {users.map((u) => {
+                      const isPrimaryAdmin = u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL;
+                      return (
                       <TableRow key={u.id}>
                         <TableCell className="font-bold">
                           <div className="flex items-center gap-3">
@@ -1517,18 +1591,31 @@ export default function AdminDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleToggleAdmin(u.id, u.role)}
-                            className="rounded-lg font-bold text-[10px] "
-                            disabled={u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL} // Protect main admin
-                          >
-                            {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleToggleAdmin(u.id, u.role)}
+                              className="rounded-lg font-bold text-[10px] "
+                              disabled={isPrimaryAdmin}
+                            >
+                              {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
+                            </Button>
+                            {!isPrimaryAdmin && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteUser(u.id, u.email)}
+                                disabled={isLoading}
+                                className="h-8 rounded-lg font-bold border-2 border-red-200 text-red-600 hover:bg-red-50 text-xs gap-1 transition-colors px-3"
+                              >
+                                <Trash2 className="h-3 w-3" /> Delete
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )})}
                     {users.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={4} className="text-center py-10 text-gray-400 font-bold">No users found</TableCell>
