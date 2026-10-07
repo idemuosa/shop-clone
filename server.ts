@@ -272,6 +272,43 @@ app.post("/api/paystack/initialize", async (req, res, next) => {
   }
 });
 
+app.delete(["/api/admin/orders/:id", "/api/admin/orders/:id/"], async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('orders').doc(id).delete();
+      } catch (fErr) {
+        console.warn(`Firestore order delete error for ${id}:`, fErr);
+      }
+    }
+    res.json({ success: true, message: `Order ${id} deleted successfully` });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+app.delete(["/api/admin/orders", "/api/admin/orders/"], async (req, res, next) => {
+  try {
+    if (isFirebaseAdminInitialized) {
+      try {
+        const ordersRef = admin.firestore().collection('orders');
+        const snapshot = await ordersRef.get();
+        const batch = admin.firestore().batch();
+        snapshot.docs.forEach((doc) => {
+          batch.delete(doc.ref);
+        });
+        await batch.commit();
+      } catch (fErr) {
+        console.warn("Firestore bulk orders clear error:", fErr);
+      }
+    }
+    res.json({ success: true, message: "All sales orders cleared successfully" });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
 app.post("/api/paystack/verify", async (req, res, next) => {
   const { reference } = req.body;
 
