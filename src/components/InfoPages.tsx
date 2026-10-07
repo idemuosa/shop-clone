@@ -438,7 +438,7 @@ export default function InfoPage({
                     key={item.name}
                     onClick={() => handlePageChange(item.name)}
                     className={cn(
-                      "flex items-center gap-1.5 px-2 py-1.2 rounded text-[10px] font-bold transition-all whitespace-nowrap text-left w-full cursor-pointer",
+                      "flex items-center gap-1.5 px-2 py-1.2 rounded text-xs md:text-sm font-bold transition-all whitespace-nowrap text-left w-full cursor-pointer",
                       isActive
                         ? "bg-orange-600 text-white shadow-2xs"
                         : "text-gray-600 hover:bg-orange-50 hover:text-orange-600"
