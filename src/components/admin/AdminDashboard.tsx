@@ -88,6 +88,7 @@ export default function AdminDashboard() {
   const [editProductImage, setEditProductImage] = useState<string>("");
   const [editCategoryId, setEditCategoryId] = useState<string>("");
   const [newCategoryId, setNewCategoryId] = useState<string>("");
+  const [tag, setTag] = useState<string>("");
   const [stats, setStats] = useState({
     totalSales: 0,
     totalOrders: 0,
@@ -868,6 +869,7 @@ export default function AdminDashboard() {
       toast.success('Product added successfully!');
       form.reset();
       setNewProductImage("");
+      setTag("");
       setNewCategoryId("");
       fetchData();
     } catch (error: any) {
@@ -1233,7 +1235,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="space-y-1">
                       <Label className="text-[10px]">Tag (e.g. Best Seller)</Label>
-                      <Select name="tag" defaultValue="">
+                      <Select name="tag" value={tag} onValueChange={(val) => setTag(val === "None" ? "" : val)}>
                         <SelectTrigger className="rounded-lg border-2 w-full h-10 text-xs">
                           <SelectValue placeholder="Select Tag (Optional)" />
                         </SelectTrigger>

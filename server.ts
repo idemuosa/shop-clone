@@ -198,11 +198,7 @@ const otpStore = new Map<string, string>();
 
 // In-Memory Data Store (Default seed data for products, categories, reviews, carts, wishlists)
 let categoriesStore: any[] = [];
-
 let productsStore: any[] = [];
-
-let categoriesStore: any[] = [...defaultCategories];
-let productsStore: any[] = [...defaultProducts];
 
 async function syncCategoriesFromFirestore() {
   if (!isFirebaseAdminInitialized) return categoriesStore;
