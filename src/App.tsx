@@ -364,23 +364,57 @@ function MainContent() {
       />
       <main>
         {searchQuery ? (
-          <div className="py-12 bg-white">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-              <div className="flex items-center gap-4 bg-green-50 p-8 rounded-[40px] border-2 border-green-100">
-                <div className="bg-orange-600 p-4 rounded-3xl shadow-xl shadow-orange-200">
-                   <Search className="h-8 w-8 text-white" />
+          <div className="py-6 sm:py-8 bg-white">
+            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+              <div className="bg-gradient-to-r from-green-50/90 to-orange-50/40 p-4 sm:p-6 rounded-2xl md:rounded-3xl border border-green-100/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className="bg-orange-600 p-2.5 sm:p-3 rounded-2xl shadow-md shadow-orange-200 shrink-0">
+                    <Search className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter italic">
+                        Search <span className="text-orange-600">Results</span>
+                      </h2>
+                      <span className="bg-orange-600 text-white text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full shadow-xs">
+                        {filteredProducts.length} {filteredProducts.length === 1 ? 'Item' : 'Items'}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm font-bold text-gray-500 tracking-wide mt-1 truncate max-w-full" title={searchQuery}>
+                      Showing results for <span className="text-orange-600 italic font-black">"{searchQuery.length > 38 ? searchQuery.slice(0, 38) + '...' : searchQuery}"</span>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-4xl font-black  tracking-tighter italic">Search <span className="text-orange-600">Results</span></h2>
-                  <p className="text-sm font-bold text-gray-400  tracking-widest mt-1">Found {filteredProducts.length} items for <span className="text-orange-600 italic">"{searchQuery}"</span></p>
+
+                <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleSearch("")}
+                    className="font-black text-[11px] sm:text-xs text-gray-600 hover:text-orange-600 hover:border-orange-300 rounded-xl h-9 px-3.5 bg-white shadow-xs transition-all flex items-center gap-1.5"
+                  >
+                    Clear search <X className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleSearch("")}
-                  className="ml-auto font-black  tracking-widest text-[10px] text-gray-400 hover:text-orange-600"
-                >
-                   Clear search <X className="h-4 w-4 ml-2" />
-                </Button>
+              </div>
+
+              {/* Dynamic Category Quick Pills */}
+              <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide no-scrollbar">
+                <span className="text-[10px] font-black uppercase text-gray-400 tracking-wider whitespace-nowrap mr-1">
+                  Quick Filter:
+                </span>
+                {["All", "Fashion", "Home & Decor", "Electronics", "Gadgets", "Watches", "Sports"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => handleSearch(cat === "All" ? "" : cat)}
+                    className={`text-[11px] font-bold px-3 py-1 rounded-full border transition-all whitespace-nowrap ${
+                      (cat === "All" && !searchQuery) || searchQuery.toLowerCase() === cat.toLowerCase()
+                        ? "bg-orange-600 text-white border-orange-600 shadow-xs"
+                        : "bg-gray-50 text-gray-600 border-gray-200 hover:border-orange-300 hover:text-orange-600 hover:bg-orange-50/50"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
               </div>
             </div>
             <ProductSection 
@@ -392,15 +426,34 @@ function MainContent() {
               onProductView={handleProductView}
             />
             {filteredProducts.length === 0 && (
-              <div className="text-center py-24">
-                <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                   <Package className="h-12 w-12 text-gray-200" />
+              <div className="text-center py-12 sm:py-16 bg-gray-50/50 rounded-2xl md:rounded-3xl border border-dashed border-gray-200 max-w-5xl mx-auto px-4 my-6">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                   <Package className="h-8 w-8 sm:h-10 sm:w-10 text-orange-400" />
                 </div>
-                <h3 className="text-3xl font-black  tracking-tighter mb-4 italic">No items <span className="text-orange-600">match</span> that search</h3>
-                <p className="text-gray-400 font-bold  text-xs tracking-widest mb-10 max-w-sm mx-auto">Try checking your spelling or using more general keywords like "Watch" or "Jersey".</p>
+                <h3 className="text-xl sm:text-2xl font-black tracking-tighter mb-2 italic">
+                  No items <span className="text-orange-600">matched</span> "{searchQuery.length > 30 ? searchQuery.slice(0, 30) + '...' : searchQuery}"
+                </h3>
+                <p className="text-gray-500 font-bold text-xs tracking-wide mb-6 max-w-md mx-auto">
+                  Try checking your spelling, or explore popular categories below.
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-2 max-w-lg mx-auto mb-6">
+                  {["Fashion", "Home & Decor", "Electronics", "Gadgets", "Watches"].map((cat) => (
+                    <Button
+                      key={cat}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSearch(cat)}
+                      className="rounded-full text-xs font-bold border-gray-200 hover:border-orange-500 hover:text-orange-600 bg-white"
+                    >
+                      {cat}
+                    </Button>
+                  ))}
+                </div>
+
                 <Button 
                   onClick={() => handleSearch("")}
-                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-2xl px-12 h-16 shadow-2xl shadow-orange-200 text-lg active:scale-95 transition-all"
+                  className="bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl px-8 h-12 shadow-lg shadow-orange-200 text-sm active:scale-95 transition-all"
                 >
                   View all products
                 </Button>
