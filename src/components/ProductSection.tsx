@@ -708,7 +708,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-transparent hover:border-orange-200"
                   onClick={() => setSelectedProduct(product)}
                 >
-                  <div className="relative aspect-square bg-gray-50 overflow-hidden">
+                  <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
                     {product.tag && (
                       <div className="absolute top-0 left-0 bg-orange-600 text-white text-[11px] font-black px-2 py-1 rounded-br-lg z-10 flex items-center gap-1">
                         <Zap className="h-3 w-3 fill-white" />
@@ -809,11 +809,11 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       )}
                     </div>
                     
-                      <div className="flex items-center justify-between mb-3 bg-gray-50 rounded-lg p-1">
+                      <div className="flex items-center justify-between mb-1.5 bg-gray-50 rounded-md p-0.5">
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-5.5 w-5.5 rounded hover:bg-white hover:text-orange-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -822,13 +822,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             }));
                           }}
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-2.5 w-2.5" />
                         </Button>
-                        <span className="text-xs font-black w-8 text-center">{productQuantities[product.id] || 1}</span>
+                        <span className="text-[11px] font-black w-6 text-center">{productQuantities[product.id] || 1}</span>
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          className="h-7 w-7 rounded-md hover:bg-white hover:text-orange-600 transition-colors"
+                          className="h-5.5 w-5.5 rounded hover:bg-white hover:text-orange-600 transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
                             setProductQuantities(prev => ({
@@ -837,17 +837,17 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             }));
                           }}
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-2.5 w-2.5" />
                         </Button>
                       </div>
                         <Button
-                          className="w-full h-8 bg-orange-600 text-white hover:bg-orange-700 border-none text-[11px] font-black rounded-lg transition-colors shadow-sm gap-2"
+                          className="w-full h-6.5 bg-orange-600 text-white hover:bg-orange-700 border-none text-[10px] font-black rounded-md transition-colors shadow-xs gap-1.5"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleAddToCart(product, productQuantities[product.id] || 1);
                           }}
                         >
-                          <ShoppingCart className="h-3.5 w-3.5" />
+                          <ShoppingCart className="h-3 w-3" />
                           Add to cart
                         </Button>
                   </div>
