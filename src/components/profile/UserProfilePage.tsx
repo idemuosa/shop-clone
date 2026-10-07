@@ -19,8 +19,15 @@ import {
   Truck,
   Ticket,
   Headset,
-  LayoutDashboard
+  LayoutDashboard,
+  Fingerprint
 } from 'lucide-react';
+import {
+  isFingerprintSupported,
+  hasEnrolledFingerprint,
+  registerFingerprintCredential,
+  removeFingerprintCredential
+} from '@/lib/fingerprintAuth';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -64,6 +71,48 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
   // Preferences state
   const [notifications, setNotifications] = useState(true);
   const [twoFactor, setTwoFactor] = useState(false);
+
+  // Fingerprint state
+  const [fpSupported, setFpSupported] = useState(false);
+  const [fpEnrolled, setFpEnrolled] = useState(false);
+  const [fpLoading, setFpLoading] = useState(false);
+
+  useEffect(() => {
+    isFingerprintSupported().then((sup) => {
+      setFpSupported(sup);
+      if (sup && user?.email) {
+        setFpEnrolled(hasEnrolledFingerprint(user.email));
+      }
+    });
+  }, [user]);
+
+  const handleRegisterFingerprint = async () => {
+    if (!user || !user.email) return;
+    setFpLoading(true);
+    try {
+      await registerFingerprintCredential(user.uid, user.email);
+      setFpEnrolled(true);
+      toast.success("Fingerprint registered successfully for fast sign-in!");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to register fingerprint.");
+    } finally {
+      setFpLoading(false);
+    }
+  };
+
+  const handleRemoveFingerprint = async () => {
+    if (!user || !user.email) return;
+    setFpLoading(true);
+    try {
+      await removeFingerprintCredential(user.uid, user.email);
+      setFpEnrolled(false);
+      toast.success("Fingerprint removed from device.");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to remove fingerprint.");
+    } finally {
+      setFpLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -474,6 +523,43 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
                          >
                             {twoFactor ? 'ENABLED' : 'DISABLED'}
                          </Button>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border-2 border-orange-100">
+                         <div className="flex items-center gap-4">
+                            <div className="bg-orange-100 p-3 rounded-xl shadow-sm">
+                               <Fingerprint className={`h-5 w-5 ${fpEnrolled ? 'text-orange-600' : 'text-gray-400'}`} />
+                            </div>
+                            <div>
+                               <p className="text-sm font-black uppercase tracking-tight">Fingerprint Sign-In</p>
+                               <p className="text-[10px] font-bold text-gray-400">
+                                 {fpSupported
+                                   ? fpEnrolled ? 'Fingerprint registered for this device' : 'Register your fingerprint for quick sign-in'
+                                   : 'Not supported on this browser'}
+                               </p>
+                            </div>
+                         </div>
+                         {fpSupported && (
+                           fpEnrolled ? (
+                             <Button
+                                variant="outline"
+                                onClick={handleRemoveFingerprint}
+                                disabled={fpLoading}
+                                className="rounded-lg h-8 text-[10px] font-black border-red-200 text-red-600 hover:bg-red-50"
+                             >
+                                {fpLoading ? 'REMOVING...' : 'REMOVE'}
+                             </Button>
+                           ) : (
+                             <Button
+                                variant="default"
+                                onClick={handleRegisterFingerprint}
+                                disabled={fpLoading}
+                                className="rounded-lg h-8 text-[10px] font-black bg-orange-600 hover:bg-orange-700 text-white"
+                             >
+                                {fpLoading ? 'SCANNING...' : 'REGISTER FINGERPRINT'}
+                             </Button>
+                           )
+                         )}
                       </div>
                    </div>
                 </Card>

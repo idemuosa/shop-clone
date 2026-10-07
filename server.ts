@@ -193,12 +193,20 @@ async function sendResendEmail(resendClient: Resend, payload: { to: string[]; su
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 
-// Store OTPs temporarily
+// Store OTPs and Fingerprint Credentials temporarily
 const otpStore = new Map<string, string>();
+const fingerprintStore = new Map<string, any>();
 
 // In-Memory Data Store (Default seed data for products, categories, reviews, carts, wishlists)
-let categoriesStore: any[] = [];
-let productsStore: any[] = [];
+const defaultCategories: any[] = [
+  { id: 1, name: 'Electronics', image: '', products: [] },
+  { id: 2, name: 'Fashion', image: '', products: [] },
+  { id: 3, name: 'Home & Office', image: '', products: [] }
+];
+const defaultProducts: any[] = [];
+
+let categoriesStore: any[] = [...defaultCategories];
+let productsStore: any[] = [...defaultProducts];
 
 async function syncCategoriesFromFirestore() {
   if (!isFirebaseAdminInitialized) return categoriesStore;
@@ -570,6 +578,156 @@ app.post("/api/send-otp", async (req, res, next) => {
       success: true,
       message: "Verification code sent successfully."
     });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+// Fingerprint / Biometric Endpoints
+app.post("/api/auth/fingerprint/register", async (req, res, next) => {
+  try {
+    const { userId, email, credentialId, credentialInfo } = req.body || {};
+    if (!email || !credentialId) {
+      return res.status(400).json({ success: false, message: "Email and credentialId are required." });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const credData = {
+      credentialId,
+      email: normalizedEmail,
+      userId: userId || credentialInfo?.userId || normalizedEmail,
+      deviceName: credentialInfo?.deviceName || 'Device',
+      createdAt: new Date().toISOString()
+    };
+
+    fingerprintStore.set(credentialId, credData);
+    fingerprintStore.set(normalizedEmail, credData);
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('fingerprint_credentials').doc(credentialId).set(credData, { merge: true });
+        if (userId) {
+          await admin.firestore().collection('users').doc(userId).set({
+            hasFingerprintEnabled: true,
+            fingerprintCredentialId: credentialId
+          }, { merge: true });
+        }
+      } catch (fErr) {
+        console.warn("Firestore fingerprint registration error:", fErr);
+      }
+    }
+
+    io.emit("new_activity", {
+      message: `Fingerprint credential registered for ${normalizedEmail}`,
+      type: "auth"
+    });
+
+    res.json({ success: true, message: "Fingerprint registered successfully", credential: credData });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+app.post("/api/auth/fingerprint/login", async (req, res, next) => {
+  try {
+    const { credentialId, email } = req.body || {};
+    const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
+
+    let credData = credentialId ? fingerprintStore.get(credentialId) : undefined;
+    if (!credData && normalizedEmail) {
+      credData = fingerprintStore.get(normalizedEmail);
+    }
+
+    let uid: string | undefined = credData?.userId;
+    let targetEmail: string = normalizedEmail || credData?.email || '';
+    let role = 'user';
+
+    // Look up in Firestore if initialized
+    if (isFirebaseAdminInitialized) {
+      try {
+        if (credentialId && !credData) {
+          const docSnap = await admin.firestore().collection('fingerprint_credentials').doc(credentialId).get();
+          if (docSnap.exists) {
+            credData = docSnap.data();
+            targetEmail = credData?.email || targetEmail;
+            uid = credData?.userId || uid;
+          }
+        }
+
+        if (targetEmail) {
+          try {
+            const userRecord = await admin.auth().getUserByEmail(targetEmail);
+            uid = userRecord.uid;
+
+            const userDoc = await admin.firestore().collection('users').doc(uid).get();
+            if (userDoc.exists) {
+              role = userDoc.data()?.role || 'user';
+            }
+          } catch (uErr) {
+            console.warn("Firebase Auth getUserByEmail error in fingerprint login:", uErr);
+          }
+        }
+      } catch (fErr) {
+        console.warn("Firestore fingerprint lookup error:", fErr);
+      }
+    }
+
+    const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'idemudiawisdom27@gmail.com').toLowerCase().trim();
+    if (targetEmail.toLowerCase().trim() === primaryAdminEmail) {
+      role = 'admin';
+    }
+
+    let customToken = null;
+    if (isFirebaseAdminInitialized && uid) {
+      try {
+        customToken = await admin.auth().createCustomToken(uid);
+      } catch (tErr: any) {
+        console.warn("Custom token generation for fingerprint failed:", tErr.message);
+      }
+    }
+
+    io.emit("new_activity", {
+      message: `Fingerprint sign-in successful for ${targetEmail || 'User'}`,
+      type: "auth"
+    });
+
+    res.json({
+      success: true,
+      customToken,
+      uid,
+      email: targetEmail,
+      role
+    });
+  } catch (error: any) {
+    next(error);
+  }
+});
+
+app.post("/api/auth/fingerprint/remove", async (req, res, next) => {
+  try {
+    const { userId, email } = req.body || {};
+    const normalizedEmail = email ? email.toLowerCase().trim() : undefined;
+
+    if (normalizedEmail) {
+      const cred = fingerprintStore.get(normalizedEmail);
+      if (cred?.credentialId) {
+        fingerprintStore.delete(cred.credentialId);
+      }
+      fingerprintStore.delete(normalizedEmail);
+    }
+
+    if (isFirebaseAdminInitialized && userId) {
+      try {
+        await admin.firestore().collection('users').doc(userId).set({
+          hasFingerprintEnabled: false,
+          fingerprintCredentialId: null
+        }, { merge: true });
+      } catch (fErr) {
+        console.warn("Firestore fingerprint removal error:", fErr);
+      }
+    }
+
+    res.json({ success: true, message: "Fingerprint removed successfully" });
   } catch (error: any) {
     next(error);
   }

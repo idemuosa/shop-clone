@@ -65,8 +65,10 @@ import {
   Truck,
   Clock,
   XCircle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Fingerprint
 } from 'lucide-react';
+import { isFingerprintSupported, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { API_URL, handleApiResponse } from '@/lib/api';
 import { cn, uploadToCloudinary } from '@/lib/utils';
@@ -89,6 +91,26 @@ export default function AdminDashboard() {
   const [editCategoryId, setEditCategoryId] = useState<string>("");
   const [newCategoryId, setNewCategoryId] = useState<string>("");
   const [tag, setTag] = useState<string>("");
+  const [adminFpSupported, setAdminFpSupported] = useState(false);
+  const [adminFpLoading, setAdminFpLoading] = useState(false);
+
+  useEffect(() => {
+    isFingerprintSupported().then(setAdminFpSupported).catch(() => setAdminFpSupported(false));
+  }, []);
+
+  const handleRegisterAdminFingerprint = async () => {
+    setAdminFpLoading(true);
+    try {
+      const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'idemudiawisdom27@gmail.com';
+      await registerFingerprintCredential('admin-uid', adminEmail);
+      toast.success("Admin Fingerprint registered successfully!");
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to register admin fingerprint.");
+    } finally {
+      setAdminFpLoading(false);
+    }
+  };
+
   const [stats, setStats] = useState({
     totalSales: 0,
     totalOrders: 0,
@@ -2026,6 +2048,28 @@ export default function AdminDashboard() {
                         <Button type="submit" disabled={isLoading} className="w-full bg-black text-white font-black rounded-2xl h-16 shadow-xl hover:bg-zinc-800 transition-all uppercase tracking-widest">
                           {isLoading ? 'Updating...' : 'Save All Store Settings'}
                         </Button>
+                     </div>
+
+                     <div className="w-full md:w-80 p-6 bg-orange-50 rounded-[32px] border-2 border-orange-100 space-y-4">
+                         <div>
+                           <div className="flex items-center gap-2 mb-1">
+                             <Fingerprint className="h-5 w-5 text-orange-600" />
+                             <h4 className="text-sm font-black text-orange-900 uppercase tracking-tighter">Admin Fingerprint</h4>
+                           </div>
+                           <p className="text-[10px] text-orange-700 font-bold italic leading-tight">Enable quick biometric sign-in to Staff Portal on this device.</p>
+                         </div>
+
+                         {adminFpSupported && (
+                           <Button
+                              type="button"
+                              onClick={handleRegisterAdminFingerprint}
+                              disabled={adminFpLoading}
+                              className="w-full h-10 rounded-xl font-black text-[10px] uppercase tracking-widest bg-orange-600 hover:bg-orange-700 text-white gap-2 shadow-md"
+                           >
+                              <Fingerprint className="h-4 w-4" />
+                              {adminFpLoading ? 'Registering...' : 'Enroll Admin Fingerprint'}
+                           </Button>
+                         )}
                      </div>
 
                      <div className="w-full md:w-80 p-6 bg-red-50 rounded-[32px] border-2 border-red-100 space-y-4">
