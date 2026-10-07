@@ -14,15 +14,15 @@ interface CategorySectionProps {
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  "Electronics": <Smartphone className="h-8 w-8" />,
-  "Fashion": <ShoppingBag className="h-8 w-8" />,
-  "Home & Decor": <Box className="h-8 w-8" />,
-  "Sports": <Footprints className="h-8 w-8" />,
-  "Gadgets": <Smartphone className="h-8 w-8" />,
-  "Laptops": <Laptop className="h-8 w-8" />,
-  "Watches": <Watch className="h-8 w-8" />,
-  "Audio": <Headphones className="h-8 w-8" />,
-  "Books": <BookOpen className="h-8 w-8" />,
+  "Electronics": <Smartphone className="h-5 w-5" />,
+  "Fashion": <ShoppingBag className="h-5 w-5" />,
+  "Home & Decor": <Box className="h-5 w-5" />,
+  "Sports": <Footprints className="h-5 w-5" />,
+  "Gadgets": <Smartphone className="h-5 w-5" />,
+  "Laptops": <Laptop className="h-5 w-5" />,
+  "Watches": <Watch className="h-5 w-5" />,
+  "Audio": <Headphones className="h-5 w-5" />,
+  "Books": <BookOpen className="h-5 w-5" />,
 };
 
 const colorMap = [
@@ -54,48 +54,48 @@ export default function CategorySection({ onSelectCategory }: CategorySectionPro
   }, []);
 
   return (
-    <section className="py-12 bg-white">
+    <section className="py-4 bg-white">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-3">
-            <div className="bg-orange-600 p-2 rounded-lg">
-              <Zap className="h-5 w-5 text-white fill-white" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="bg-orange-600 p-1.5 rounded-md">
+              <Zap className="h-3.5 w-3.5 text-white fill-white" />
             </div>
-            <h2 className="text-xl font-black text-black uppercase tracking-tight">Shop By <span className="text-orange-600 italic">Category</span></h2>
+            <h2 className="text-sm md:text-base font-black text-black uppercase tracking-tight">Shop By <span className="text-orange-600 italic">Category</span></h2>
           </div>
           <button 
             onClick={() => onSelectCategory?.("all")}
-            className="text-sm font-bold text-orange-600 hover:underline uppercase tracking-widest"
+            className="text-xs font-bold text-orange-600 hover:underline uppercase tracking-widest"
           >
             See All
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
           {categories.map((cat, idx) => {
             const theme = colorMap[idx % colorMap.length];
             return (
               <motion.div
                 key={cat.id}
-                whileHover={{ y: -5, scale: 1.02 }}
+                whileHover={{ y: -3, scale: 1.02 }}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: idx * 0.05 }}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border ${theme.border} ${theme.color} cursor-pointer transition-all hover:shadow-md group`}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl border ${theme.border} ${theme.color} cursor-pointer transition-all hover:shadow-xs group`}
                 onClick={() => onSelectCategory?.(cat.name)}
               >
-                <div className="mb-4 group-hover:scale-110 transition-transform duration-300">
-                  {iconMap[cat.name] || <Box className="h-8 w-8" />}
+                <div className="mb-2 group-hover:scale-110 transition-transform duration-300">
+                  {iconMap[cat.name] || <Box className="h-5 w-5" />}
                 </div>
-                <h3 className="text-xs font-black uppercase tracking-wider text-center">{cat.name}</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-wider text-center">{cat.name}</h3>
               </motion.div>
             );
           })}
           {categories.length === 0 && (
-             <div className="col-span-full py-10 text-center border-2 border-dashed border-gray-100 rounded-3xl">
-                <Box className="h-10 w-10 text-gray-200 mx-auto mb-3" />
-                <p className="text-gray-400 font-medium italic">No categories found in database.</p>
+             <div className="col-span-full py-6 text-center border border-dashed border-gray-100 rounded-2xl">
+                <Box className="h-6 w-6 text-gray-200 mx-auto mb-2" />
+                <p className="text-xs text-gray-400 font-medium italic">No categories found in database.</p>
              </div>
           )}
         </div>

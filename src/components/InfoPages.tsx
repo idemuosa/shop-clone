@@ -73,6 +73,16 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                 <p className="text-orange-100 text-xs md:text-sm max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
               </div>
               <Zap className="absolute right-[-20px] bottom-[-20px] h-40 w-40 text-white/10 rotate-12" />
+          <div className="space-y-3">
+            <div className="bg-orange-600 rounded-lg p-2.5 md:p-3 text-white relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="bg-white/20 w-fit p-1 rounded-md mb-1 backdrop-blur-md">
+                   <Zap className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                </div>
+                <h2 className="text-sm md:text-base font-black uppercase italic tracking-tighter mb-0.5">The Vivi <span className="text-yellow-400">Flash Sale</span></h2>
+                <p className="text-orange-100 text-[9px] md:text-[10px] max-w-xl">Every day, we drop prices by up to 90% on top-tier electronics, fashion, and home decor. These deals are live for only 24 hours.</p>
+              </div>
+              <Zap className="absolute right-[-15px] bottom-[-15px] h-20 w-20 text-white/10 rotate-12" />
             </div>
 
             <ProductSection
@@ -95,6 +105,18 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                   </div>
                   <h4 className="font-black uppercase tracking-tight text-xs mb-1">{item.title}</h4>
                   <p className="text-xs text-gray-500 font-medium leading-relaxed">{item.desc}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {[
+                { icon: <Clock className="h-4 w-4" />, title: "Limited Time", desc: "Deals expire every midnight. Act fast or miss out." },
+                { icon: <Zap className="h-4 w-4" />, title: "Huge Discounts", desc: "Prices slashed up to 90% off retail value." },
+                { icon: <Star className="h-4 w-4" />, title: "Top Quality", desc: "Only highly-rated products make it to flash sales." }
+              ].map((item, i) => (
+                <div key={i} className="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                  <div className="bg-orange-50 w-6 h-6 rounded flex items-center justify-center text-orange-600 mb-2">
+                    {item.icon}
+                  </div>
+                  <h4 className="font-bold text-[11px] uppercase tracking-tight mb-0.5">{item.title}</h4>
+                  <p className="text-[10px] text-gray-500 font-medium">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -130,7 +152,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                        transition={{ duration: 0.15, ease: "easeInOut" }}
                       >
                         <div className="px-3 pb-3 text-gray-500 font-medium text-[11px] md:text-xs leading-relaxed border-t border-gray-50 pt-2 mt-0.5 mx-3 italic">
                           {faq.a}
@@ -157,7 +179,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
               </div>
               <Button
                 onClick={handleStartChat}
-                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-black rounded-lg px-6 h-9 shadow-md shadow-orange-900/40 transition-all active:scale-95 text-xs"
+                className="relative z-10 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-md px-3 h-7 shadow-sm transition-all active:scale-95 text-[10px]"
               >
                 GET IN TOUCH
               </Button>
@@ -167,14 +189,14 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
       case 'new arrivals':
       case 'best sellers':
         return (
-          <div className="space-y-6">
-            <div className="bg-zinc-900 rounded-3xl p-6 md:p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
-              <div className="relative z-10 max-w-md">
-                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-3 font-black uppercase tracking-widest px-3 py-0.5 text-[9px]">{title}</Badge>
-                <h2 className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter mb-2">Shop the Latest <span className="text-orange-600">Trends</span></h2>
-                <p className="text-zinc-400 text-xs md:text-sm">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
+          <div className="space-y-3">
+            <div className="bg-zinc-900 rounded-lg p-2.5 md:p-3 text-white flex flex-col md:flex-row items-center justify-between gap-2 overflow-hidden relative">
+              <div className="relative z-10 max-w-sm">
+                <Badge variant="outline" className="border-orange-500 text-orange-500 mb-0.5 font-bold uppercase tracking-widest px-1.5 py-0 text-[7.5px]">{title}</Badge>
+                <h2 className="text-sm md:text-base font-black uppercase italic tracking-tighter mb-0.5">Shop the Latest <span className="text-orange-600">Trends</span></h2>
+                <p className="text-zinc-400 text-[9px] md:text-[10px]">Curated selection of {normalizedTitle === 'new arrivals' ? 'the newest products to hit our store' : 'our most popular and high-rated items'} this week.</p>
               </div>
-              <div className="relative z-10 w-full md:w-1/4 aspect-square bg-orange-600 rounded-2xl overflow-hidden shadow-xl rotate-3">
+              <div className="relative z-10 w-16 h-16 md:w-20 md:h-20 bg-orange-600 rounded-lg overflow-hidden shadow-sm rotate-2 shrink-0">
                  <img
                     src={normalizedTitle === 'new arrivals' ? "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" : "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1000&auto=format&fit=crop"}
                     className="w-full h-full object-cover"
@@ -185,6 +207,7 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                  />
               </div>
               <div className="absolute top-[-50px] left-[-50px] w-48 h-48 bg-orange-600/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-[-20px] left-[-20px] w-32 h-32 bg-orange-600/10 rounded-full blur-xl"></div>
             </div>
 
             {filteredDisplayProducts.length > 0 ? (
@@ -196,10 +219,10 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
                 onProductView={onProductView}
               />
             ) : (
-              <div className="text-center py-12 bg-white rounded-3xl border-2 border-dashed border-gray-100">
-                <Package className="h-9 w-9 text-gray-200 mx-auto mb-2" />
-                <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px]">Live inventory for {title} is syncing...</p>
-                <Button onClick={onBack} variant="link" className="text-orange-600 font-black uppercase text-[9px] tracking-[0.2em] mt-2">Browse All Products</Button>
+              <div className="text-center py-6 bg-white rounded-xl border border-dashed border-gray-100">
+                <Package className="h-6 w-6 text-gray-200 mx-auto mb-1" />
+                <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Live inventory for {title} is syncing...</p>
+                <Button onClick={onBack} variant="link" className="text-orange-600 font-bold uppercase text-[8px] tracking-widest mt-1">Browse All Products</Button>
               </div>
             )}
           </div>
@@ -289,23 +312,23 @@ export default function InfoPage({ title, onBack, products = [], onAddToWishlist
         );
       default:
         return (
-          <div className="text-center py-12">
-            <h2 className="text-2xl font-black uppercase italic mb-2">{title}</h2>
-            <p className="text-gray-400 font-medium text-xs">This page is under construction.</p>
+          <div className="text-center py-6">
+            <h2 className="text-lg font-bold uppercase italic mb-1">{title}</h2>
+            <p className="text-[10px] text-gray-400 font-medium">This page is under construction.</p>
           </div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] py-6">
-      <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8f9fa] py-3">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <Button
           variant="ghost"
           onClick={onBack}
-          className="mb-4 hover:bg-white rounded-full font-black uppercase tracking-widest text-[9px] md:text-[10px] text-gray-400 hover:text-orange-600 flex items-center gap-1.5 h-8 px-3"
+          className="mb-2 hover:bg-white rounded-full font-bold uppercase tracking-widest text-[8px] text-gray-400 hover:text-orange-600 flex items-center gap-1 h-7 px-2.5"
         >
-          <ChevronLeft className="h-3.5 w-3.5" /> Back to Shop
+          <ChevronLeft className="h-3 w-3" /> Back to Shop
         </Button>
         {renderContent()}
       </div>
