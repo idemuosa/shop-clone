@@ -344,7 +344,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           className="w-full rounded-xl h-12 border-2 border-orange-500/30 text-orange-600 hover:bg-orange-50 font-black text-xs gap-2 transition-all shadow-sm"
                         >
                           <Fingerprint className="h-5 w-5 text-orange-600" />
-                          Sign In with Fingerprint
+                          Click Fingerprint to Sign In
                         </Button>
                       )}
 
@@ -451,6 +451,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Button type="submit" disabled={isLoading} className="w-full bg-black hover:bg-zinc-800 text-white font-black rounded-2xl h-16 shadow-2xl shadow-zinc-200 text-lg transition-all active:scale-95">
                         {isLoading ? 'Creating Account...' : 'Create Account & Join'}
                       </Button>
+
+                      {fingerprintSupported && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleFingerprintSignIn(false)}
+                          disabled={isLoading}
+                          className="w-full rounded-2xl h-14 border-2 border-orange-500/30 text-orange-600 hover:bg-orange-50 font-black text-xs gap-2 transition-all shadow-sm"
+                        >
+                          <Fingerprint className="h-5 w-5 text-orange-600" />
+                          Click Fingerprint to Sign In
+                        </Button>
+                      )}
                     </form>
                   </TabsContent>
 
