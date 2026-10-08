@@ -22,7 +22,7 @@ import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
 import { SocketProvider } from "./lib/SocketContext";
 import { API_URL } from "./lib/api";
-import { Truck, Headset, ShieldCheck, Search, X, Package } from "lucide-react";
+import { Truck, Headset, ShieldCheck, Search, X, Package, ChevronLeft } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { Button } from "./components/ui/button";
 import { getOptimizedImageUrl } from "./lib/utils";
@@ -277,7 +277,7 @@ function MainContent() {
           showAdmin={showAdmin}
           wishlistCount={wishlistCount}
         />
-        <AdminDashboard />
+        <AdminDashboard onBack={() => setShowAdmin(false)} />
         <CartDrawer
           isOpen={isCartOpen} 
           onClose={() => setIsCartOpen(false)} 
@@ -371,6 +371,15 @@ function MainContent() {
                   <div className="bg-orange-600 p-2.5 sm:p-3 rounded-2xl shadow-md shadow-orange-200 shrink-0">
                     <Search className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSearch("")}
+                    className="rounded-full hover:bg-white/60 h-8 w-8 text-gray-700 shrink-0"
+                    title="Clear Search"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tighter italic">

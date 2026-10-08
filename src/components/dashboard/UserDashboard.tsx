@@ -16,7 +16,8 @@ import {
   Bell,
   Clock,
   Smartphone,
-  Wallet
+  Wallet,
+  ChevronLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -133,12 +134,23 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black tracking-tighter italic leading-none mb-1">
-                User <span className="text-orange-600">Dashboard</span>
-              </h1>
-              <div className="text-gray-400 font-bold text-xs tracking-widest flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Always secure • Always discounted
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBrowseMore}
+                className="rounded-full hover:bg-gray-100 h-9 w-9 shrink-0"
+                title="Back to Market"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-700" />
+              </Button>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black tracking-tighter italic leading-none mb-1">
+                  User <span className="text-orange-600">Dashboard</span>
+                </h1>
+                <div className="text-gray-400 font-bold text-xs tracking-widest flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" /> Always secure • Always discounted
+                </div>
               </div>
             </div>
             

@@ -21,7 +21,8 @@ import {
   Headset,
   LayoutDashboard,
   Fingerprint,
-  Star
+  Star,
+  ChevronLeft
 } from 'lucide-react';
 import {
   isFingerprintSupported,
@@ -287,8 +288,8 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
               </div>
               <p className="text-gray-400 font-bold uppercase text-xs tracking-widest mb-6">{user.email}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-3">
-                <Button variant="outline" className="rounded-xl border-2 font-bold px-6 h-11" onClick={onClose}>
-                  Back to Store
+                <Button variant="outline" className="rounded-xl border-2 font-bold px-5 h-11 flex items-center gap-1.5" onClick={onClose}>
+                  <ChevronLeft className="h-4 w-4 text-gray-600" /> Back to Store
                 </Button>
                 {isAdmin && (
                   <Button 

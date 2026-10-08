@@ -67,14 +67,19 @@ import {
   XCircle,
   Image as ImageIcon,
   Fingerprint,
-  Phone
+  Phone,
+  ChevronLeft
 } from 'lucide-react';
 import { isFingerprintSupported, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 import { useCurrency } from '@/lib/CurrencyContext';
 import { API_URL, handleApiResponse } from '@/lib/api';
 import { cn, uploadToCloudinary } from '@/lib/utils';
 
-export default function AdminDashboard() {
+interface AdminDashboardProps {
+  onBack?: () => void;
+}
+
+export default function AdminDashboard({ onBack }: AdminDashboardProps) {
   const { formatPrice } = useCurrency();
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -933,6 +938,17 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 mb-4 md:mb-6">
+          {onBack && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="rounded-full hover:bg-gray-200 h-9 w-9 shrink-0 mr-1"
+              title="Back to Shop"
+            >
+              <ChevronLeft className="h-5 w-5 text-gray-700" />
+            </Button>
+          )}
           <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200">
             <Zap className="h-6 w-6 text-white fill-white" />
           </div>
