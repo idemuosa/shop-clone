@@ -819,11 +819,6 @@ app.post("/api/auth/fingerprint/login", async (req, res, next) => {
       }
     }
 
-    io.emit("new_activity", {
-      message: `Fingerprint sign-in successful for ${targetEmail || 'User'}`,
-      type: "auth"
-    });
-
     res.json({
       success: true,
       customToken,
