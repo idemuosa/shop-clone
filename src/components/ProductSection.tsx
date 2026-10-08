@@ -1,4 +1,4 @@
-import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText } from "lucide-react";
+import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -99,6 +99,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryCity, setDeliveryCity] = useState("");
   const [deliveryZip, setDeliveryZip] = useState("");
+  const [deliveryPhone, setDeliveryPhone] = useState("");
   const [productQuantities, setProductQuantities] = useState<Record<string, number>>({});
   const [saveCard, setSaveCard] = useState(false);
   const [reviews, setReviews] = useState<any[]>([]);
@@ -107,6 +108,13 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [storeSettings, setStoreSettings] = useState<any>(null);
   const { user, profile } = useAuth();
+
+  useEffect(() => {
+    if (profile || user) {
+      const initialPhone = (profile as any)?.phone || user?.phoneNumber || "";
+      if (initialPhone) setDeliveryPhone(initialPhone);
+    }
+  }, [profile, user]);
   const { addToCart, setIsOpen } = useCart();
   const { formatPrice } = useCurrency();
 
@@ -376,8 +384,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
     }
 
     if (checkoutStep === 'address') {
-      if (!deliveryAddress || !deliveryCity || !deliveryZip) {
-        toast.error("Please fill in all delivery details");
+      if (!deliveryAddress || !deliveryCity || !deliveryZip || !deliveryPhone) {
+        toast.error("Please fill in all delivery details including phone number");
         return;
       }
       setCheckoutStep('payment');
@@ -427,7 +435,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
       const generatedOrderNumber = `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
       const customerName = profile?.displayName || profile?.display_name || user.displayName || user.email?.split('@')[0] || 'Customer';
-      const customerPhone = (profile as any)?.phone || user.phoneNumber || '07045108847 or 09053091235';
+      const customerPhone = deliveryPhone.trim() || (profile as any)?.phone || user.phoneNumber || '07045108847 or 09053091235';
 
       const orderData = {
         userId: user.uid,
@@ -1327,6 +1335,19 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                     />
                                     <Home className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                   </div>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label htmlFor="delivery-phone" className="text-[10px] font-black  tracking-widest text-gray-400">Phone Number</Label>
+                                <div className="relative">
+                                  <Input
+                                    id="delivery-phone"
+                                    placeholder="Phone number for delivery updates"
+                                    value={deliveryPhone}
+                                    onChange={(e) => setDeliveryPhone(e.target.value)}
+                                    className="rounded-xl border-gray-100 focus:border-orange-500 bg-gray-50/30 pl-10"
+                                  />
+                                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 </div>
                               </div>
                             </div>
