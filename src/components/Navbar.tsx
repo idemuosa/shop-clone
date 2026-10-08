@@ -176,7 +176,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
               <div className="relative">
                 <User className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
               </div>
-              <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">
+              <span className="text-[9px] md:text-[11px] mt-1 font-bold text-gray-600 group-hover:text-orange-600">
                 {user ? 'Account' : 'Login'}
               </span>
             </div>
@@ -186,7 +186,7 @@ export default function Navbar({ onOpenAuth, onOpenCart, onOpenProfile: _onOpenP
                 <div className="relative">
                   <LogOut className="h-5 w-5 md:h-6 md:w-6 text-gray-700 group-hover:text-orange-600 transition-colors" />
                 </div>
-                <span className="text-[9px] md:text-[11px] hidden sm:block mt-1 font-bold text-gray-600 group-hover:text-orange-600">Logout</span>
+                <span className="text-[9px] md:text-[11px] mt-1 font-bold text-gray-600 group-hover:text-orange-600">Logout</span>
               </div>
             )}
             
