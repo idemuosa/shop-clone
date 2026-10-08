@@ -95,6 +95,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             orderId: orderId,
             orderNumber: orderId,
             customerName: customerName,
+            customerEmail: user.email,
             name: customerName,
             phone: customerPhone,
             phoneNumber: customerPhone,
@@ -113,13 +114,29 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
             status: paymentType === 'card' ? 'paid' : 'pending',
             createdAt: serverTimestamp()
           });
+
+          // Save notification for customer in Firestore
+          await addDoc(collection(db, 'notifications'), {
+            type: 'order_notification',
+            userId: user.uid,
+            orderId: orderId,
+            orderNumber: orderId,
+            email: user.email,
+            name: customerName,
+            phone: customerPhone,
+            amount: finalTotal,
+            paymentMethod: paymentType,
+            message: `Order #${orderId} placed successfully! Total: ₦${finalTotal.toFixed(2)} (${paymentType.toUpperCase()})`,
+            createdAt: serverTimestamp()
+          });
         } catch (dbErr) {
           console.error("Firestore order save error:", dbErr);
         }
       }
 
-      // Send order confirmation email
+      // Send order confirmation email and notify backend
       const payload = {
+        userId: user?.uid,
         email: user?.email,
         phone: customerPhone,
         name: customerName,

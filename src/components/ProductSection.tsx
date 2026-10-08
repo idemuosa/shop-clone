@@ -474,15 +474,18 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
         { duration: 6000 }
       );
 
-      // Log notification for order email (simulated)
+      // Log notification for order and payment
       await addDoc(collection(db, 'notifications'), {
         type: 'order_notification',
-        orderId: orderRef.id,
+        orderId: generatedOrderNumber,
         orderNumber: generatedOrderNumber,
         userId: user.uid,
         email: user.email,
         name: customerName,
         phone: customerPhone,
+        amount: totalAmount,
+        paymentMethod: paymentType,
+        message: `Order #${generatedOrderNumber} (${product.name}) placed successfully! Total: ₦${totalAmount.toFixed(2)} (${paymentType.toUpperCase()})`,
         status: 'pending',
         createdAt: serverTimestamp(),
       });
@@ -493,12 +496,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
+            userId: user.uid,
             email: user.email, 
             phone: customerPhone,
             orderId: generatedOrderNumber,
             orderNumber: generatedOrderNumber,
             productName: product.name,
             totalAmount: totalAmount.toFixed(2),
+            paymentMethod: paymentType,
             shippingAddress: {
               address: deliveryAddress,
               city: deliveryCity,
