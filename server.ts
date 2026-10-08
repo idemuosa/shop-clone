@@ -1241,8 +1241,115 @@ app.get(["/products/:id", "/products/:id/", "/api/products/:id", "/api/products/
   }
 });
 
+app.post(["/products/bulk", "/products/bulk/", "/api/products/bulk", "/api/products/bulk/"], async (req, res, next) => {
+  try {
+    const rawItems = Array.isArray(req.body) ? req.body : (req.body?.products || req.body?.items || []);
+    if (!Array.isArray(rawItems) || rawItems.length === 0) {
+      return res.status(400).json({ error: "Invalid payload: array of products expected" });
+    }
+
+    const categories = await fetchCategoriesFromFS();
+    const products = await fetchProductsFromFS();
+    let currentMaxId = products.length > 0 ? Math.max(...products.map(p => Number(p.id) || 0)) : 0;
+
+    const createdProducts: any[] = [];
+    for (const item of rawItems) {
+      currentMaxId += 1;
+      const category = categories.find(c =>
+        Number(c.id) === Number(item.category_id) ||
+        (c.name && item.category_name && c.name.toLowerCase() === String(item.category_name).toLowerCase()) ||
+        (c.name && item.category && c.name.toLowerCase() === String(item.category).toLowerCase())
+      );
+      const category_id = category ? Number(category.id) : (Number(item.category_id) || 1);
+      const category_name = category ? category.name : (item.category_name || item.category || "General");
+
+      const newProduct = {
+        id: currentMaxId,
+        name: item.name || "Unnamed Product",
+        description: item.description || "",
+        price: Number(item.price) || 0,
+        old_price: item.old_price !== undefined && item.old_price !== null && item.old_price !== "" ? Number(item.old_price) : null,
+        image: item.image || "",
+        category_id: category_id,
+        category_name: category_name,
+        tag: item.tag || "",
+        stock: item.stock !== undefined ? Number(item.stock) : 100,
+        sold: item.sold !== undefined ? Number(item.sold) : 0,
+        is_available: item.is_available !== undefined ? Boolean(item.is_available) : true,
+        rating: 5.0,
+        reviews_count: 0
+      };
+
+      productsStore.push(newProduct);
+      createdProducts.push(newProduct);
+
+      if (isFirebaseAdminInitialized) {
+        try {
+          await admin.firestore().collection('products').doc(String(newProduct.id)).set(newProduct);
+        } catch (fErr) {
+          console.warn("Firestore product bulk save error:", fErr);
+        }
+      }
+    }
+
+    res.status(201).json({ success: true, count: createdProducts.length, products: createdProducts });
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post(["/products", "/products/", "/api/products", "/api/products/"], async (req, res, next) => {
   try {
+    if (Array.isArray(req.body) || (req.body && Array.isArray(req.body.products))) {
+      // Forward array requests to bulk handler behavior
+      const rawItems = Array.isArray(req.body) ? req.body : req.body.products;
+      const categories = await fetchCategoriesFromFS();
+      const products = await fetchProductsFromFS();
+      let currentMaxId = products.length > 0 ? Math.max(...products.map(p => Number(p.id) || 0)) : 0;
+
+      const createdProducts: any[] = [];
+      for (const item of rawItems) {
+        currentMaxId += 1;
+        const category = categories.find(c =>
+          Number(c.id) === Number(item.category_id) ||
+          (c.name && item.category_name && c.name.toLowerCase() === String(item.category_name).toLowerCase()) ||
+          (c.name && item.category && c.name.toLowerCase() === String(item.category).toLowerCase())
+        );
+        const category_id = category ? Number(category.id) : (Number(item.category_id) || 1);
+        const category_name = category ? category.name : (item.category_name || item.category || "General");
+
+        const newProduct = {
+          id: currentMaxId,
+          name: item.name || "Unnamed Product",
+          description: item.description || "",
+          price: Number(item.price) || 0,
+          old_price: item.old_price !== undefined && item.old_price !== null && item.old_price !== "" ? Number(item.old_price) : null,
+          image: item.image || "",
+          category_id: category_id,
+          category_name: category_name,
+          tag: item.tag || "",
+          stock: item.stock !== undefined ? Number(item.stock) : 100,
+          sold: item.sold !== undefined ? Number(item.sold) : 0,
+          is_available: item.is_available !== undefined ? Boolean(item.is_available) : true,
+          rating: 5.0,
+          reviews_count: 0
+        };
+
+        productsStore.push(newProduct);
+        createdProducts.push(newProduct);
+
+        if (isFirebaseAdminInitialized) {
+          try {
+            await admin.firestore().collection('products').doc(String(newProduct.id)).set(newProduct);
+          } catch (fErr) {
+            console.warn("Firestore product bulk save error:", fErr);
+          }
+        }
+      }
+
+      return res.status(201).json({ success: true, count: createdProducts.length, products: createdProducts });
+    }
+
     const { name, description, price, old_price, image, category_id, tag, stock, sold, is_available } = req.body;
     const categories = await fetchCategoriesFromFS();
     const products = await fetchProductsFromFS();

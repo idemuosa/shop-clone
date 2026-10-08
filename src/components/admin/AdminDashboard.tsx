@@ -68,7 +68,13 @@ import {
   Image as ImageIcon,
   Fingerprint,
   Phone,
-  ChevronLeft
+  ChevronLeft,
+  Upload,
+  FileText,
+  Download,
+  Layers,
+  AlertCircle,
+  FileSpreadsheet
 } from 'lucide-react';
 import { isFingerprintSupported, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -99,6 +105,297 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
   const [tag, setTag] = useState<string>("");
   const [adminFpSupported, setAdminFpSupported] = useState(false);
   const [adminFpLoading, setAdminFpLoading] = useState(false);
+
+  // Bulk Upload State
+  const [showBulkUploadDialog, setShowBulkUploadDialog] = useState(false);
+  const [bulkTab, setBulkTab] = useState<'form' | 'file'>('form');
+  const [bulkRows, setBulkRows] = useState<any[]>([
+    { id: '1', name: '', price: '', old_price: '', stock: '100', category_id: '', tag: '', description: '', image: '' },
+    { id: '2', name: '', price: '', old_price: '', stock: '100', category_id: '', tag: '', description: '', image: '' }
+  ]);
+  const [parsedCsvItems, setParsedCsvItems] = useState<any[]>([]);
+  const [csvFileName, setCsvFileName] = useState<string>('');
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
+
+  const handleAddBulkRow = () => {
+    setBulkRows(prev => [
+      ...prev,
+      { id: Date.now().toString(), name: '', price: '', old_price: '', stock: '100', category_id: '', tag: '', description: '', image: '' }
+    ]);
+  };
+
+  const handleRemoveBulkRow = (id: string) => {
+    if (bulkRows.length <= 1) {
+      toast.error("At least one product row is required");
+      return;
+    }
+    setBulkRows(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleBulkRowChange = (id: string, field: string, value: any) => {
+    setBulkRows(prev => prev.map(row => row.id === id ? { ...row, [field]: value } : row));
+  };
+
+  const handleRowImageUpload = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        const img = new Image();
+        img.src = base64String;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > h) {
+            if (w > MAX) { h *= MAX / w; w = MAX; }
+          } else {
+            if (h > MAX) { w *= MAX / h; h = MAX; }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, w, h);
+          const compressed = canvas.toDataURL('image/jpeg', 0.7);
+          handleBulkRowChange(id, 'image', compressed);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDownloadCsvTemplate = () => {
+    const csvContent = "name,price,old_price,stock,category,tag,description,image\n" +
+      '"Wireless Earbuds Pro",129.99,159.99,50,"Audio","Best Seller","Crystal clear noise cancelling earbuds","https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=500"\n' +
+      '"Smart Sport Watch",89.99,119.99,100,"Watches","Featured","High accuracy fitness watch","https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=500"\n' +
+      '"Leather Fashion Bag",75.00,,40,"Fashion","New Arrival","Genuine Italian leather handbag","https://images.unsplash.com/photo-1548036328-c9fa89d128fa?q=80&w=500"';
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'sample_products_template.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Sample CSV template downloaded!");
+  };
+
+  const parseCsvText = (text: string) => {
+    const lines = text.split(/\r\n|\n/);
+    if (lines.length < 2) return [];
+
+    const parseLine = (line: string) => {
+      const result = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(cur.trim());
+          cur = '';
+        } else {
+          cur += char;
+        }
+      }
+      result.push(cur.trim());
+      return result;
+    };
+
+    const headers = parseLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+    const items: any[] = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      const values = parseLine(lines[i]);
+      const obj: Record<string, any> = {};
+      headers.forEach((h, idx) => {
+        obj[h] = values[idx] || '';
+      });
+
+      if (obj.name || obj.price) {
+        items.push({
+          name: obj.name || 'Unnamed Product',
+          price: parseFloat(obj.price) || 0,
+          old_price: obj.old_price && !isNaN(parseFloat(obj.old_price)) ? parseFloat(obj.old_price) : null,
+          stock: obj.stock && !isNaN(parseInt(obj.stock)) ? parseInt(obj.stock) : 100,
+          category: obj.category || 'General',
+          tag: obj.tag || '',
+          description: obj.description || '',
+          image: obj.image || ''
+        });
+      }
+    }
+    return items;
+  };
+
+  const handleCsvFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCsvFileName(file.name);
+    const reader = new FileReader();
+
+    if (file.name.endsWith('.json')) {
+      reader.onload = (event) => {
+        try {
+          const json = JSON.parse(event.target?.result as string);
+          const rawList = Array.isArray(json) ? json : (json.products || json.items || []);
+          const items = rawList.map((item: any) => ({
+            name: item.name || 'Unnamed Product',
+            price: parseFloat(item.price) || 0,
+            old_price: item.old_price ? parseFloat(item.old_price) : null,
+            stock: item.stock !== undefined ? parseInt(item.stock) : 100,
+            category: item.category || item.category_name || 'General',
+            tag: item.tag || '',
+            description: item.description || '',
+            image: item.image || ''
+          }));
+          setParsedCsvItems(items);
+          toast.success(`Parsed ${items.length} products from JSON file`);
+        } catch (err: any) {
+          toast.error("Failed to parse JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      reader.onload = (event) => {
+        try {
+          const text = event.target?.result as string;
+          const items = parseCsvText(text);
+          setParsedCsvItems(items);
+          if (items.length === 0) {
+            toast.error("No valid product rows found in CSV");
+          } else {
+            toast.success(`Parsed ${items.length} products from CSV file`);
+          }
+        } catch (err: any) {
+          toast.error("Failed to parse CSV file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleSubmitBulkRows = async () => {
+    const validRows = bulkRows.filter(r => r.name.trim() !== '' && !isNaN(parseFloat(r.price)));
+    if (validRows.length === 0) {
+      toast.error("Please fill in at least one product with a name and price");
+      return;
+    }
+
+    setIsBulkSubmitting(true);
+    toast.loading(`Processing and uploading ${validRows.length} products...`);
+
+    try {
+      const processedProducts = [];
+      for (const row of validRows) {
+        let imageUrl = row.image;
+        if (imageUrl && imageUrl.startsWith('data:')) {
+          try {
+            imageUrl = await uploadToCloudinary(imageUrl);
+          } catch (e) {
+            console.warn("Cloudinary upload fallback for row:", e);
+          }
+        }
+
+        processedProducts.push({
+          name: row.name,
+          price: parseFloat(row.price) || 0,
+          old_price: row.old_price ? parseFloat(row.old_price) : null,
+          stock: row.stock ? parseInt(row.stock) : 100,
+          category_id: row.category_id ? parseInt(row.category_id) : undefined,
+          tag: row.tag || '',
+          description: row.description || '',
+          image: imageUrl || ''
+        });
+      }
+
+      const response = await fetch(`${API_URL}/products/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: processedProducts })
+      });
+
+      await handleApiResponse(response);
+
+      toast.dismiss();
+      toast.success(`Successfully uploaded ${processedProducts.length} products!`);
+      setShowBulkUploadDialog(false);
+      setBulkRows([
+        { id: '1', name: '', price: '', old_price: '', stock: '100', category_id: '', tag: '', description: '', image: '' },
+        { id: '2', name: '', price: '', old_price: '', stock: '100', category_id: '', tag: '', description: '', image: '' }
+      ]);
+      fetchData();
+    } catch (error: any) {
+      toast.dismiss();
+      toast.error(error?.message || "Failed to bulk upload products");
+    } finally {
+      setIsBulkSubmitting(false);
+    }
+  };
+
+  const handleSubmitParsedCsv = async () => {
+    if (parsedCsvItems.length === 0) {
+      toast.error("No parsed products to upload. Please choose a CSV/JSON file.");
+      return;
+    }
+
+    setIsBulkSubmitting(true);
+    toast.loading(`Uploading ${parsedCsvItems.length} products...`);
+
+    try {
+      const processedProducts = [];
+      for (const item of parsedCsvItems) {
+        let imageUrl = item.image;
+        if (imageUrl && imageUrl.startsWith('data:')) {
+          try {
+            imageUrl = await uploadToCloudinary(imageUrl);
+          } catch (e) {
+            console.warn("Cloudinary upload fallback for CSV row:", e);
+          }
+        }
+
+        const catMatch = categories.find(c => c.name.toLowerCase() === (item.category || '').toLowerCase());
+
+        processedProducts.push({
+          name: item.name,
+          price: item.price,
+          old_price: item.old_price,
+          stock: item.stock,
+          category_id: catMatch ? catMatch.id : undefined,
+          category_name: item.category,
+          tag: item.tag,
+          description: item.description,
+          image: imageUrl
+        });
+      }
+
+      const response = await fetch(`${API_URL}/products/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products: processedProducts })
+      });
+
+      await handleApiResponse(response);
+
+      toast.dismiss();
+      toast.success(`Successfully imported ${processedProducts.length} products!`);
+      setShowBulkUploadDialog(false);
+      setParsedCsvItems([]);
+      setCsvFileName('');
+      fetchData();
+    } catch (error: any) {
+      toast.dismiss();
+      toast.error(error?.message || "Failed to import products from file");
+    } finally {
+      setIsBulkSubmitting(false);
+    }
+  };
 
   useEffect(() => {
     isFingerprintSupported().then(setAdminFpSupported).catch(() => setAdminFpSupported(false));
@@ -957,6 +1254,13 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
             <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5">Inventory & Orders</p>
           </div>
           <div className="flex gap-1.5">
+            <Button
+              variant="outline"
+              onClick={() => setShowBulkUploadDialog(true)}
+              className="rounded-lg border-2 font-black text-xs px-3 h-9 border-orange-200 text-orange-600 hover:bg-orange-50 gap-1.5 transition-all bg-white"
+            >
+              <Upload className="h-3.5 w-3.5" /> Bulk Upload
+            </Button>
             <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
               <DialogTrigger
                 render={(props) => (
@@ -1325,17 +1629,27 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
               <Card className="lg:col-span-3 rounded-2xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
                 <CardHeader className="py-4 flex flex-row items-center justify-between">
                   <CardTitle className="text-lg font-black tracking-tighter">Inventory</CardTitle>
-                  {products.length > 0 && (
+                  <div className="flex items-center gap-2">
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={handleClearAllInventory}
-                      disabled={isLoading}
-                      className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-8 px-3 gap-1"
+                      onClick={() => setShowBulkUploadDialog(true)}
+                      className="rounded-xl border-orange-200 text-orange-600 hover:bg-orange-50 font-bold text-xs h-8 px-3 gap-1"
                     >
-                      <Trash2 className="h-3.5 w-3.5" /> Clear All Inventory
+                      <Upload className="h-3.5 w-3.5" /> Bulk Upload
                     </Button>
-                  )}
+                    {products.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleClearAllInventory}
+                        disabled={isLoading}
+                        className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-8 px-3 gap-1"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" /> Clear All Inventory
+                      </Button>
+                    )}
+                  </div>
                 </CardHeader>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
@@ -2188,6 +2502,262 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Bulk Upload Dialog */}
+        <Dialog open={showBulkUploadDialog} onOpenChange={setShowBulkUploadDialog}>
+          <DialogContent className="rounded-3xl max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+            <DialogHeader className="mb-4">
+              <div className="flex items-center gap-2">
+                <div className="bg-orange-100 p-2 rounded-xl text-orange-600">
+                  <Upload className="h-5 w-5" />
+                </div>
+                <div>
+                  <DialogTitle className="text-xl font-black tracking-tighter">Bulk Upload Products</DialogTitle>
+                  <CardDescription className="text-xs font-bold text-gray-500">
+                    Add multiple products at once via interactive form rows or CSV/JSON file import
+                  </CardDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            <div className="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3">
+              <Button
+                type="button"
+                variant={bulkTab === 'form' ? 'default' : 'outline'}
+                onClick={() => setBulkTab('form')}
+                className={`rounded-xl text-xs font-black h-9 px-4 gap-1.5 ${bulkTab === 'form' ? 'bg-orange-600 text-white' : 'bg-white'}`}
+              >
+                <Layers className="h-4 w-4" /> Form Rows ({bulkRows.length})
+              </Button>
+              <Button
+                type="button"
+                variant={bulkTab === 'file' ? 'default' : 'outline'}
+                onClick={() => setBulkTab('file')}
+                className={`rounded-xl text-xs font-black h-9 px-4 gap-1.5 ${bulkTab === 'file' ? 'bg-orange-600 text-white' : 'bg-white'}`}
+              >
+                <FileSpreadsheet className="h-4 w-4" /> CSV / JSON Import
+              </Button>
+            </div>
+
+            {bulkTab === 'form' && (
+              <div className="space-y-4">
+                <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
+                  {bulkRows.map((row, index) => (
+                    <div key={row.id} className="p-4 rounded-2xl border-2 border-gray-100 bg-gray-50/50 space-y-3 relative">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-orange-600 uppercase tracking-wider">Product #{index + 1}</span>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveBulkRow(row.id)}
+                          className="h-7 px-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg text-xs font-bold gap-1"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Remove
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="space-y-1 sm:col-span-2">
+                          <Label className="text-[10px]">Product Name *</Label>
+                          <Input
+                            value={row.name}
+                            onChange={(e) => handleBulkRowChange(row.id, 'name', e.target.value)}
+                            placeholder="e.g. Wireless Headphones"
+                            className="h-9 text-xs rounded-xl bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Price (₦) *</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={row.price}
+                            onChange={(e) => handleBulkRowChange(row.id, 'price', e.target.value)}
+                            placeholder="0.00"
+                            className="h-9 text-xs rounded-xl bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Old Price (₦)</Label>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={row.old_price}
+                            onChange={(e) => handleBulkRowChange(row.id, 'old_price', e.target.value)}
+                            placeholder="Optional"
+                            className="h-9 text-xs rounded-xl bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Category</Label>
+                          <Select
+                            value={row.category_id}
+                            onValueChange={(val) => handleBulkRowChange(row.id, 'category_id', val)}
+                          >
+                            <SelectTrigger className="h-9 text-xs rounded-xl bg-white">
+                              <SelectValue placeholder="Category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {categories.map((cat) => (
+                                <SelectItem key={cat.id} value={cat.id.toString()}>
+                                  {cat.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Stock</Label>
+                          <Input
+                            type="number"
+                            value={row.stock}
+                            onChange={(e) => handleBulkRowChange(row.id, 'stock', e.target.value)}
+                            placeholder="100"
+                            className="h-9 text-xs rounded-xl bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Tag</Label>
+                          <Input
+                            value={row.tag}
+                            onChange={(e) => handleBulkRowChange(row.id, 'tag', e.target.value)}
+                            placeholder="e.g. Best Seller"
+                            className="h-9 text-xs rounded-xl bg-white"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-[10px]">Image File or URL</Label>
+                          <div className="flex gap-2 items-center">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleRowImageUpload(row.id, e)}
+                              className="h-9 text-[10px] rounded-xl bg-white file:py-0.5 file:px-2 file:text-[10px] file:rounded-md file:border-0 file:bg-orange-50 file:text-orange-700"
+                            />
+                            {row.image && (
+                              <div className="w-9 h-9 shrink-0 rounded-lg overflow-hidden border border-gray-200">
+                                <img src={row.image} className="w-full h-full object-cover" alt="Preview" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddBulkRow}
+                    className="rounded-xl border-dashed border-2 border-orange-300 text-orange-600 hover:bg-orange-50 font-bold text-xs h-10 gap-1.5 flex-1"
+                  >
+                    <Plus className="h-4 w-4" /> Add Another Product Row
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleSubmitBulkRows}
+                    disabled={isBulkSubmitting}
+                    className="rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-xs h-10 px-6 gap-2 flex-1"
+                  >
+                    <Upload className="h-4 w-4" />
+                    {isBulkSubmitting ? 'Uploading Products...' : `Upload ${bulkRows.filter(r => r.name.trim()).length} Products`}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {bulkTab === 'file' && (
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                  <div>
+                    <h4 className="text-xs font-black text-orange-900 uppercase tracking-wider">CSV/JSON File Import</h4>
+                    <p className="text-[11px] text-orange-700 font-medium mt-0.5">
+                      Upload a file containing product entries. Use our template for easy column formatting.
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDownloadCsvTemplate}
+                    className="rounded-xl border-orange-200 bg-white text-orange-700 hover:bg-orange-100 font-bold text-xs h-9 px-3 shrink-0 gap-1.5"
+                  >
+                    <Download className="h-4 w-4" /> Download Sample CSV
+                  </Button>
+                </div>
+
+                <div className="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-orange-400 transition-colors bg-white">
+                  <FileText className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-xs font-bold text-gray-700 mb-1">Select a CSV or JSON file to import</p>
+                  <p className="text-[10px] text-gray-400 mb-3">Supported columns: name, price, old_price, stock, category, tag, description, image</p>
+                  <Input
+                    type="file"
+                    accept=".csv,.json"
+                    onChange={handleCsvFileChange}
+                    className="max-w-xs mx-auto text-xs file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-orange-600 file:text-white"
+                  />
+                  {csvFileName && (
+                    <p className="text-xs font-bold text-orange-600 mt-2">Selected File: {csvFileName}</p>
+                  )}
+                </div>
+
+                {parsedCsvItems.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black text-gray-700 uppercase tracking-wider">
+                        Parsed Products Preview ({parsedCsvItems.length})
+                      </span>
+                    </div>
+
+                    <div className="max-h-60 overflow-y-auto border rounded-2xl">
+                      <Table>
+                        <TableHeader className="bg-gray-50">
+                          <TableRow>
+                            <TableHead className="text-[10px] font-black uppercase">Product</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase">Price</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase">Stock</TableHead>
+                            <TableHead className="text-[10px] font-black uppercase">Category</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {parsedCsvItems.map((item, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell className="font-bold text-xs py-2">
+                                <div className="flex items-center gap-2">
+                                  {item.image && (
+                                    <img src={item.image} className="w-6 h-6 rounded object-cover" alt="" />
+                                  )}
+                                  <span>{item.name}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-xs font-black text-orange-600 py-2">
+                                {formatPrice(item.price)}
+                              </TableCell>
+                              <TableCell className="text-xs font-bold py-2">{item.stock}</TableCell>
+                              <TableCell className="text-xs font-medium py-2 text-gray-500">{item.category}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+
+                    <Button
+                      type="button"
+                      onClick={handleSubmitParsedCsv}
+                      disabled={isBulkSubmitting}
+                      className="w-full rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-xs h-11 gap-2 shadow-lg"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {isBulkSubmitting ? 'Importing Products...' : `Import ${parsedCsvItems.length} Products`}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </DialogContent>
         </Dialog>
 
