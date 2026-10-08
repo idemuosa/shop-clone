@@ -247,7 +247,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             ) : (
               <>
                 <TabsTrigger value="login" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Login</TabsTrigger>
-                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Join Free</TabsTrigger>
+                <TabsTrigger value="register" className="rounded-lg font-bold data-[state=active]:bg-orange-600 data-[state=active]:text-white  text-xs sm:text-sm tracking-widest leading-none py-2 sm:py-2.5">Register</TabsTrigger>
               </>
             )}
           </TabsList>
