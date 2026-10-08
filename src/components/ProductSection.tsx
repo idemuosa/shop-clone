@@ -909,7 +909,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   </div>
                 ) : (
   <>
-                    <div className="h-52 sm:h-64 md:h-auto md:w-2/5 bg-gray-50 relative shrink-0">
+                    <div className="h-36 sm:h-48 md:h-auto md:w-2/5 bg-gray-100/60 relative shrink-0 overflow-hidden flex items-center justify-center p-2">
                       <Button
                         variant="ghost"
                         size="icon"
@@ -917,20 +917,19 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           setSelectedProduct(null);
                           setCheckoutStep('details');
                         }}
-                        className="absolute top-3 left-3 z-30 rounded-full bg-white/90 backdrop-blur-md hover:bg-white text-gray-700 shadow-sm h-8 w-8"
+                        className="absolute top-2.5 left-2.5 z-40 rounded-full bg-white/95 text-black hover:bg-white shadow-md border border-gray-200/80 backdrop-blur-md h-8 w-8"
                         title="Back to Products"
                       >
-                        <ChevronLeft className="h-4 w-4" />
+                        <ChevronLeft className="h-4 w-4 stroke-[2.5]" />
                       </Button>
                       <img
                         src={getOptimizedImageUrl(selectedProduct.image, 800)}
                         alt={selectedProduct.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain max-h-[140px] sm:max-h-[180px] md:max-h-full"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
                     <div className="md:w-3/5 p-3.5 sm:p-5 flex flex-col">
                   {checkoutStep === 'details' ? (
