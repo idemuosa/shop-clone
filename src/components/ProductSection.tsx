@@ -890,8 +890,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     <div className="h-56 sm:h-64 md:h-auto md:w-2/5 bg-gray-200 shrink-0" />
                     <div className="md:w-3/5 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
                       <div className="flex gap-2">
-                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
-                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                        <div className="h-5 w-16 bg-gray-200 rounded-full" />
+                        <div className="h-5 w-16 bg-gray-200 rounded-full" />
                       </div>
                       <div className="h-8 sm:h-10 w-3/4 bg-gray-200 rounded-xl" />
                       <div className="h-4 w-1/2 bg-gray-200 rounded-lg" />
@@ -912,7 +912,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     <div className="h-52 sm:h-64 md:h-auto md:w-2/5 bg-gray-50 relative shrink-0">
                       <Button
                         variant="ghost"
-                        size="icon"
                         onClick={() => {
                           setSelectedProduct(null);
                           setCheckoutStep('details');
@@ -921,16 +920,16 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         title="Back to Products"
                       >
                         <ChevronLeft className="h-4 w-4" />
+                        <span>Back</span>
                       </Button>
                       <img
                         src={getOptimizedImageUrl(selectedProduct.image, 800)}
                         alt={selectedProduct.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain max-h-48 sm:max-h-56 md:max-h-80 rounded-2xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
                     <div className="md:w-3/5 p-3.5 sm:p-5 flex flex-col">
                   {checkoutStep === 'details' ? (
