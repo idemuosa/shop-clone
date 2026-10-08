@@ -66,7 +66,8 @@ import {
   Clock,
   XCircle,
   Image as ImageIcon,
-  Fingerprint
+  Fingerprint,
+  Phone
 } from 'lucide-react';
 import { isFingerprintSupported, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -1663,6 +1664,15 @@ export default function AdminDashboard() {
                                         <div>
                                           <p className="text-xs font-black  text-gray-400">Customer</p>
                                           <p className="font-medium text-sm">{selectedOrder.customerEmail}</p>
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-orange-50 rounded-lg">
+                                          <Phone className="h-4 w-4 text-orange-600" />
+                                        </div>
+                                        <div>
+                                          <p className="text-xs font-black  text-gray-400">Phone number</p>
+                                          <p className="font-medium text-sm">{selectedOrder.phone || selectedOrder.phoneNumber || 'N/A'}</p>
                                         </div>
                                       </div>
                                       <div className="flex items-center gap-3">

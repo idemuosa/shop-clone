@@ -19,7 +19,8 @@ import {
   ArrowRight,
   Package,
   ShieldAlert,
-  Zap
+  Zap,
+  Phone
 } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -41,10 +42,18 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
   const [step, setStep] = useState<'address' | 'payment' | 'success'>('address');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Address State
+  // Address & Contact State
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [zip, setZip] = useState('');
+  const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    if (profile || user) {
+      const initialPhone = (profile as any)?.phone || user?.phoneNumber || '';
+      if (initialPhone) setPhone(initialPhone);
+    }
+  }, [profile, user]);
 
   // Discount/Voucher State
   const [discount, setDiscount] = useState(0);
@@ -83,7 +92,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       const finalTotal = totalPrice - discount;
       const orderId = paymentRef || `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
       const customerName = profile?.displayName || (profile as any)?.display_name || user?.displayName || user?.email?.split('@')[0] || 'Customer';
-      const customerPhone = (profile as any)?.phone || user?.phoneNumber || '07045108847 or 09053091235';
+      const customerPhone = phone.trim() || (profile as any)?.phone || user?.phoneNumber || '07045108847 or 09053091235';
 
       setCreatedOrderDetails({ orderId, name: customerName, phone: customerPhone });
 
@@ -308,6 +317,19 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                               />
                             </div>
                           </div>
+
+                          <div className="space-y-1">
+                            <Label className="text-[9px] md:text-[10px] font-black text-gray-400 ml-1 uppercase">Phone Number</Label>
+                            <div className="relative">
+                              <Input
+                                placeholder="Phone number (for delivery updates)"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                className="pl-9 md:pl-10 h-10 md:h-12 rounded-xl border-2 border-gray-50 focus:border-orange-500 font-bold transition-all bg-gray-50/50 text-xs md:text-sm"
+                              />
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
+                            </div>
+                          </div>
                         </div>
                       </div>
 
@@ -325,8 +347,8 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
 
                       <Button
                         onClick={() => {
-                          if (!address || !city || !zip) {
-                            toast.error("Please fill in your shipping details");
+                          if (!address || !city || !zip || !phone) {
+                            toast.error("Please fill in your shipping details including phone number");
                             return;
                           }
                           setStep('payment');
