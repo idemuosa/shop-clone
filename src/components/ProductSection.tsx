@@ -176,32 +176,48 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
     return () => unsubscribe();
   }, [user, checkoutStep]);
 
+  const fetchReviews = async (productId?: string | number) => {
+    const pId = productId || selectedProduct?.id;
+    if (!pId) {
+      setReviews([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/api/reviews/?product_id=${pId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data.map((r: any) => ({
+          id: r.id,
+          userName: r.user_name || r.userName || "Customer",
+          rating: Number(r.rating) || 5,
+          comment: r.comment || "",
+          createdAt: {
+            toDate: () => {
+              const d = r.created_at || r.createdAt;
+              if (d && typeof d.toDate === 'function') return d.toDate();
+              if (d) {
+                const parsed = new Date(d);
+                if (!isNaN(parsed.getTime())) return parsed;
+              }
+              return new Date();
+            }
+          }
+        })));
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    }
+  };
+
   useEffect(() => {
     if (!selectedProduct) {
       setReviews([]);
       return;
     }
 
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/reviews/?product_id=${selectedProduct.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setReviews(data.map((r: any) => ({
-            id: r.id,
-            userName: r.user_name,
-            rating: r.rating,
-            comment: r.comment,
-            createdAt: { toDate: () => new Date(r.created_at) }
-          })));
-        }
-      } catch (error) {
-        console.error("Failed to fetch reviews:", error);
-      }
-    };
-
-    fetchReviews();
-  }, [selectedProduct]);
+    fetchReviews(selectedProduct.id);
+  }, [selectedProduct?.id]);
 
   const handleSubmitReview = async () => {
     if (!user) {
@@ -214,9 +230,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
       return;
     }
 
+    if (!selectedProduct) return;
+
     setIsSubmittingReview(true);
     try {
       const token = await user.getIdToken();
+      const authorName = profile?.displayName || profile?.display_name || user.displayName || user.email?.split('@')[0] || "Customer";
       const response = await fetch(`${API_URL}/api/reviews/`, {
         method: 'POST',
         headers: {
@@ -224,9 +243,10 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          product: selectedProduct!.id,
+          product: selectedProduct.id,
           rating: newReviewRating,
-          comment: newReviewComment,
+          comment: newReviewComment.trim(),
+          user_name: authorName
         }),
       });
 
@@ -234,11 +254,9 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
         setNewReviewComment("");
         setNewReviewRating(5);
         toast.success("Review submitted!");
-        // Trigger a re-fetch of reviews by resetting state or just calling fetchReviews again
-        // Here we just reload the selected product to trigger the useEffect
-        const temp = selectedProduct;
-        setInternalSelectedProduct(null);
-        setTimeout(() => setInternalSelectedProduct(temp), 10);
+        // Update product reviews count in local object
+        selectedProduct.reviews = (selectedProduct.reviews || 0) + 1;
+        await fetchReviews(selectedProduct.id);
       } else {
         toast.error("Failed to submit review.");
       }
@@ -1107,7 +1125,14 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                           </div>
                                         </div>
                                         <span className="text-[9px] sm:text-[10px] text-gray-400 font-bold italic mt-0.5 sm:mt-1 shrink-0">
-                                          {review.createdAt?.toDate().toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) || "Just now"}
+                                          {(() => {
+                                            try {
+                                              const d = review.createdAt?.toDate ? review.createdAt.toDate() : null;
+                                              return d && !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : "Just now";
+                                            } catch (e) {
+                                              return "Just now";
+                                            }
+                                          })()}
                                         </span>
                                       </div>
                                       <p className="text-xs sm:text-sm text-gray-700 font-medium leading-relaxed bg-gray-50/50 p-2.5 sm:p-4 rounded-lg sm:rounded-xl border border-gray-50 italic">

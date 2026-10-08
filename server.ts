@@ -469,6 +469,32 @@ async function fetchProductsFromFS(): Promise<any[]> {
   }
 }
 
+async function fetchReviewsFromFS(): Promise<any[]> {
+  if (!isFirebaseAdminInitialized) return reviewsStore;
+  try {
+    const snap = await admin.firestore().collection('reviews').get();
+    if (snap.empty) {
+      return reviewsStore;
+    }
+    const reviews = snap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        product: data.product,
+        rating: Number(data.rating) || 5,
+        comment: data.comment || "",
+        user_name: data.user_name || data.userName || "Customer",
+        created_at: data.created_at || (data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : new Date().toISOString())
+      };
+    });
+    reviewsStore = reviews;
+    return reviews;
+  } catch (err) {
+    console.warn("Firestore fetchReviews error:", err);
+    return reviewsStore;
+  }
+}
+
 // API routes
 app.post("/api/paystack/initialize", async (req, res, next) => {
   const { email, amount } = req.body;
@@ -1386,27 +1412,80 @@ app.delete(["/products", "/products/", "/api/products", "/api/products/"], async
 });
 
 // Reviews Endpoints
-app.get(["/api/reviews", "/api/reviews/"], (req, res) => {
-  const productId = req.query.product_id ? Number(req.query.product_id) : null;
-  if (productId) {
-    const filtered = reviewsStore.filter(r => r.product === productId);
-    return res.json(filtered);
+app.get(["/api/reviews", "/api/reviews/"], async (req, res, next) => {
+  try {
+    const reviews = await fetchReviewsFromFS();
+    const productId = req.query.product_id ? String(req.query.product_id) : null;
+    if (productId) {
+      const filtered = reviews.filter(r => String(r.product) === productId);
+      return res.json(filtered);
+    }
+    res.json(reviews);
+  } catch (err) {
+    next(err);
   }
-  res.json(reviewsStore);
 });
 
-app.post(["/api/reviews", "/api/reviews/"], (req, res) => {
-  const { product, rating, comment } = req.body;
-  const newReview = {
-    id: reviewsStore.length + 1,
-    product: Number(product),
-    rating: Number(rating) || 5,
-    comment: comment || "",
-    user_name: "Customer",
-    created_at: new Date().toISOString()
-  };
-  reviewsStore.push(newReview);
-  res.status(201).json(newReview);
+app.post(["/api/reviews", "/api/reviews/"], async (req, res, next) => {
+  try {
+    const { product, rating, comment, user_name, userName } = req.body;
+    const authorName = user_name || userName || "Customer";
+    const prodId = String(product);
+    const numRating = Number(rating) || 5;
+
+    const newReview: any = {
+      product: prodId,
+      rating: numRating,
+      comment: comment || "",
+      user_name: authorName,
+      created_at: new Date().toISOString()
+    };
+
+    let savedReview = { ...newReview, id: Date.now().toString() };
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        const docRef = await admin.firestore().collection('reviews').add({
+          ...newReview,
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        savedReview.id = docRef.id;
+
+        // Update product reviews_count and rating in Firestore
+        const prodRef = admin.firestore().collection('products').doc(prodId);
+        const prodDoc = await prodRef.get();
+        if (prodDoc.exists) {
+          const prodData = prodDoc.data();
+          const currentCount = Number(prodData?.reviews_count) || 0;
+          const currentRating = Number(prodData?.rating) || 5;
+          const newCount = currentCount + 1;
+          const newAvgRating = Number(((currentRating * currentCount + numRating) / newCount).toFixed(1));
+          await prodRef.update({
+            reviews_count: newCount,
+            rating: newAvgRating
+          });
+        }
+      } catch (fErr) {
+        console.warn("Firestore review save error:", fErr);
+      }
+    }
+
+    // Update in-memory productsStore
+    const pIndex = productsStore.findIndex(p => String(p.id) === prodId);
+    if (pIndex !== -1) {
+      const p = productsStore[pIndex];
+      const currentCount = Number(p.reviews_count) || 0;
+      const currentRating = Number(p.rating) || 5;
+      const newCount = currentCount + 1;
+      p.reviews_count = newCount;
+      p.rating = Number(((currentRating * currentCount + numRating) / newCount).toFixed(1));
+    }
+
+    reviewsStore.push(savedReview);
+    res.status(201).json(savedReview);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Cart Endpoints
@@ -1547,7 +1626,7 @@ app.all(["/api/reset-store-data", "/api/reset-store-data/"], async (_req, res, n
 
     if (isFirebaseAdminInitialized) {
       try {
-        const collectionsToClear = ['orders', 'products', 'categories'];
+        const collectionsToClear = ['orders', 'products', 'categories', 'reviews'];
         for (const colName of collectionsToClear) {
           const ref = admin.firestore().collection(colName);
           const snapshot = await ref.get();
