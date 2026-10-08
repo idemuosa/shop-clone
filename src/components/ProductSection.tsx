@@ -176,32 +176,44 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
     return () => unsubscribe();
   }, [user, checkoutStep]);
 
+  const fetchReviews = async () => {
+    if (!selectedProduct) return;
+    try {
+      const response = await fetch(`${API_URL}/api/reviews/?product_id=${selectedProduct.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        const mappedReviews = data.map((r: any) => ({
+          id: r.id,
+          userName: r.user_name || "Customer",
+          rating: Number(r.rating) || 5,
+          comment: r.comment,
+          createdAt: { toDate: () => new Date(r.created_at) }
+        }));
+        setReviews(mappedReviews);
+
+        if (mappedReviews.length > 0) {
+          const sumRating = mappedReviews.reduce((acc: number, r: any) => acc + (Number(r.rating) || 5), 0);
+          const avgRating = parseFloat((sumRating / mappedReviews.length).toFixed(1));
+          setInternalSelectedProduct((prev: Product | null) => prev ? {
+            ...prev,
+            reviews: mappedReviews.length,
+            rating: avgRating
+          } : null);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    }
+  };
+
   useEffect(() => {
     if (!selectedProduct) {
       setReviews([]);
       return;
     }
 
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/reviews/?product_id=${selectedProduct.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setReviews(data.map((r: any) => ({
-            id: r.id,
-            userName: r.user_name,
-            rating: r.rating,
-            comment: r.comment,
-            createdAt: { toDate: () => new Date(r.created_at) }
-          })));
-        }
-      } catch (error) {
-        console.error("Failed to fetch reviews:", error);
-      }
-    };
-
     fetchReviews();
-  }, [selectedProduct]);
+  }, [selectedProduct?.id]);
 
   const handleSubmitReview = async () => {
     if (!user) {
@@ -217,6 +229,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
     setIsSubmittingReview(true);
     try {
       const token = await user.getIdToken();
+      const reviewerName = profile?.displayName || (profile as any)?.display_name || user?.displayName || user?.email?.split('@')[0] || 'Customer';
+
       const response = await fetch(`${API_URL}/api/reviews/`, {
         method: 'POST',
         headers: {
@@ -227,18 +241,25 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
           product: selectedProduct!.id,
           rating: newReviewRating,
           comment: newReviewComment,
+          user_name: reviewerName,
         }),
       });
 
       if (response.ok) {
+        const resData = await response.json();
         setNewReviewComment("");
         setNewReviewRating(5);
         toast.success("Review submitted!");
-        // Trigger a re-fetch of reviews by resetting state or just calling fetchReviews again
-        // Here we just reload the selected product to trigger the useEffect
-        const temp = selectedProduct;
-        setInternalSelectedProduct(null);
-        setTimeout(() => setInternalSelectedProduct(temp), 10);
+
+        if (resData.product_reviews_count !== undefined) {
+          setInternalSelectedProduct((prev: Product | null) => prev ? {
+            ...prev,
+            reviews: resData.product_reviews_count,
+            rating: resData.product_rating
+          } : null);
+        }
+
+        await fetchReviews();
       } else {
         toast.error("Failed to submit review.");
       }
@@ -950,7 +971,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         </TabsTrigger>
                       </TabsList>
 
-                      <TabsContent value="overview" className="flex-1 flex flex-col mt-0 focus-visible:outline-none">
+                      <TabsContent value="overview" className="flex-1 flex flex-col mt-0 focus-visible:outline-none min-h-0">
                         <ScrollArea className="flex-1 pr-2 -mr-2 sm:pr-3 sm:-mr-3 max-h-[45vh] sm:max-h-[380px]">
                           <DialogHeader className="mb-2 sm:mb-3 text-left">
                             <div className="flex items-center gap-1.5 mb-1">
@@ -1038,7 +1059,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         </ScrollArea>
                       </TabsContent>
 
-                      <TabsContent value="reviews" className="flex-1 flex flex-col mt-0 focus-visible:outline-none overflow-hidden">
+                      <TabsContent value="reviews" className="flex-1 flex flex-col mt-0 focus-visible:outline-none min-h-0">
                         <ScrollArea className="flex-1 pr-2 -mr-2 sm:pr-4 sm:-mr-4 max-h-[45vh] sm:max-h-[380px]">
                           <div className="space-y-4 sm:space-y-8 pb-4">
                             <div className="bg-gradient-to-br from-green-50 to-white p-3.5 sm:p-8 rounded-2xl sm:rounded-[32px] border-2 border-green-100 shadow-sm">

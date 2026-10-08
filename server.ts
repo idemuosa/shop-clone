@@ -1386,27 +1386,123 @@ app.delete(["/products", "/products/", "/api/products", "/api/products/"], async
 });
 
 // Reviews Endpoints
-app.get(["/api/reviews", "/api/reviews/"], (req, res) => {
-  const productId = req.query.product_id ? Number(req.query.product_id) : null;
-  if (productId) {
-    const filtered = reviewsStore.filter(r => r.product === productId);
-    return res.json(filtered);
+app.get(["/api/reviews", "/api/reviews/"], async (req, res, next) => {
+  try {
+    const productId = req.query.product_id ? Number(req.query.product_id) : null;
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        let queryRef: admin.firestore.Query = admin.firestore().collection('reviews');
+        if (productId) {
+          queryRef = queryRef.where('product', '==', productId);
+        }
+        const snapshot = await queryRef.get();
+        if (!snapshot.empty) {
+          const fsReviews = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              ...data,
+              product: Number(data.product)
+            };
+          });
+          return res.json(fsReviews);
+        }
+      } catch (fErr) {
+        console.warn("Firestore fetch reviews error:", fErr);
+      }
+    }
+
+    if (productId) {
+      const filtered = reviewsStore.filter(r => Number(r.product) === productId);
+      return res.json(filtered);
+    }
+    res.json(reviewsStore);
+  } catch (err) {
+    next(err);
   }
-  res.json(reviewsStore);
 });
 
-app.post(["/api/reviews", "/api/reviews/"], (req, res) => {
-  const { product, rating, comment } = req.body;
-  const newReview = {
-    id: reviewsStore.length + 1,
-    product: Number(product),
-    rating: Number(rating) || 5,
-    comment: comment || "",
-    user_name: "Customer",
-    created_at: new Date().toISOString()
-  };
-  reviewsStore.push(newReview);
-  res.status(201).json(newReview);
+app.post(["/api/reviews", "/api/reviews/"], async (req, res, next) => {
+  try {
+    const { product, rating, comment, user_name } = req.body;
+    const productId = Number(product);
+    const numericRating = Math.min(5, Math.max(1, Number(rating) || 5));
+    const reviewerName = user_name || "Customer";
+    const createdAtIso = new Date().toISOString();
+
+    const newReview: any = {
+      id: reviewsStore.length + 1,
+      product: productId,
+      rating: numericRating,
+      comment: comment || "",
+      user_name: reviewerName,
+      created_at: createdAtIso
+    };
+
+    reviewsStore.push(newReview);
+
+    if (isFirebaseAdminInitialized) {
+      try {
+        const reviewRef = await admin.firestore().collection('reviews').add({
+          product: productId,
+          rating: numericRating,
+          comment: comment || "",
+          user_name: reviewerName,
+          created_at: createdAtIso
+        });
+        newReview.id = reviewRef.id;
+      } catch (fErr) {
+        console.warn("Firestore add review error:", fErr);
+      }
+    }
+
+    // Calculate updated reviews count and rating for the product
+    let allProductReviews: any[] = [];
+    if (isFirebaseAdminInitialized) {
+      try {
+        const snap = await admin.firestore().collection('reviews').where('product', '==', productId).get();
+        if (!snap.empty) {
+          allProductReviews = snap.docs.map(doc => doc.data());
+        }
+      } catch (e) {
+        allProductReviews = reviewsStore.filter(r => Number(r.product) === productId);
+      }
+    } else {
+      allProductReviews = reviewsStore.filter(r => Number(r.product) === productId);
+    }
+
+    const reviewsCount = allProductReviews.length;
+    const totalRatingSum = allProductReviews.reduce((sum, r) => sum + (Number(r.rating) || 5), 0);
+    const avgRating = reviewsCount > 0 ? parseFloat((totalRatingSum / reviewsCount).toFixed(1)) : 5.0;
+
+    // Update in-memory product store
+    const prodIndex = productsStore.findIndex(p => Number(p.id) === productId);
+    if (prodIndex !== -1) {
+      productsStore[prodIndex].reviews_count = reviewsCount;
+      productsStore[prodIndex].rating = avgRating;
+    }
+
+    // Update Firestore product
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection('products').doc(String(productId)).set({
+          reviews_count: reviewsCount,
+          rating: avgRating
+        }, { merge: true });
+      } catch (fErr) {
+        console.warn("Firestore product review stats update error:", fErr);
+      }
+    }
+
+    res.status(201).json({
+      ...newReview,
+      product_reviews_count: reviewsCount,
+      product_rating: avgRating
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Cart Endpoints
