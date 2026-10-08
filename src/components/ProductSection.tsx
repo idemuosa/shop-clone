@@ -882,57 +882,51 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             }
           }}
         >
-          <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl border-none">
+          <DialogContent className="max-w-3xl p-0 overflow-hidden rounded-3xl border-none max-h-[90vh] flex flex-col">
             {selectedProduct && (
-              <div className="flex flex-col md:flex-row min-h-[500px]">
+              <div className="flex flex-col md:flex-row overflow-y-auto max-h-[90vh]">
                 {isDetailLoading ? (
                   <div className="flex flex-col md:flex-row w-full animate-pulse">
-                    <div className="md:w-2/5 bg-gray-200" />
-                    <div className="md:w-3/5 p-8 space-y-6">
+                    <div className="h-48 md:h-auto md:w-1/3 bg-gray-200" />
+                    <div className="md:w-2/3 p-6 space-y-4">
                       <div className="flex gap-2">
-                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
-                        <div className="h-6 w-20 bg-gray-200 rounded-full" />
+                        <div className="h-5 w-16 bg-gray-200 rounded-full" />
+                        <div className="h-5 w-16 bg-gray-200 rounded-full" />
                       </div>
-                      <div className="h-10 w-3/4 bg-gray-200 rounded-xl" />
+                      <div className="h-8 w-3/4 bg-gray-200 rounded-xl" />
                       <div className="h-4 w-1/2 bg-gray-200 rounded-lg" />
-                      <div className="h-12 w-1/3 bg-gray-200 rounded-xl mt-8" />
-                      <div className="space-y-3 mt-10">
+                      <div className="h-10 w-1/3 bg-gray-200 rounded-xl mt-4" />
+                      <div className="space-y-2 mt-6">
                         <div className="h-3 w-full bg-gray-100 rounded" />
                         <div className="h-3 w-full bg-gray-100 rounded" />
-                        <div className="h-3 w-2/3 bg-gray-100 rounded" />
-                      </div>
-                      <div className="flex gap-4 mt-auto pt-10">
-                        <div className="h-14 flex-1 bg-gray-200 rounded-2xl" />
-                        <div className="h-14 flex-1 bg-gray-200 rounded-2xl" />
                       </div>
                     </div>
                   </div>
                 ) : (
   <>
-                    <div className="md:w-2/5 bg-gray-50 relative">
+                    <div className="h-48 sm:h-56 md:h-auto md:w-1/3 bg-gray-50 relative flex-shrink-0 flex items-center justify-center p-2">
                       <Button
                         variant="ghost"
-                        size="icon"
                         onClick={() => {
                           setSelectedProduct(null);
                           setCheckoutStep('details');
                         }}
-                        className="absolute top-3 left-3 z-30 rounded-full bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 shadow-sm h-8 w-8"
+                        className="absolute top-3 left-3 z-30 rounded-full bg-white text-gray-900 shadow-md border border-gray-200 hover:bg-orange-50 hover:text-orange-600 h-9 px-2.5 flex items-center gap-1 font-bold text-xs"
                         title="Back to Products"
                       >
                         <ChevronLeft className="h-4 w-4" />
+                        <span>Back</span>
                       </Button>
                       <img
                         src={getOptimizedImageUrl(selectedProduct.image, 800)}
                         alt={selectedProduct.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain max-h-48 sm:max-h-56 md:max-h-80 rounded-2xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
-                    <div className="md:w-3/5 p-4 md:p-5 flex flex-col">
+                    <div className="md:w-2/3 p-4 md:p-5 flex flex-col flex-1">
                   {checkoutStep === 'details' ? (
                     <Tabs defaultValue="overview" className="flex flex-col h-full">
                       <TabsList className="grid w-full grid-cols-2 mb-3 bg-gray-100/50 rounded-xl p-1">
