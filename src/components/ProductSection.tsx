@@ -722,7 +722,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-transparent hover:border-orange-200"
                   onClick={() => setSelectedProduct(product)}
                 >
-                  <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
+                  <div className="relative aspect-square bg-gray-50 p-2 flex items-center justify-center overflow-hidden">
                     {product.tag && (
                       <div className="absolute top-0 left-0 bg-orange-600 text-white text-[11px] font-black px-2 py-1 rounded-br-lg z-10 flex items-center gap-1">
                         <Zap className="h-3 w-3 fill-white" />
@@ -785,7 +785,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     <img 
                       src={getOptimizedImageUrl(product.image, 400)}
                       alt={product.name} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500 ease-out"
                       loading="lazy"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
@@ -882,12 +882,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             }
           }}
         >
-          <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-2xl sm:rounded-3xl p-0 border-none">
+          <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[90vh] overflow-y-auto overflow-x-hidden rounded-2xl sm:rounded-3xl p-0 border-none">
             {selectedProduct && (
-              <div className="flex flex-col md:flex-row min-h-[480px]">
+              <div className="flex flex-col md:flex-row min-h-[400px] max-w-full overflow-x-hidden">
                 {isDetailLoading ? (
                   <div className="flex flex-col md:flex-row w-full animate-pulse">
-                    <div className="h-56 sm:h-64 md:h-auto md:w-2/5 bg-gray-200 shrink-0" />
+                    <div className="h-36 sm:h-48 md:h-auto md:w-2/5 bg-gray-200 shrink-0" />
                     <div className="md:w-3/5 p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
                       <div className="flex gap-2">
                         <div className="h-5 w-16 bg-gray-200 rounded-full" />
@@ -909,7 +909,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                   </div>
                 ) : (
   <>
-                    <div className="h-52 sm:h-64 md:h-auto md:w-2/5 bg-gray-50 relative shrink-0">
+                    <div className="h-40 sm:h-52 md:h-auto md:w-2/5 bg-gray-50 relative shrink-0 flex items-center justify-center p-2">
                       <Button
                         variant="ghost"
                         onClick={() => {
@@ -925,7 +925,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <img
                         src={getOptimizedImageUrl(selectedProduct.image, 800)}
                         alt={selectedProduct.name}
-                        className="w-full h-full object-contain max-h-48 sm:max-h-56 md:max-h-80 rounded-2xl"
+                        className="w-full h-full object-contain max-h-36 sm:max-h-48 md:max-h-80 rounded-xl"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                         }}
