@@ -45,6 +45,7 @@ import { useCart } from "@/lib/CartContext";
 import { useCurrency } from "@/lib/CurrencyContext";
 import { API_URL } from "@/lib/api";
 import { cn, getOptimizedImageUrl } from "@/lib/utils";
+import { StarRating } from "@/components/ui/star-rating";
 
 interface Product {
   id: string | number;
@@ -940,9 +941,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                             <DialogTitle className="text-3xl font-black leading-tight mb-2">{selectedProduct.name}</DialogTitle>
                             <div className="flex items-center gap-4">
                               <div className="flex items-center gap-1">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star key={i} className={`h-4 w-4 ${i < Math.floor(selectedProduct.rating) ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
-                                ))}
+                                <StarRating value={selectedProduct.rating} readOnly size="sm" />
                                 <span className="text-sm font-bold ml-1">{selectedProduct.rating}</span>
                               </div>
                               <span className="text-sm text-gray-400 font-medium">{selectedProduct.reviews} Verified Reviews</span>
@@ -1034,17 +1033,12 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                               <div className="space-y-6">
                                 <div className="space-y-3">
                                   <Label className="text-[10px] font-black  tracking-widest text-gray-400">How would you rate it?</Label>
-                                  <div className="flex gap-2">
-                                    {[1, 2, 3, 4, 5].map((star) => (
-                                      <button
-                                        key={star}
-                                        onClick={() => setNewReviewRating(star)}
-                                        className="transition-all active:scale-75 hover:scale-110"
-                                      >
-                                        <Star className={`h-10 w-10 ${star <= newReviewRating ? "fill-orange-500 text-orange-500" : "text-gray-200"}`} />
-                                      </button>
-                                    ))}
-                                  </div>
+                                  <StarRating
+                                    value={newReviewRating}
+                                    onChange={setNewReviewRating}
+                                    size="xl"
+                                    showLabel
+                                  />
                                 </div>
                                 <div className="space-y-2">
                                   <Label className="text-[10px] font-black  tracking-widest text-gray-400">Share your experience</Label>
@@ -1088,10 +1082,8 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                                                 <BadgeCheck className="h-3 w-3" /> VERIFIED BUYER
                                               </Badge>
                                             </div>
-                                            <div className="flex gap-0.5 mt-1">
-                                              {[...Array(5)].map((_, i) => (
-                                                <Star key={i} className={`h-3 w-3 ${i < review.rating ? "fill-orange-500 text-orange-500" : "text-gray-100"}`} />
-                                              ))}
+                                            <div className="mt-1">
+                                              <StarRating value={review.rating} readOnly size="sm" />
                                             </div>
                                           </div>
                                         </div>
