@@ -22,7 +22,8 @@ import {
   LayoutDashboard,
   Fingerprint,
   Star,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import {
   isFingerprintSupported,
@@ -264,8 +265,32 @@ export default function UserProfilePage({ onClose, onSwitchToAdmin }: UserProfil
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] pb-20">
+      {/* Top Navigation Bar */}
+      <div className="bg-white border-b border-gray-100 py-3 px-4 sm:px-6 lg:px-8 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Button
+            variant="ghost"
+            onClick={onClose}
+            className="flex items-center gap-1.5 text-xs font-black text-gray-700 hover:text-orange-600 rounded-xl px-3 h-9"
+            title="Back to Store"
+          >
+            <ChevronLeft className="h-5 w-5" /> Back
+          </Button>
+          <span className="text-xs font-black uppercase text-gray-400 tracking-wider">User Profile</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full hover:bg-gray-100 h-9 w-9 text-gray-700 hover:text-orange-600"
+            title="Close Profile"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+
       {/* Header Profile Info */}
-      <div className="bg-white border-b border-gray-100 pt-10 pb-16">
+      <div className="bg-white border-b border-gray-100 pt-6 pb-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="relative group cursor-pointer" onClick={() => setActiveTab('details')}>

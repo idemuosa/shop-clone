@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   ChevronLeft,
+  X,
   Zap,
   Headset,
   Clock,
@@ -409,6 +410,7 @@ export default function InfoPage({
               variant="ghost"
               onClick={onBack}
               className="hover:bg-gray-50 rounded-full font-bold uppercase tracking-widest text-[8px] text-gray-500 hover:text-orange-600 flex items-center gap-1 h-6 px-2"
+              title="Back to Shop"
             >
               <ChevronLeft className="h-3 w-3" /> Back to Shop
             </Button>
@@ -417,10 +419,19 @@ export default function InfoPage({
               <Layers className="h-3 w-3 text-orange-600" /> Catalog Pages
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <span className="text-[8.5px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100 uppercase tracking-tight">
               {activePage}
             </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="rounded-full hover:bg-gray-100 h-6 w-6 text-gray-500 hover:text-orange-600"
+              title="Close Page"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
           </div>
         </div>
 

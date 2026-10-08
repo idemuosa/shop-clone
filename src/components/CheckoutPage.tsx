@@ -20,7 +20,8 @@ import {
   Package,
   ShieldAlert,
   Zap,
-  Phone
+  Phone,
+  X
 } from 'lucide-react';
 import { useCart } from '@/lib/CartContext';
 import { useAuth } from '@/lib/AuthContext';
@@ -250,7 +251,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                 <div className="bg-white p-4 md:p-6 rounded-2xl md:rounded-3xl shadow-sm border border-gray-100">
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <div className="flex items-center gap-2 md:gap-3">
-                      <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100 h-8 w-8">
+                      <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100 h-8 w-8 text-gray-700 hover:text-orange-600" title="Back">
                         <ChevronLeft className="h-4 w-4 md:h-5 md:w-5" />
                       </Button>
                       <div>
@@ -258,14 +259,19 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                         <p className="text-[8px] md:text-[10px] font-bold text-gray-400 tracking-widest mt-0.5 uppercase">Secure Payment</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 md:gap-2">
-                       <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center font-black text-[10px] ${step === 'address' ? 'bg-orange-600 text-white' : 'bg-green-100 text-green-700'}`}>
-                          {step === 'address' ? '1' : <CheckCircle2 className="h-3 w-3" />}
-                       </div>
-                       <div className="w-4 md:w-6 h-1 bg-gray-100 rounded-full"></div>
-                       <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center font-black text-[10px] ${step === 'payment' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                          2
-                       </div>
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div className="flex items-center gap-1.5 md:gap-2">
+                         <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center font-black text-[10px] ${step === 'address' ? 'bg-orange-600 text-white' : 'bg-green-100 text-green-700'}`}>
+                            {step === 'address' ? '1' : <CheckCircle2 className="h-3 w-3" />}
+                         </div>
+                         <div className="w-4 md:w-6 h-1 bg-gray-100 rounded-full"></div>
+                         <div className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center font-black text-[10px] ${step === 'payment' ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                            2
+                         </div>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full hover:bg-gray-100 h-8 w-8 text-gray-700 hover:text-orange-600" title="Close Checkout">
+                        <X className="h-4 w-4 md:h-5 md:w-5" />
+                      </Button>
                     </div>
                   </div>
 
