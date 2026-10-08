@@ -1197,16 +1197,18 @@ export default function AdminDashboard() {
                     </div>
                   )}
 
-                  {orders.slice(0, 5).map((o) => (
-                    <div key={o.id} className="flex items-center gap-4">
-                      <div className="bg-green-100 p-2 rounded-lg">
-                        <ShoppingCart className="h-4 w-4 text-orange-600" />
+                  {notifications.slice(0, 5).map((n) => (
+                    <div key={n.id} className="flex items-center gap-3 p-2 bg-orange-50/50 rounded-xl border border-orange-100/50">
+                      <div className="bg-orange-100 p-2 rounded-lg shrink-0">
+                        <Zap className="h-4 w-4 text-orange-600" />
                       </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-bold truncate">{o.customerEmail}</p>
-                        <p className="text-[10px] text-gray-500  font-black">Placed order #{o.id.slice(-4).toUpperCase()}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-black text-orange-900 truncate">{n.name || n.email || 'Customer'}</p>
+                        <p className="text-[10px] text-orange-700 font-bold truncate">{n.message || `${n.type} received`}</p>
                       </div>
-                      <p className="font-black text-sm text-orange-600">{formatPrice(o.totalAmount)}</p>
+                      <span className="text-[9px] font-black text-orange-500 shrink-0">
+                        {n.createdAt?.toDate ? n.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
+                      </span>
                     </div>
                   ))}
                   <Button variant="ghost" className="w-full text-orange-600 font-bold  tracking-tighter text-xs h-10 hover:bg-green-50" onClick={() => setActiveTab('orders')}>

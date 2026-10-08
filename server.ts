@@ -552,10 +552,25 @@ app.post("/api/paystack/verify", async (req, res, next) => {
 
     const data = await response.json();
     if (data.status && data.data?.status === "success") {
+      const email = data.data?.customer?.email || '';
+      const amount = data.data?.amount ? data.data.amount / 100 : 0;
       io.emit("new_activity", {
-        message: `Payment verified for transaction ${reference}`,
+        message: `Payment verified for transaction ${reference} (₦${amount} by ${email})`,
         type: "payment"
       });
+
+      if (isFirebaseAdminInitialized) {
+        try {
+          await admin.firestore().collection("notifications").add({
+            type: "payment_success",
+            email: email,
+            message: `Payment of ₦${amount} confirmed for reference ${reference}`,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (fErr) {
+          console.warn("Firestore payment notification save error:", fErr);
+        }
+      }
     }
     res.json(data);
   } catch (error: any) {
@@ -582,6 +597,17 @@ app.post("/api/paystack/webhook", async (req, res, next) => {
 
         if (!snapshot.empty) {
           await snapshot.docs[0].ref.update({ status: 'paid' });
+        }
+
+        try {
+          await admin.firestore().collection("notifications").add({
+            type: "payment_webhook",
+            email: customer?.email || '',
+            message: `Payment of ₦${amount / 100} received via Paystack (Ref: ${reference})`,
+            createdAt: admin.firestore.FieldValue.serverTimestamp()
+          });
+        } catch (fErr) {
+          console.warn("Firestore webhook notification save error:", fErr);
         }
       }
     }
@@ -957,17 +983,39 @@ app.post("/api/send-welcome", async (req, res, next) => {
 
 app.post("/api/send-order-confirmation", async (req, res, next) => {
   try {
-    const { email, phone, orderId, orderNumber, productName, totalAmount, shippingAddress, name, items, paymentMethod } = req.body || {};
+    const { email, phone, orderId, orderNumber, productName, totalAmount, shippingAddress, name, items, paymentMethod, userId } = req.body || {};
     const resendClient = getResend();
 
     const orderRef = orderNumber || (orderId || '').slice(-8).toUpperCase() || 'NEW';
     const displayTotal = typeof totalAmount === 'number' ? totalAmount.toFixed(2) : (totalAmount || '0.00');
+    const paymentMethodText = typeof paymentMethod === 'string' ? paymentMethod : (paymentMethod?.type || 'Online Payment');
 
     // Broadcast real-time order activity via Socket.IO
     io.emit("new_activity", {
-      message: `New Order #${orderRef} (${name || 'Customer'} - ${phone || 'N/A'}): ₦${displayTotal}`,
+      message: `New Order #${orderRef} placed by ${name || 'Customer'} (₦${displayTotal} via ${paymentMethodText.toUpperCase()})`,
       type: "order"
     });
+
+    // Save notification doc in Firestore
+    if (isFirebaseAdminInitialized) {
+      try {
+        await admin.firestore().collection("notifications").add({
+          type: "order_placed",
+          orderId: orderRef,
+          orderNumber: orderRef,
+          userId: userId || null,
+          email: email || '',
+          name: name || 'Customer',
+          phone: phone || '',
+          amount: displayTotal,
+          paymentMethod: paymentMethodText,
+          message: `Order #${orderRef} confirmed! Total: ₦${displayTotal} (${paymentMethodText.toUpperCase()})`,
+          createdAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } catch (fErr) {
+        console.warn("Firestore order notification creation error:", fErr);
+      }
+    }
 
     if (resendClient && email) {
       try {
