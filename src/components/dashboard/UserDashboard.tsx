@@ -17,7 +17,8 @@ import {
   Clock,
   Smartphone,
   Wallet,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -137,12 +138,11 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
-                size="icon"
                 onClick={onBrowseMore}
-                className="rounded-full hover:bg-gray-100 h-9 w-9 shrink-0"
+                className="flex items-center gap-1.5 text-xs font-black text-gray-700 hover:text-orange-600 rounded-xl px-3 h-9"
                 title="Back to Market"
               >
-                <ChevronLeft className="h-5 w-5 text-gray-700" />
+                <ChevronLeft className="h-5 w-5" /> Back
               </Button>
               <div>
                 <h1 className="text-2xl md:text-3xl font-black tracking-tighter italic leading-none mb-1">
@@ -168,6 +168,15 @@ export default function UserDashboard({ onBrowseMore }: UserDashboardProps) {
               </div>
               <Button onClick={onBrowseMore} className="bg-black hover:bg-zinc-800 text-white rounded-xl font-black uppercase tracking-widest text-[10px] h-10 md:h-12 px-5 md:px-7 shadow-xl shadow-zinc-100 transition-all active:scale-95">
                 Market
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBrowseMore}
+                className="rounded-full hover:bg-gray-100 h-9 w-9 text-gray-700 hover:text-orange-600 shrink-0"
+                title="Close Dashboard"
+              >
+                <X className="h-5 w-5" />
               </Button>
             </div>
           </div>

@@ -68,7 +68,8 @@ import {
   Image as ImageIcon,
   Fingerprint,
   Phone,
-  ChevronLeft
+  ChevronLeft,
+  X
 } from 'lucide-react';
 import { isFingerprintSupported, registerFingerprintCredential } from '@/lib/fingerprintAuth';
 import { useCurrency } from '@/lib/CurrencyContext';
@@ -937,25 +938,40 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
   return (
     <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
       <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-2 mb-4 md:mb-6">
+        <div className="flex items-center justify-between gap-2 mb-4 md:mb-6 bg-white p-3 rounded-2xl shadow-xs border border-gray-100">
+          <div className="flex items-center gap-2">
+            {onBack && (
+              <Button
+                variant="ghost"
+                onClick={onBack}
+                className="flex items-center gap-1.5 text-xs font-black text-gray-700 hover:text-orange-600 rounded-xl px-3 h-9"
+                title="Back to Shop"
+              >
+                <ChevronLeft className="h-5 w-5" /> Back
+              </Button>
+            )}
+            <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200">
+              <Zap className="h-6 w-6 text-white fill-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
+              <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5">Inventory & Orders</p>
+            </div>
+          </div>
           {onBack && (
             <Button
               variant="ghost"
               size="icon"
               onClick={onBack}
-              className="rounded-full hover:bg-gray-200 h-9 w-9 shrink-0 mr-1"
-              title="Back to Shop"
+              className="rounded-full hover:bg-gray-100 h-9 w-9 text-gray-700 hover:text-orange-600 shrink-0"
+              title="Close Admin Panel"
             >
-              <ChevronLeft className="h-5 w-5 text-gray-700" />
+              <X className="h-5 w-5" />
             </Button>
           )}
-          <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200">
-            <Zap className="h-6 w-6 text-white fill-white" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
-            <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5">Inventory & Orders</p>
-          </div>
+        </div>
+
+        <div className="flex items-center gap-2 mb-4 md:mb-6">
           <div className="flex gap-1.5">
             <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
               <DialogTrigger
