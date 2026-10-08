@@ -908,8 +908,20 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                     </div>
                   </div>
                 ) : (
-                  <>
+  <>
                     <div className="md:w-2/5 bg-gray-50 relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          setSelectedProduct(null);
+                          setCheckoutStep('details');
+                        }}
+                        className="absolute top-3 left-3 z-30 rounded-full bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 shadow-sm h-8 w-8"
+                        title="Back to Products"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
                       <img
                         src={getOptimizedImageUrl(selectedProduct.image, 800)}
                         alt={selectedProduct.name}
@@ -920,19 +932,19 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                     </div>
-                    <div className="md:w-3/5 p-8 flex flex-col">
+                    <div className="md:w-3/5 p-4 md:p-5 flex flex-col">
                   {checkoutStep === 'details' ? (
                     <Tabs defaultValue="overview" className="flex flex-col h-full">
-                      <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100/50 rounded-2xl p-1">
+                      <TabsList className="grid w-full grid-cols-2 mb-3 bg-gray-100/50 rounded-xl p-1">
                         <TabsTrigger 
                           value="overview" 
-                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all"
+                          className="rounded-lg font-black text-[9px] tracking-wider data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-2xs transition-all h-7"
                         >
                           Overview
                         </TabsTrigger>
                         <TabsTrigger 
                           value="reviews" 
-                          className="rounded-xl font-black text-[10px]  tracking-[0.2em] data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5"
+                          className="rounded-lg font-black text-[9px] tracking-wider data-[state=active]:bg-white data-[state=active]:text-orange-600 data-[state=active]:shadow-2xs transition-all flex items-center gap-1 h-7"
                         >
                           <Sparkles className="h-3 w-3" />
                           Reviews ({selectedProduct.reviews})
@@ -940,85 +952,85 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       </TabsList>
 
                       <TabsContent value="overview" className="flex-1 flex flex-col mt-0 focus-visible:outline-none">
-                        <ScrollArea className="flex-1 pr-4 -mr-4">
-                          <DialogHeader className="mb-6">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge className="bg-orange-600 text-white border-none">{selectedProduct.category}</Badge>
-                              {selectedProduct.tag && <Badge variant="outline" className="border-orange-600 text-orange-600">{selectedProduct.tag} OFF</Badge>}
+                        <ScrollArea className="flex-1 pr-3 -mr-3 max-h-[380px]">
+                          <DialogHeader className="mb-3 text-left">
+                            <div className="flex items-center gap-1.5 mb-1.5">
+                              <Badge className="bg-orange-600 text-white border-none text-[8px] px-2 py-0.5">{selectedProduct.category}</Badge>
+                              {selectedProduct.tag && <Badge variant="outline" className="border-orange-600 text-orange-600 text-[8px] px-2 py-0.5">{selectedProduct.tag} OFF</Badge>}
                             </div>
-                            <DialogTitle className="text-3xl font-black leading-tight mb-2">{selectedProduct.name}</DialogTitle>
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1">
+                            <DialogTitle className="text-base md:text-lg font-black leading-snug mb-1">{selectedProduct.name}</DialogTitle>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-0.5">
                                 <StarRating value={selectedProduct.rating} readOnly size="sm" />
-                                <span className="text-sm font-bold ml-1">{selectedProduct.rating}</span>
+                                <span className="text-xs font-bold ml-1">{selectedProduct.rating}</span>
                               </div>
-                              <span className="text-sm text-gray-400 font-medium">{selectedProduct.reviews} Verified Reviews</span>
+                              <span className="text-xs text-gray-400 font-medium">{selectedProduct.reviews} Verified Reviews</span>
                             </div>
                           </DialogHeader>
                           
-                          <div className="flex items-baseline gap-3 mb-8">
-                            <span className="text-5xl font-black text-orange-600">{formatPrice(selectedProduct.price)}</span>
+                          <div className="flex items-baseline gap-2 mb-3">
+                            <span className="text-2xl md:text-3xl font-black text-orange-600">{formatPrice(selectedProduct.price)}</span>
                             {selectedProduct.oldPrice && (
-                              <span className="text-xl text-gray-400 line-through font-medium">{formatPrice(selectedProduct.oldPrice)}</span>
+                              <span className="text-sm text-gray-400 line-through font-medium">{formatPrice(selectedProduct.oldPrice)}</span>
                             )}
                           </div>
 
-                          <DialogDescription className="text-gray-600 mb-6 leading-relaxed font-medium text-base">
+                          <DialogDescription className="text-gray-600 mb-4 leading-relaxed font-medium text-xs">
                             {selectedProduct.description || `Experience premium quality with our ${selectedProduct.name}. This top-rated product from our ${selectedProduct.category} collection is designed for performance and style. Limited stock available at this flash sale price!`}
                           </DialogDescription>
 
                           {selectedProduct.prescription && (
-                            <div className="bg-blue-50 border-2 border-blue-100 p-6 rounded-[32px] mb-8 relative overflow-hidden group">
+                            <div className="bg-blue-50 border border-blue-100 p-3 rounded-2xl mb-4 relative overflow-hidden group">
                                <div className="relative z-10">
-                                  <div className="flex items-center gap-2 mb-3">
-                                     <div className="bg-blue-600 p-1.5 rounded-lg text-white">
-                                        <AlertCircle className="h-4 w-4" />
+                                  <div className="flex items-center gap-1.5 mb-1.5">
+                                     <div className="bg-blue-600 p-1 rounded text-white">
+                                        <AlertCircle className="h-3 w-3" />
                                      </div>
-                                     <h4 className="text-sm font-black  tracking-tighter text-blue-900 italic">Special <span className="text-blue-600">Instructions</span></h4>
+                                     <h4 className="text-xs font-black tracking-tight text-blue-900 italic">Special <span className="text-blue-600">Instructions</span></h4>
                                   </div>
-                                  <p className="text-xs font-bold text-blue-800 leading-relaxed whitespace-pre-wrap">
+                                  <p className="text-[10px] font-bold text-blue-800 leading-relaxed whitespace-pre-wrap">
                                      {selectedProduct.prescription}
                                   </p>
                                </div>
-                               <FileText className="absolute right-[-10px] top-[-10px] h-24 w-24 text-blue-600/5 rotate-12 transition-transform group-hover:scale-110" />
+                               <FileText className="absolute right-[-10px] top-[-10px] h-16 w-16 text-blue-600/5 rotate-12 transition-transform group-hover:scale-110" />
                             </div>
                           )}
 
-                          <div className="grid grid-cols-2 gap-4 mb-8">
-                            <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                              <p className="text-[10px] font-black text-gray-400  tracking-widest mb-1 flex items-center gap-2">
+                          <div className="grid grid-cols-2 gap-2 mb-4">
+                            <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                              <p className="text-[9px] font-black text-gray-400 tracking-wider mb-0.5 flex items-center gap-1">
                                 <ShieldCheck className="h-3 w-3 text-green-500" /> Vivi Assurance
                               </p>
-                              <p className="text-xs font-bold">100% Original Guaranteed</p>
+                              <p className="text-[10px] font-bold">100% Original Guaranteed</p>
                             </div>
-                            <div className="bg-gray-50 p-4 rounded-3xl border border-gray-100">
-                              <p className="text-[10px] font-black text-gray-400  tracking-widest mb-1 flex items-center gap-2">
+                            <div className="bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                              <p className="text-[9px] font-black text-gray-400 tracking-wider mb-0.5 flex items-center gap-1">
                                 <Clock className="h-3 w-3 text-orange-500" /> Shopsy Express
                               </p>
-                              <p className="text-xs font-bold">Delivery by tomorrow</p>
+                              <p className="text-[10px] font-bold">Delivery by tomorrow</p>
                             </div>
                           </div>
 
-                          <div className="space-y-6 mb-8">
-                            <div className="bg-white p-6 rounded-3xl border-2 border-gray-100">
-                              <h4 className="text-sm font-black  tracking-[0.2em] mb-4 flex items-center gap-2">
-                                <Info className="h-4 w-4 text-orange-600" /> Apple Style Specs
+                          <div className="space-y-3 mb-4">
+                            <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-2xs">
+                              <h4 className="text-xs font-black tracking-wider mb-2 flex items-center gap-1.5">
+                                <Info className="h-3.5 w-3.5 text-orange-600" /> Apple Style Specs
                               </h4>
-                              <div className="space-y-3">
-                                <div className="flex justify-between items-center py-2 border-b border-gray-50 text-[11px]">
-                                  <span className="text-gray-400 font-bold  tracking-tight">Dimensions</span>
+                              <div className="space-y-1.5">
+                                <div className="flex justify-between items-center py-1 border-b border-gray-50 text-[10px]">
+                                  <span className="text-gray-400 font-bold tracking-tight">Dimensions</span>
                                   <span className="font-black">15.5 x 7.2 x 0.8 cm</span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-gray-50 text-[11px]">
-                                  <span className="text-gray-400 font-bold  tracking-tight">Weight</span>
+                                <div className="flex justify-between items-center py-1 border-b border-gray-50 text-[10px]">
+                                  <span className="text-gray-400 font-bold tracking-tight">Weight</span>
                                   <span className="font-black">187g</span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 border-b border-gray-50 text-[11px]">
-                                  <span className="text-gray-400 font-bold  tracking-tight">Materials</span>
+                                <div className="flex justify-between items-center py-1 border-b border-gray-50 text-[10px]">
+                                  <span className="text-gray-400 font-bold tracking-tight">Materials</span>
                                   <span className="font-black">Aerospace-grade Aluminum</span>
                                 </div>
-                                <div className="flex justify-between items-center py-2 text-[11px]">
-                                  <span className="text-gray-400 font-bold  tracking-tight">Box Includes</span>
+                                <div className="flex justify-between items-center py-1 text-[10px]">
+                                  <span className="text-gray-400 font-bold tracking-tight">Box Includes</span>
                                   <span className="font-black">Device, USB-C Cable</span>
                                 </div>
                               </div>
@@ -1124,59 +1136,59 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                         </ScrollArea>
                       </TabsContent>
 
-                      <div className="mt-8 pt-6 border-t border-gray-100 space-y-4 bg-white">
-                        <div className="flex items-center gap-4 mb-2">
-                          <div className="flex items-center bg-gray-50 rounded-xl p-1 border border-green-100">
+                      <div className="mt-3 pt-3 border-t border-gray-100 space-y-2 bg-white">
+                        <div className="flex items-center gap-3 mb-1">
+                          <div className="flex items-center bg-gray-50 rounded-lg p-0.5 border border-green-100">
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-orange-600 transition-all"
+                              className="h-7 w-7 rounded hover:bg-white hover:text-orange-600 transition-all"
                               onClick={() => setProductQuantities(prev => ({
                                 ...prev,
                                 [selectedProduct.id]: Math.max(1, (prev[selectedProduct.id] || 1) - 1)
                               }))}
                             >
-                              <Minus className="h-4 w-4" />
+                              <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="text-lg font-black w-12 text-center text-orange-600">{productQuantities[selectedProduct.id] || 1}</span>
+                            <span className="text-xs font-black w-8 text-center text-orange-600">{productQuantities[selectedProduct.id] || 1}</span>
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              className="h-10 w-10 rounded-lg hover:bg-white hover:text-orange-600 transition-all"
+                              className="h-7 w-7 rounded hover:bg-white hover:text-orange-600 transition-all"
                               onClick={() => setProductQuantities(prev => ({
                                 ...prev,
                                 [selectedProduct.id]: (prev[selectedProduct.id] || 1) + 1
                               }))}
                             >
-                              <Plus className="h-4 w-4" />
+                              <Plus className="h-3 w-3" />
                             </Button>
                           </div>
-                          <p className="text-[10px] font-black text-gray-400  tracking-[0.2em]">Adjust Quantity</p>
+                          <p className="text-[9px] font-black text-gray-400 tracking-wider">Adjust Quantity</p>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-2">
                           <Button 
-                            className="flex-1 h-16 bg-orange-600 hover:bg-orange-700 text-white font-black text-xl rounded-2xl shadow-lg shadow-orange-200 transition-all active:scale-95"
+                            className="flex-1 h-10 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs rounded-xl shadow-md shadow-orange-200 transition-all active:scale-95"
                             onClick={() => handlePlaceOrder(selectedProduct)}
                           >
                             Buy now
                           </Button>
                           <Button 
                             variant="secondary"
-                            className="flex-1 h-16 bg-white border-2 border-orange-600 text-orange-600 hover:bg-green-50 font-black text-xl rounded-2xl transition-all active:scale-95"
+                            className="flex-1 h-10 bg-white border border-orange-600 text-orange-600 hover:bg-green-50 font-black text-xs rounded-xl transition-all active:scale-95"
                             onClick={() => handleAddToCart(selectedProduct, productQuantities[selectedProduct.id] || 1)}
                           >
                             Add to cart
                           </Button>
                         </div>
-                        <div className="flex gap-4">
+                        <div className="flex gap-2">
                           <Button 
                             variant="outline" 
-                            className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-gray-700"
+                            className="flex-1 h-8 rounded-lg border font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-gray-700 text-[10px]"
                             onClick={() => handleAddToWishlistAction(selectedProduct)}
                           >
-                            <Heart className="h-5 w-5 mr-2" /> Wishlist
+                            <Heart className="h-3.5 w-3.5 mr-1" /> Wishlist
                           </Button>
-                          <Button variant="outline" className="flex-1 h-12 rounded-xl border-2 font-bold hover:bg-green-50 hover:text-orange-600 transition-all  tracking-tighter">
+                          <Button variant="outline" className="flex-1 h-8 rounded-lg border font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-[10px] tracking-tight">
                             Share
                           </Button>
                         </div>
