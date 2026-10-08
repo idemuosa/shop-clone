@@ -718,16 +718,6 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                       <div className="absolute top-0 right-0 bg-yellow-400 text-black text-[9px] font-black px-2 py-1 rounded-bl-lg z-10 animate-pulse">
                         Price drop
                       </div>
-                      <div className="absolute bottom-2 left-2 flex flex-col gap-1 z-20">
-                        <div className="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-lg flex items-center gap-1">
-                          <BadgeCheck className="h-2 w-2" />
-                          Shopsy express
-                        </div>
-                        <div className="bg-green-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full shadow-lg flex items-center gap-1">
-                          <CheckCircle2 className="h-2 w-2" />
-                          Quality verified
-                        </div>
-                      </div>
                     <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
                       <Button 
                         size="icon" 
