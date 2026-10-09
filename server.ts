@@ -7,10 +7,16 @@ import dotenv from "dotenv";
 import admin from "firebase-admin";
 import fs from "fs";
 import cors from "cors";
+import helmet from "helmet";
 
 dotenv.config();
 
 const app = express();
+
+// Secure HTTP headers with helmet
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for Vite dev / inline scripts compatibility
+}));
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
