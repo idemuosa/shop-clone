@@ -1060,11 +1060,20 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
           itemsTableHtml = `<p style="font-size: 15px; color: #334155;"><strong>Ordered Item:</strong> ${productName}</p>`;
         }
 
+        const totalItemsCount = Array.isArray(items) && items.length > 0
+          ? items.reduce((sum: number, item: any) => sum + (Number(item.quantity) || 1), 0)
+          : 1;
+
+        const buyerName = name || 'Valued Customer';
+        const buyerPhone = phone || 'N/A';
+
         const addressString = shippingAddress
           ? typeof shippingAddress === 'string'
             ? shippingAddress
-            : `${shippingAddress.address || ''}, ${shippingAddress.city || ''} ${shippingAddress.zip || ''}`.trim()
-          : '';
+            : [shippingAddress.address, shippingAddress.city, shippingAddress.zipCode || shippingAddress.zip]
+                .filter(Boolean)
+                .join(', ')
+          : 'N/A';
 
         const userHtml = `
           <div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff;">
@@ -1074,22 +1083,23 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
             </div>
 
             <div style="padding: 20px 0;">
-              <p style="font-size: 16px; margin-bottom: 15px;">Hi <strong>${name || 'Valued Customer'}</strong>,</p>
+              <p style="font-size: 16px; margin-bottom: 15px;">Hi <strong>${buyerName}</strong>,</p>
               <p style="font-size: 14px; color: #475569; line-height: 1.5;">Thank you for shopping with Vivi Shop! Your order <strong>#${orderRef}</strong> has been successfully placed.</p>
 
-              <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 13px;">
-                <p style="margin: 4px 0;"><strong>Order Number:</strong> ${orderRef}</p>
-                <p style="margin: 4px 0;"><strong>Customer Name:</strong> ${name || 'Valued Customer'}</p>
-                ${phone ? `<p style="margin: 4px 0;"><strong>Phone Number:</strong> ${phone}</p>` : ''}
-                <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${(paymentMethod || 'Online Payment').toUpperCase()}</p>
-                ${addressString ? `<p style="margin: 4px 0;"><strong>Shipping Address:</strong> ${addressString}</p>` : ''}
+              <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;">
+                <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderRef}</p>
+                <p style="margin: 4px 0;"><strong>Number of Items:</strong> ${totalItemsCount}</p>
+                <p style="margin: 4px 0;"><strong>Total Amount:</strong> ₦${displayTotal}</p>
+                <p style="margin: 4px 0;"><strong>Phone Number:</strong> ${buyerPhone}</p>
+                <p style="margin: 4px 0;"><strong>Home Address:</strong> ${addressString}</p>
+                <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${paymentMethodText.toUpperCase()}</p>
               </div>
 
               <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 16px; color: #0f172a;">Order Summary</h3>
               ${itemsTableHtml}
 
               <div style="margin-top: 25px; padding: 18px; background-color: #fff7ed; border-radius: 12px; border: 1px solid #ffedd5; text-align: right;">
-                <p style="margin: 0; font-size: 14px; color: #9a3412;">Total Amount to Pay:</p>
+                <p style="margin: 0; font-size: 14px; color: #9a3412;">Total Amount Paid / Payable:</p>
                 <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #ea580c;">₦${displayTotal}</p>
               </div>
             </div>
@@ -1101,19 +1111,68 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
           </div>
         `;
 
-        const userEmail = sendResendEmail(resendClient, {
-          to: [email],
-          subject: `Order Confirmation #${orderRef} - Vivi Shop`,
-          html: userHtml,
-        });
+        const adminHtml = `
+          <div style="font-family: sans-serif; padding: 24px; color: #1e293b; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 20px; background-color: #ffffff;">
+            <div style="text-align: center; padding-bottom: 20px; border-bottom: 2px solid #f1f5f9;">
+              <h1 style="color: #ea580c; font-style: italic; margin: 0; font-size: 32px;">Vivi Shop Admin</h1>
+              <p style="color: #2563eb; font-weight: bold; margin-top: 6px; font-size: 16px;">New Order Notification 📦</p>
+            </div>
 
-        const adminNotif = sendResendEmail(resendClient, {
-          to: [adminEmail || 'idemudiawisdom27@gmail.com'],
-          subject: `NEW ORDER: #${orderRef} (₦${displayTotal})`,
-          html: userHtml,
-        });
+            <div style="padding: 20px 0;">
+              <p style="font-size: 16px; margin-bottom: 15px;">A new order has been placed on Vivi Shop.</p>
 
-        await Promise.all([userEmail, adminNotif]);
+              <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;">
+                <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderRef}</p>
+                <p style="margin: 4px 0;"><strong>Buyer Name:</strong> ${buyerName}</p>
+                <p style="margin: 4px 0;"><strong>Buyer Email:</strong> ${email || 'N/A'}</p>
+                <p style="margin: 4px 0;"><strong>Buyer Phone Number:</strong> ${buyerPhone}</p>
+                <p style="margin: 4px 0;"><strong>Buyer Home Address:</strong> ${addressString}</p>
+                <p style="margin: 4px 0;"><strong>Number of Items:</strong> ${totalItemsCount}</p>
+                <p style="margin: 4px 0;"><strong>Total Amount:</strong> ₦${displayTotal}</p>
+                <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${paymentMethodText.toUpperCase()}</p>
+              </div>
+
+              <h3 style="margin-top: 25px; margin-bottom: 10px; font-size: 16px; color: #0f172a;">Order Items</h3>
+              ${itemsTableHtml}
+
+              <div style="margin-top: 25px; padding: 18px; background-color: #eff6ff; border-radius: 12px; border: 1px solid #dbeafe; text-align: right;">
+                <p style="margin: 0; font-size: 14px; color: #1e40af;">Total Amount:</p>
+                <p style="margin: 4px 0 0 0; font-size: 24px; font-weight: 900; color: #2563eb;">₦${displayTotal}</p>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 20px; text-align: center; color: #94a3b8; font-size: 12px;">
+              <p style="margin: 0;">Vivi Shop Administrative Notification</p>
+            </div>
+          </div>
+        `;
+
+        const emailPromises: Promise<any>[] = [];
+
+        if (email) {
+          emailPromises.push(
+            sendResendEmail(resendClient, {
+              to: [email],
+              subject: `Order Confirmation #${orderRef} - Vivi Shop`,
+              html: userHtml,
+            })
+          );
+        }
+
+        const recipientAdminEmail = process.env.ADMIN_EMAIL || adminEmail;
+        if (recipientAdminEmail) {
+          emailPromises.push(
+            sendResendEmail(resendClient, {
+              to: [recipientAdminEmail],
+              subject: `NEW ORDER ALERT: #${orderRef} (₦${displayTotal})`,
+              html: adminHtml,
+            })
+          );
+        }
+
+        if (emailPromises.length > 0) {
+          await Promise.all(emailPromises);
+        }
       } catch (err) {
         console.error("Order Email Error:", err);
       }

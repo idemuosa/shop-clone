@@ -532,12 +532,20 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
             orderId: generatedOrderNumber,
             orderNumber: generatedOrderNumber,
             productName: product.name,
+            items: [{
+              name: product.name,
+              quantity: quantity,
+              price: product.price,
+              priceValue: unitPrice,
+              image: product.image
+            }],
             totalAmount: totalAmount.toFixed(2),
             paymentMethod: paymentType,
             shippingAddress: {
               address: deliveryAddress,
               city: deliveryCity,
-              zipCode: deliveryZip
+              zipCode: deliveryZip,
+              zip: deliveryZip
             },
             name: customerName
           }),
