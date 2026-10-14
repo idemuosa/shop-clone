@@ -17,6 +17,9 @@ const InfoPage = lazy(() => import("./components/InfoPages"));
 import BrandPartners from "./components/BrandPartners";
 import CartDrawer from "./components/CartDrawer";
 import ScrollToTop from "./components/ScrollToTop";
+import MobileBottomNav from "./components/MobileBottomNav";
+import OfflineBanner from "./components/OfflineBanner";
+import { useCapacitorMobile } from "./lib/mobile";
 import { AuthProvider, useAuth } from "./lib/AuthContext";
 import { CartProvider, useCart } from "./lib/CartContext";
 import { CurrencyProvider } from "./lib/CurrencyContext";
@@ -44,6 +47,87 @@ function MainContent() {
     return localStorage.getItem('lastViewedCategory') || '';
   });
   const { user, isAdmin, loading } = useAuth();
+
+  const handleHardwareBack = () => {
+    if (isCartOpen) {
+      setIsCartOpen(false);
+      return true;
+    }
+    if (isAuthModalOpen) {
+      setIsAuthModalOpen(false);
+      return true;
+    }
+    if (showCheckout) {
+      setShowCheckout(false);
+      return true;
+    }
+    if (activeInfoPage) {
+      setActiveInfoPage(null);
+      return true;
+    }
+    if (showAdmin) {
+      setShowAdmin(false);
+      return true;
+    }
+    if (showProfile) {
+      setShowProfile(false);
+      return true;
+    }
+    if (showDashboard) {
+      setShowDashboard(false);
+      return true;
+    }
+    if (searchQuery) {
+      setSearchQuery("");
+      return true;
+    }
+    return false;
+  };
+
+  const { networkStatus } = useCapacitorMobile(user?.uid, handleHardwareBack);
+
+  const activeMobileTab = showAdmin ? 'admin' : showProfile ? 'profile' : searchQuery ? 'search' : 'home';
+
+  const handleMobileNavigate = (tab: 'home' | 'search' | 'wishlist' | 'cart' | 'profile' | 'admin') => {
+    if (tab === 'home') {
+      setShowAdmin(false);
+      setShowProfile(false);
+      setShowCheckout(false);
+      setShowDashboard(false);
+      setActiveInfoPage(null);
+      setSearchQuery("");
+      setIsCartOpen(false);
+    } else if (tab === 'search') {
+      setShowAdmin(false);
+      setShowProfile(false);
+      setShowCheckout(false);
+      setActiveInfoPage(null);
+      setIsCartOpen(false);
+      setSearchQuery(searchQuery || "All");
+    } else if (tab === 'cart') {
+      setIsCartOpen(true);
+    } else if (tab === 'wishlist') {
+      setShowAdmin(false);
+      setShowProfile(false);
+      setShowCheckout(false);
+      setActiveInfoPage("Wishlist");
+      setIsCartOpen(false);
+    } else if (tab === 'profile') {
+      if (!user) {
+        setIsAuthModalOpen(true);
+      } else {
+        setShowAdmin(false);
+        setShowProfile(true);
+        setIsCartOpen(false);
+      }
+    } else if (tab === 'admin') {
+      if (isAdmin) {
+        setShowProfile(false);
+        setShowAdmin(true);
+        setIsCartOpen(false);
+      }
+    }
+  };
 
   // Check for Paystack reference on mount
   useEffect(() => {
@@ -193,6 +277,7 @@ function MainContent() {
   if (showCheckout) {
     return (
       <>
+        <OfflineBanner networkStatus={networkStatus} />
         <Navbar
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenCart={() => setIsCartOpen(true)}
@@ -215,6 +300,11 @@ function MainContent() {
           onClose={() => setIsCartOpen(false)}
           onCheckout={handleCheckout}
         />
+        <MobileBottomNav
+          activeTab={activeMobileTab}
+          onNavigate={handleMobileNavigate}
+          wishlistCount={wishlistCount}
+        />
       </>
     );
   }
@@ -222,6 +312,7 @@ function MainContent() {
   if (activeInfoPage) {
     return (
       <>
+        <OfflineBanner networkStatus={networkStatus} />
         <Navbar
           onOpenAuth={() => setIsAuthModalOpen(true)}
           onOpenCart={() => setIsCartOpen(true)}
@@ -251,6 +342,11 @@ function MainContent() {
           onCheckout={handleCheckout}
         />
         <Footer />
+        <MobileBottomNav
+          activeTab={activeMobileTab}
+          onNavigate={handleMobileNavigate}
+          wishlistCount={wishlistCount}
+        />
       </>
     );
   }
@@ -264,6 +360,7 @@ function MainContent() {
 
     return (
       <>
+        <OfflineBanner networkStatus={networkStatus} />
         <Navbar 
           onOpenAuth={() => setIsAuthModalOpen(true)} 
           onOpenCart={() => setIsCartOpen(true)}
@@ -283,6 +380,11 @@ function MainContent() {
           onClose={() => setIsCartOpen(false)} 
           onCheckout={handleCheckout}
         />
+        <MobileBottomNav
+          activeTab={activeMobileTab}
+          onNavigate={handleMobileNavigate}
+          wishlistCount={wishlistCount}
+        />
       </>
     );
   }
@@ -290,6 +392,7 @@ function MainContent() {
   if (showProfile) {
     return (
       <>
+        <OfflineBanner networkStatus={networkStatus} />
         <Navbar 
           onOpenAuth={() => setIsAuthModalOpen(true)} 
           onOpenCart={() => setIsCartOpen(true)}
@@ -315,13 +418,19 @@ function MainContent() {
           onClose={() => setIsCartOpen(false)} 
           onCheckout={handleCheckout}
         />
+        <MobileBottomNav
+          activeTab={activeMobileTab}
+          onNavigate={handleMobileNavigate}
+          wishlistCount={wishlistCount}
+        />
       </>
     );
   }
 
   if (showDashboard && user && !searchQuery) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="min-h-screen bg-[#f8f9fa] pb-16 md:pb-0">
+        <OfflineBanner networkStatus={networkStatus} />
         <Navbar 
           onOpenAuth={() => setIsAuthModalOpen(true)} 
           onOpenCart={() => setIsCartOpen(true)}
@@ -346,12 +455,18 @@ function MainContent() {
         />
         <Footer />
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+        <MobileBottomNav
+          activeTab={activeMobileTab}
+          onNavigate={handleMobileNavigate}
+          wishlistCount={wishlistCount}
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] font-sans selection:bg-green-100 selection:text-orange-600">
+    <div className="min-h-screen bg-[#f5f5f5] font-sans selection:bg-green-100 selection:text-orange-600 pb-16 md:pb-0">
+      <OfflineBanner networkStatus={networkStatus} />
       <Navbar 
         onOpenAuth={() => setIsAuthModalOpen(true)} 
         onOpenCart={() => setIsCartOpen(true)}
@@ -578,6 +693,11 @@ function MainContent() {
         isOpen={isCartOpen} 
         onClose={() => setIsCartOpen(false)} 
         onCheckout={handleCheckout}
+      />
+      <MobileBottomNav
+        activeTab={activeMobileTab}
+        onNavigate={handleMobileNavigate}
+        wishlistCount={wishlistCount}
       />
     </div>
   );

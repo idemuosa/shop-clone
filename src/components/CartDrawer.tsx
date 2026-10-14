@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { hapticImpact } from '@/lib/haptics';
 import { 
   Sheet, 
   SheetContent, 
@@ -121,7 +122,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                onClick={() => updateQuantity(item.id, -1)}
+                                onClick={() => {
+                                  hapticImpact('LIGHT');
+                                  updateQuantity(item.id, -1);
+                                }}
                                 className="h-5 w-5 md:h-6 md:w-6 rounded-md hover:bg-white text-gray-400"
                               >
                                 <Minus className="h-2 w-2 md:h-2.5 md:w-2.5" />
@@ -130,7 +134,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                               <Button 
                                 variant="ghost" 
                                 size="icon" 
-                                onClick={() => updateQuantity(item.id, 1)}
+                                onClick={() => {
+                                  hapticImpact('LIGHT');
+                                  updateQuantity(item.id, 1);
+                                }}
                                 className="h-5 w-5 md:h-6 md:w-6 rounded-md hover:bg-white text-gray-600"
                               >
                                 <Plus className="h-2 w-2 md:h-2.5 md:w-2.5" />
@@ -140,7 +147,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
                             <Button 
                               variant="ghost" 
                               size="icon" 
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => {
+                                hapticImpact('MEDIUM');
+                                removeFromCart(item.id);
+                              }}
                               className="h-6 w-6 md:h-7 md:w-7 text-gray-300 hover:text-red-500 transition-colors"
                             >
                               <Trash2 className="h-3 w-3 md:h-3.5 md:w-3.5" />
@@ -172,7 +182,10 @@ export default function CartDrawer({ isOpen, onClose, onCheckout }: CartDrawerPr
               </div>
               
               <Button 
-                onClick={onCheckout}
+                onClick={() => {
+                  hapticImpact('MEDIUM');
+                  onCheckout();
+                }}
                 className="w-full h-10 md:h-12 bg-orange-600 hover:bg-orange-700 text-white font-black text-xs md:text-base rounded-xl shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 group"
               >
                 Proceed to Checkout

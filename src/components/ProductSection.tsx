@@ -1,4 +1,6 @@
-import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText, Phone } from "lucide-react";
+import { Star, Heart, ShoppingCart, ChevronLeft, ChevronRight, Filter, X, Zap, Eye, Truck, CheckCircle2, SlidersHorizontal, CreditCard, ShieldCheck, Plus, User, MapPin, Home, Building, Minus, Clock, Info, BadgeCheck, AlertCircle, Sparkles, Edit, ShoppingBag, Package, FileText, Phone, Share2 } from "lucide-react";
+import { hapticImpact, hapticNotification } from "@/lib/haptics";
+import { shareProduct } from "@/lib/mobile";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -128,6 +130,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   }, []);
 
   const handleAddToCart = (product: Product, quantity: number = 1) => {
+    hapticImpact('MEDIUM');
     const orderNumber = `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
     const customerName = profile?.displayName || profile?.display_name || user?.displayName || user?.email?.split('@')[0] || 'Customer';
     const customerPhone = (profile as any)?.phone || user?.phoneNumber || '07045108847 or 09053091235';
@@ -271,6 +274,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
   };
 
   const handleAddToWishlistAction = async (product: Product) => {
+    hapticImpact('LIGHT');
     if (!user) {
       toast.error("Please login to save items");
       return;
@@ -289,6 +293,7 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
 
       if (response.ok) {
         onAddToWishlist?.();
+        hapticNotification('SUCCESS');
         toast.success("Added to Wishlist");
       } else {
         toast.error("Failed to add to wishlist");
@@ -1216,8 +1221,15 @@ export default function ProductSection({ title, subtitle, products, isLoading, o
                           >
                             <Heart className="h-3.5 w-3.5 mr-1" /> Wishlist
                           </Button>
-                          <Button variant="outline" className="flex-1 h-8 rounded-lg border font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-[10px] tracking-tight">
-                            Share
+                          <Button
+                            variant="outline"
+                            className="flex-1 h-8 rounded-lg border font-bold hover:bg-green-50 hover:text-orange-600 transition-all text-[10px] tracking-tight flex items-center justify-center gap-1"
+                            onClick={() => {
+                              hapticImpact('LIGHT');
+                              shareProduct(selectedProduct);
+                            }}
+                          >
+                            <Share2 className="h-3.5 w-3.5" /> Share
                           </Button>
                         </div>
                       </div>
