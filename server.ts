@@ -1084,14 +1084,15 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
 
             <div style="padding: 20px 0;">
               <p style="font-size: 16px; margin-bottom: 15px;">Hi <strong>${buyerName}</strong>,</p>
-              <p style="font-size: 14px; color: #475569; line-height: 1.5;">Thank you for shopping with Vivi Shop! Your order <strong>#${orderRef}</strong> has been successfully placed.</p>
+              <p style="font-size: 14px; color: #475569; line-height: 1.5;">You have placed an order with Vivi Shop! Your order <strong>#${orderRef}</strong> has been successfully placed.</p>
 
               <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;">
                 <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderRef}</p>
+                <p style="margin: 4px 0;"><strong>User Email:</strong> ${email || 'N/A'}</p>
+                <p style="margin: 4px 0;"><strong>Phone Number:</strong> ${buyerPhone}</p>
+                <p style="margin: 4px 0;"><strong>Delivery Address:</strong> ${addressString}</p>
                 <p style="margin: 4px 0;"><strong>Number of Items:</strong> ${totalItemsCount}</p>
                 <p style="margin: 4px 0;"><strong>Total Amount:</strong> ₦${displayTotal}</p>
-                <p style="margin: 4px 0;"><strong>Phone Number:</strong> ${buyerPhone}</p>
-                <p style="margin: 4px 0;"><strong>Home Address:</strong> ${addressString}</p>
                 <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${paymentMethodText.toUpperCase()}</p>
               </div>
 
@@ -1119,14 +1120,14 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
             </div>
 
             <div style="padding: 20px 0;">
-              <p style="font-size: 16px; margin-bottom: 15px;">A new order has been placed on Vivi Shop.</p>
+              <p style="font-size: 16px; margin-bottom: 15px;">A user has placed an order on Vivi Shop.</p>
 
               <div style="margin-top: 20px; background-color: #f8fafc; padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6;">
                 <p style="margin: 4px 0;"><strong>Order ID:</strong> ${orderRef}</p>
                 <p style="margin: 4px 0;"><strong>Buyer Name:</strong> ${buyerName}</p>
-                <p style="margin: 4px 0;"><strong>Buyer Email:</strong> ${email || 'N/A'}</p>
-                <p style="margin: 4px 0;"><strong>Buyer Phone Number:</strong> ${buyerPhone}</p>
-                <p style="margin: 4px 0;"><strong>Buyer Home Address:</strong> ${addressString}</p>
+                <p style="margin: 4px 0;"><strong>User Email:</strong> ${email || 'N/A'}</p>
+                <p style="margin: 4px 0;"><strong>Phone Number:</strong> ${buyerPhone}</p>
+                <p style="margin: 4px 0;"><strong>Delivery Address:</strong> ${addressString}</p>
                 <p style="margin: 4px 0;"><strong>Number of Items:</strong> ${totalItemsCount}</p>
                 <p style="margin: 4px 0;"><strong>Total Amount:</strong> ₦${displayTotal}</p>
                 <p style="margin: 4px 0;"><strong>Payment Method:</strong> ${paymentMethodText.toUpperCase()}</p>
@@ -1159,7 +1160,7 @@ app.post("/api/send-order-confirmation", async (req, res, next) => {
           );
         }
 
-        const recipientAdminEmail = process.env.ADMIN_EMAIL || adminEmail;
+        const recipientAdminEmail = process.env.ADMIN_EMAIL || process.env.VITE_ADMIN_EMAIL || adminEmail;
         if (recipientAdminEmail) {
           emailPromises.push(
             sendResendEmail(resendClient, {
