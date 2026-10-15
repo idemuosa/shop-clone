@@ -84,7 +84,7 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
     };
   }, [user]);
 
-  const [createdOrderDetails, setCreatedOrderDetails] = useState<{ orderId: string; name: string; phone: string } | null>(null);
+  const [createdOrderDetails, setCreatedOrderDetails] = useState<{ orderId: string; name: string; phone: string; email?: string; address?: string } | null>(null);
 
   const processOrderPlacement = async (paymentRef: string) => {
     setIsProcessing(true);
@@ -93,8 +93,9 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
       const orderId = paymentRef || `VIVI-${Math.random().toString(36).slice(-6).toUpperCase()}`;
       const customerName = profile?.displayName || (profile as any)?.display_name || user?.displayName || user?.email?.split('@')[0] || 'Customer';
       const customerPhone = phone.trim() || (profile as any)?.phone || user?.phoneNumber || '07045108847 or 09053091235';
+      const fullAddress = [address, city, zip].filter(Boolean).join(', ');
 
-      setCreatedOrderDetails({ orderId, name: customerName, phone: customerPhone });
+      setCreatedOrderDetails({ orderId, name: customerName, phone: customerPhone, email: user?.email || '', address: fullAddress });
 
       // Save order to Firestore if user exists
       if (user) {
@@ -675,14 +676,16 @@ export default function CheckoutPage({ onBack }: CheckoutPageProps) {
                  </div>
 
                  <div className="grid grid-cols-2 gap-3">
-                    <div className="bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-100 col-span-2 text-left">
+                    <div className="bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-100 col-span-2 text-left space-y-1">
                        <p className="text-[8px] md:text-[9px] font-black text-gray-400 mb-1 uppercase tracking-widest">Order Details</p>
-                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Order #: <span className="text-orange-600 font-black">{createdOrderDetails?.orderId || 'VIVI-ORDER'}</span></p>
-                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Customer: <span className="font-black">{createdOrderDetails?.name}</span></p>
-                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Phone: <span className="font-black">{createdOrderDetails?.phone}</span></p>
+                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Order ID #: <span className="text-orange-600 font-black">{createdOrderDetails?.orderId || 'VIVI-ORDER'}</span></p>
+                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Customer Name: <span className="font-black">{createdOrderDetails?.name}</span></p>
+                       <p className="text-[10px] md:text-xs font-bold text-gray-800">User Email: <span className="font-black">{createdOrderDetails?.email || user?.email}</span></p>
+                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Phone Number: <span className="font-black">{createdOrderDetails?.phone}</span></p>
+                       <p className="text-[10px] md:text-xs font-bold text-gray-800">Delivery Address: <span className="font-black">{createdOrderDetails?.address || 'N/A'}</span></p>
                     </div>
                     <div className="bg-gray-50 p-3 md:p-4 rounded-xl border border-gray-100 col-span-2">
-                       <p className="text-[8px] md:text-[9px] font-black text-gray-400 mb-0.5 uppercase tracking-widest">Arrival Date</p>
+                       <p className="text-[8px] md:text-[9px] font-black text-gray-400 mb-0.5 uppercase tracking-widest">Estimated Arrival Date</p>
                        <p className="text-[9px] md:text-xs font-black text-green-600">Tomorrow, 4PM</p>
                     </div>
                  </div>
