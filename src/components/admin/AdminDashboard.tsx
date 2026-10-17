@@ -1233,154 +1233,159 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5] p-2 md:p-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-center gap-2 mb-4 md:mb-6">
-          {onBack && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBack}
-              className="rounded-full hover:bg-gray-200 h-9 w-9 shrink-0 mr-1"
-              title="Back to Shop"
-            >
-              <ChevronLeft className="h-5 w-5 text-gray-700" />
-            </Button>
-          )}
-          <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200">
-            <Zap className="h-6 w-6 text-white fill-white" />
+      <div className="max-w-5xl mx-auto w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 md:mb-6">
+          <div className="flex items-center gap-2">
+            {onBack && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBack}
+                className="rounded-full hover:bg-gray-200 h-9 w-9 shrink-0 mr-1"
+                title="Back to Shop"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-700" />
+              </Button>
+            )}
+            <div className="bg-orange-600 p-2 rounded-xl shadow-lg shadow-orange-200 shrink-0">
+              <Zap className="h-6 w-6 text-white fill-white" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl md:text-3xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
+              <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5 truncate">Inventory & Orders</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-black text-black italic tracking-tighter leading-none">Admin</h1>
-            <p className="text-gray-500 font-bold text-xs tracking-widest mt-0.5">Inventory & Orders</p>
-          </div>
-          <div className="flex gap-1.5">
-            <Button
-              variant="outline"
-              onClick={() => setShowBulkUploadDialog(true)}
-              className="rounded-lg border-2 font-black text-xs px-3 h-9 border-orange-200 text-orange-600 hover:bg-orange-50 gap-1.5 transition-all bg-white"
-            >
-              <Upload className="h-3.5 w-3.5" /> Bulk Upload
-            </Button>
-            <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
-              <DialogTrigger
-                render={(props) => (
-                  <button
-                    {...props}
-                    className={cn(
-                      buttonVariants({ variant: "outline" }),
-                      "rounded-lg border-2 font-black text-xs px-3 h-9 border-gray-100 hover:border-orange-200 gap-1.5 transition-all bg-white"
-                    )}
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Category
-                  </button>
-                )}
-              />
-              <DialogContent className="rounded-3xl max-w-sm">
-                <DialogHeader>
-                  <DialogTitle className="text-lg font-black tracking-tighter">Add category</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleAddCategory} className="space-y-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="cat-name" className="text-[10px]">Name</Label>
-                    <Input
-                      id="cat-name"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      required
-                      className="rounded-xl h-10"
-                      placeholder="Tech, Shoes"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="cat-image" className="text-[10px]">Image</Label>
-                    <div className="flex flex-col gap-2">
-                      <Input
-                        id="cat-image-file"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setNewCategoryImage(reader.result as string);
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
-                        className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
-                      />
-                      {newCategoryImage && (
-                        <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
-                           <img src={newCategoryImage} className="w-full h-full object-cover" />
-                        </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={() => setShowBulkUploadDialog(true)}
+                className="flex-1 sm:flex-none rounded-lg border-2 font-black text-xs px-3 h-9 border-orange-200 text-orange-600 hover:bg-orange-50 gap-1.5 transition-all bg-white"
+              >
+                <Upload className="h-3.5 w-3.5" /> Bulk Upload
+              </Button>
+              <Dialog open={showCategoryDialog} onOpenChange={setShowCategoryDialog}>
+                <DialogTrigger
+                  render={(props) => (
+                    <button
+                      {...props}
+                      className={cn(
+                        buttonVariants({ variant: "outline" }),
+                        "flex-1 sm:flex-none rounded-lg border-2 font-black text-xs px-3 h-9 border-gray-100 hover:border-orange-200 gap-1.5 transition-all bg-white"
                       )}
+                    >
+                      <Plus className="h-3.5 w-3.5" /> Category
+                    </button>
+                  )}
+                />
+                <DialogContent className="rounded-3xl w-[95vw] sm:max-w-sm p-4 sm:p-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-black tracking-tighter">Add category</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleAddCategory} className="space-y-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="cat-name" className="text-[10px]">Name</Label>
+                      <Input
+                        id="cat-name"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        required
+                        className="rounded-xl h-10"
+                        placeholder="Tech, Shoes"
+                      />
                     </div>
-                  </div>
-                  <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
-                    {isLoading ? 'Creating...' : 'Create category'}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-            <div className="relative w-40 md:w-60">
+                    <div className="space-y-1">
+                      <Label htmlFor="cat-image" className="text-[10px]">Image</Label>
+                      <div className="flex flex-col gap-2">
+                        <Input
+                          id="cat-image-file"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setNewCategoryImage(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="rounded-lg h-auto py-1.5 text-[10px] file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-black file:bg-orange-50 file:text-orange-700"
+                        />
+                        {newCategoryImage && (
+                          <div className="relative w-28 h-28 rounded-lg overflow-hidden border bg-gray-50 mx-auto">
+                             <img src={newCategoryImage} className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white font-black rounded-xl h-10 text-xs" disabled={isLoading}>
+                      {isLoading ? 'Creating...' : 'Create category'}
+                    </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            </div>
+            <div className="relative w-full sm:w-44 md:w-60">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400" />
               <Input
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 h-9 rounded-lg border-gray-200 focus:border-orange-500 transition-all bg-white text-xs"
+                className="pl-8 h-9 w-full rounded-lg border-gray-200 focus:border-orange-500 transition-all bg-white text-xs"
               />
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 mb-6">
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50 bg-gradient-to-br from-white to-green-50/30">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex justify-between items-start mb-2">
-                <div className="p-1.5 bg-green-100 rounded-lg">
+                <div className="p-1.5 bg-green-100 rounded-lg shrink-0">
                   <TrendingUp className="h-4 w-4 text-orange-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Sales</p>
-              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.totalSales)}</h3>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase truncate">Sales</p>
+              <h3 className="text-base sm:text-xl font-black italic tracking-tighter text-black leading-tight truncate">{formatPrice(stats.totalSales)}</h3>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex justify-between items-start mb-2">
-                <div className="p-1.5 bg-red-100 rounded-lg">
+                <div className="p-1.5 bg-red-100 rounded-lg shrink-0">
                   <TrendingDown className="h-4 w-4 text-red-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Expenses</p>
-              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">{formatPrice(stats.expenses)}</h3>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase truncate">Expenses</p>
+              <h3 className="text-base sm:text-xl font-black italic tracking-tighter text-black leading-tight truncate">{formatPrice(stats.expenses)}</h3>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex justify-between items-start mb-2">
-                <div className="p-1.5 bg-orange-100 rounded-lg">
+                <div className="p-1.5 bg-orange-100 rounded-lg shrink-0">
                   <DollarSign className="h-4 w-4 text-orange-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Profit</p>
-              <h3 className={`text-xl font-black italic tracking-tighter leading-tight ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase truncate">Profit</p>
+              <h3 className={`text-base sm:text-xl font-black italic tracking-tighter leading-tight truncate ${stats.profit >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatPrice(stats.profit)}
               </h3>
             </CardContent>
           </Card>
           <Card className="rounded-2xl border-none shadow-lg shadow-gray-200/50">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex justify-between items-start mb-2">
-                <div className="p-1.5 bg-blue-100 rounded-lg">
+                <div className="p-1.5 bg-blue-100 rounded-lg shrink-0">
                   <Package className="h-4 w-4 text-blue-600" />
                 </div>
               </div>
-              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase">Inventory</p>
-              <h3 className="text-xl font-black italic tracking-tighter text-black leading-tight">
+              <p className="text-gray-500 text-[10px] font-black tracking-widest mb-0.5 uppercase truncate">Inventory</p>
+              <h3 className="text-base sm:text-xl font-black italic tracking-tighter text-black leading-tight truncate">
                 <span className="text-green-600">{stats.totalStockIn}</span>
                 <span className="text-gray-300 mx-1">/</span>
                 <span className="text-red-500">{stats.totalStockOut}</span>
@@ -1390,32 +1395,32 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-white p-0.5 rounded-xl shadow-sm border border-gray-100 flex-wrap h-auto gap-0.5">
-            <TabsTrigger value="overview" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+          <TabsList className="bg-white p-1 rounded-xl shadow-sm border border-gray-100 flex justify-start overflow-x-auto whitespace-nowrap max-w-full w-full no-scrollbar h-auto gap-1">
+            <TabsTrigger value="overview" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Overview
             </TabsTrigger>
-            <TabsTrigger value="products" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="products" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Products
             </TabsTrigger>
-            <TabsTrigger value="categories" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="categories" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Categories
             </TabsTrigger>
-            <TabsTrigger value="gallery" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="gallery" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Gallery
             </TabsTrigger>
-            <TabsTrigger value="orders" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="orders" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Orders
             </TabsTrigger>
-            <TabsTrigger value="users" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="users" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Admins
             </TabsTrigger>
-            <TabsTrigger value="merchants" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="merchants" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Merchants
             </TabsTrigger>
-            <TabsTrigger value="emails" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="emails" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Logs
             </TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-lg font-black tracking-tighter px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
+            <TabsTrigger value="settings" className="shrink-0 rounded-lg font-black tracking-tighter px-3.5 sm:px-4 py-1.5 text-xs data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               Settings
             </TabsTrigger>
           </TabsList>
@@ -1717,7 +1722,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-4">
-            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-6 md:p-8">
+            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-4 sm:p-6 md:p-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
                   <h2 className="text-2xl font-black tracking-tighter italic">Manage Categories</h2>
@@ -1792,7 +1797,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
           </TabsContent>
 
           <TabsContent value="gallery">
-            <Card className="rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-8">
+            <Card className="rounded-3xl sm:rounded-[40px] border-none shadow-xl shadow-gray-200/50 p-4 sm:p-6 md:p-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
                 <div>
                   <h2 className="text-3xl font-black  tracking-tighter italic">Product gallery</h2>
@@ -1894,7 +1899,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
           <TabsContent value="orders">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
                 <div>
                   <CardTitle className="text-xl font-black  tracking-tighter">Sales orders</CardTitle>
                   <CardDescription>Real-time stream of customer transactions</CardDescription>
@@ -1905,13 +1910,14 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     variant="outline"
                     onClick={handleClearOrders}
                     disabled={isLoading}
-                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1 shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Clear All Orders
                   </Button>
                 )}
               </CardHeader>
               <CardContent className="p-0">
+                <div className="overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -1972,7 +1978,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                                       </button>
                                     )}
                                   />
-                              <DialogContent className="max-w-md rounded-3xl">
+                              <DialogContent className="rounded-3xl w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
                                 <DialogHeader>
                                   <DialogTitle className="text-2xl font-black  tracking-tighter">Order <span className="text-orange-600">details</span></DialogTitle>
                                 </DialogHeader>
@@ -2036,14 +2042,14 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                                       </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-dashed flex justify-between items-center gap-4">
+                                    <div className="pt-4 border-t border-dashed flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
                                       <div>
                                         <p className="text-[10px] font-black text-gray-400 mb-1">Update status</p>
                                         <Select 
                                           value={selectedOrder.status} 
                                           onValueChange={(val) => handleUpdateOrderStatus(selectedOrder.id, val)}
                                         >
-                                          <SelectTrigger className="w-[150px] rounded-xl font-bold">
+                                          <SelectTrigger className="w-full sm:w-[150px] rounded-xl font-bold">
                                             <SelectValue placeholder="Status" />
                                           </SelectTrigger>
                                           <SelectContent>
@@ -2055,7 +2061,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                                           </SelectContent>
                                         </Select>
                                       </div>
-                                      <div className="flex items-center gap-3">
+                                      <div className="flex items-center justify-between sm:justify-end gap-3">
                                         <Button
                                           type="button"
                                           variant="outline"
@@ -2068,7 +2074,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                                         </Button>
                                         <div className="text-right">
                                           <p className="text-xs font-black text-gray-400">Total paid</p>
-                                          <p className="text-2xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
+                                          <p className="text-xl sm:text-2xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
                                         </div>
                                       </div>
                                     </div>
@@ -2092,13 +2098,14 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="users">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 sm:p-6">
                 <div>
                   <CardTitle className="text-xl font-black  tracking-tighter">User & Admin management</CardTitle>
                   <CardDescription>Grant or revoke administrator privileges</CardDescription>
@@ -2109,13 +2116,14 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     variant="outline"
                     onClick={handleClearUsers}
                     disabled={isLoading}
-                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1"
+                    className="rounded-xl border-red-200 text-red-600 hover:bg-red-50 font-bold text-xs h-9 px-3 gap-1 shrink-0"
                   >
                     <Trash2 className="h-3.5 w-3.5" /> Clear All Users
                   </Button>
                 )}
               </CardHeader>
               <CardContent className="p-0">
+                <div className="overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2177,17 +2185,19 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="merchants">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-xl font-black tracking-tighter">Merchant Applications</CardTitle>
                 <CardDescription>Review and approve new sellers</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
+                <div className="overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2247,16 +2257,18 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="emails">
             <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 overflow-hidden">
-              <CardHeader>
+              <CardHeader className="p-4 sm:p-6">
                 <CardTitle className="text-xl font-black  tracking-tighter">Email notification logs</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
+                <div className="overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2288,11 +2300,12 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="settings">
-            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-4 md:p-8">
+            <Card className="rounded-3xl border-none shadow-xl shadow-gray-200/50 p-4 sm:p-6 md:p-8">
                <div className="flex items-center gap-3 mb-6 md:mb-8">
                   <div className="bg-orange-600 p-2 rounded-lg">
                     <Wallet className="h-5 w-5 text-white" />
@@ -2442,7 +2455,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
         {/* Edit Category Dialog */}
         <Dialog open={showEditCategoryDialog} onOpenChange={setShowEditCategoryDialog}>
-          <DialogContent className="rounded-3xl max-w-sm">
+          <DialogContent className="rounded-3xl w-[95vw] sm:max-w-sm p-4 sm:p-6">
             <DialogHeader>
               <DialogTitle className="text-lg font-black tracking-tighter">Edit category</DialogTitle>
             </DialogHeader>
@@ -2507,7 +2520,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
         {/* Bulk Upload Dialog */}
         <Dialog open={showBulkUploadDialog} onOpenChange={setShowBulkUploadDialog}>
-          <DialogContent className="rounded-3xl max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+          <DialogContent className="rounded-3xl w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader className="mb-4">
               <div className="flex items-center gap-2">
                 <div className="bg-orange-100 p-2 rounded-xl text-orange-600">
@@ -2763,7 +2776,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
 
         {/* Edit Product Dialog */}
         <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
-          <DialogContent className="rounded-3xl max-w-md">
+          <DialogContent className="rounded-3xl w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
             <DialogHeader>
               <DialogTitle className="text-lg font-black tracking-tighter">Edit product</DialogTitle>
             </DialogHeader>
