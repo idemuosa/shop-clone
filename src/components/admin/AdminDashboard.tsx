@@ -1657,7 +1657,60 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                   </div>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <div className="overflow-x-auto">
+                  {/* Mobile Cards View */}
+                  <div className="block sm:hidden space-y-2.5 p-3">
+                    {filteredProducts.map((p) => (
+                      <div key={p.id} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <img
+                            src={p.image}
+                            className="w-11 h-11 rounded-lg object-cover shrink-0 border border-gray-100"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
+                            }}
+                          />
+                          <div className="min-w-0">
+                            <h4 className="font-bold text-xs text-gray-900 truncate leading-snug">{p.name}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="font-black text-orange-600 text-xs">{formatPrice(p.price)}</span>
+                              <Badge variant="outline" className={`${p.stock < 10 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200'} font-bold text-[9px] h-4 px-1.5`}>
+                                {p.stock || 0} left
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-blue-600 bg-blue-50/80 rounded-lg"
+                            onClick={() => {
+                              setEditingProduct(p);
+                              setEditCategoryId(categories.find(c => c.name === (p.category_name || p.category))?.id?.toString() || "");
+                            }}
+                          >
+                            <Edit className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-600 bg-red-50/80 rounded-lg"
+                            onClick={() => handleDeleteProduct(p.id)}
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    {filteredProducts.length === 0 && (
+                      <div className="text-center py-10 text-gray-400 font-bold text-xs italic">
+                        No matching products found
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden sm:block overflow-x-auto">
                     <Table>
                       <TableHeader className="bg-gray-50">
                         <TableRow>
@@ -1825,7 +1878,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
                 {filteredProducts.map((p) => (
                   <div key={p.id} className="group relative bg-white rounded-3xl border-2 border-transparent hover:border-orange-500 transition-all overflow-hidden shadow-sm hover:shadow-xl hover:shadow-orange-100 hover:-translate-y-1">
                     <div className="aspect-square relative overflow-hidden bg-gray-50">
@@ -1837,7 +1890,7 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?q=80&w=500&auto=format&fit=crop';
                         }}
                       />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:flex items-center justify-center gap-2">
                         <Button 
                           size="icon"
                           variant="secondary"
@@ -1861,25 +1914,47 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                         </button>
                       </div>
                       {p.tag && (
-                        <div className="absolute top-3 left-3 bg-orange-600 text-white text-[8px] font-black  px-2 py-1 rounded-full shadow-lg">
+                        <div className="absolute top-3 left-3 bg-orange-600 text-white text-[8px] font-black px-2 py-1 rounded-full shadow-lg">
                           {p.tag}
                         </div>
                       )}
                     </div>
-                    <div className="p-4 flex flex-col gap-1">
+                    <div className="p-3 sm:p-4 flex flex-col gap-1">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-[10px] font-black text-orange-600  tracking-widest truncate max-w-[80px]">{p.category}</p>
+                        <p className="text-[10px] font-black text-orange-600 tracking-widest truncate max-w-[80px]">{p.category}</p>
                         <Badge variant="outline" className={`${p.stock < 10 ? 'border-red-200 text-red-500' : 'border-gray-100 text-gray-400'} text-[8px] font-black h-5`}>
                           {p.stock} left
                         </Badge>
                       </div>
-                      <h4 className="font-bold text-sm truncate leading-tight mb-1">{p.name}</h4>
+                      <h4 className="font-bold text-xs sm:text-sm truncate leading-tight mb-0.5">{p.name}</h4>
                       <div className="flex items-center justify-between">
-                        <p className="font-black text-orange-600 text-base">{formatPrice(p.price)}</p>
+                        <p className="font-black text-orange-600 text-xs sm:text-base">{formatPrice(p.price)}</p>
                         <div className="flex items-center gap-1 text-gray-400">
                            <ImageIcon className="h-3 w-3" />
-                           <span className="text-[9px] font-bold  tracking-tighter">{p.sold || '0 sold'}</span>
+                           <span className="text-[9px] font-bold tracking-tighter">{p.sold || '0 sold'}</span>
                         </div>
+                      </div>
+                      {/* Mobile action buttons (visible on mobile touch screens) */}
+                      <div className="flex items-center gap-1.5 pt-2 mt-1 border-t border-gray-100 sm:hidden">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 h-7 text-[10px] font-bold text-blue-600 border-blue-100 hover:bg-blue-50 rounded-lg gap-1 px-1"
+                          onClick={() => {
+                            setEditingProduct(p);
+                            setEditCategoryId(categories.find(c => c.name === (p.category_name || p.category))?.id?.toString() || "");
+                          }}
+                        >
+                          <Edit className="h-3 w-3" /> Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 h-7 text-[10px] font-bold text-red-600 border-red-100 hover:bg-red-50 rounded-lg gap-1 px-1"
+                          onClick={() => handleDeleteProduct(p.id)}
+                        >
+                          <Trash2 className="h-3 w-3" /> Delete
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -1917,7 +1992,181 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 )}
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto w-full">
+                {/* Mobile Orders Cards View */}
+                <div className="block md:hidden space-y-3 p-3">
+                  {filteredOrders.map((o) => (
+                    <div key={o.id} className="bg-white rounded-2xl border border-gray-100 p-3.5 shadow-sm space-y-2.5">
+                      <div className="flex items-center justify-between gap-2 border-b border-gray-100 pb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-black text-gray-700 bg-gray-100 px-2 py-0.5 rounded-md">
+                            #{o.id.slice(-6).toUpperCase()}
+                          </span>
+                          <span className="text-[10px] text-gray-400 font-medium">
+                            {o.createdAt?.toDate ? o.createdAt.toDate().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Recent'}
+                          </span>
+                        </div>
+                        <div>{getStatusBadge(o.status)}</div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <p className="font-bold text-xs text-gray-900 truncate">{o.customerEmail}</p>
+                        {o.shippingAddress?.address && (
+                          <p className="text-[11px] text-gray-500 line-clamp-1">
+                            📍 {o.shippingAddress.address}, {o.shippingAddress.city}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1">
+                        <div>
+                          <span className="text-[9px] font-black uppercase text-gray-400 tracking-wider block">Total</span>
+                          <span className="font-black text-orange-600 text-sm">{formatPrice(o.totalAmount)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteOrder(o.id)}
+                            disabled={isLoading}
+                            className="h-8 rounded-lg font-bold border-red-200 text-red-600 hover:bg-red-50 text-xs px-2.5 gap-1"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                          <Dialog onOpenChange={(open) => !open && setSelectedOrder(null)}>
+                            <DialogTrigger
+                              render={(props) => (
+                                <button
+                                  {...props}
+                                  className={cn(
+                                    buttonVariants({ variant: "outline", size: "sm" }),
+                                    "h-8 rounded-lg font-bold border-orange-200 text-orange-600 hover:bg-orange-50 text-xs gap-1 bg-white px-3"
+                                  )}
+                                  onClick={(e) => {
+                                     props.onClick?.(e);
+                                     setSelectedOrder(o);
+                                  }}
+                                >
+                                  <Eye className="h-3 w-3" /> View
+                                </button>
+                              )}
+                            />
+                            <DialogContent className="rounded-3xl w-[95vw] sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+                              <DialogHeader>
+                                <DialogTitle className="text-2xl font-black tracking-tighter">Order <span className="text-orange-600">details</span></DialogTitle>
+                              </DialogHeader>
+                              {selectedOrder && (
+                                <div className="space-y-6">
+                                  <div className="flex justify-between items-center p-4 bg-gray-50 rounded-2xl">
+                                    <div>
+                                      <p className="text-[10px] font-black text-gray-400 tracking-widest">Order id</p>
+                                      <p className="font-bold text-sm">{selectedOrder.id}</p>
+                                    </div>
+                                    {getStatusBadge(selectedOrder.status)}
+                                  </div>
+
+                                  <div className="space-y-4">
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-blue-50 rounded-lg">
+                                        <Mail className="h-4 w-4 text-blue-600" />
+                                      </div>
+                                      <div>
+                                        <p className="text-xs font-black text-gray-400">Customer</p>
+                                        <p className="font-medium text-sm">{selectedOrder.customerEmail}</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-orange-50 rounded-lg">
+                                        <Phone className="h-4 w-4 text-orange-600" />
+                                      </div>
+                                      <div>
+                                        <p className="text-xs font-black text-gray-400">Phone number</p>
+                                        <p className="font-medium text-sm">{selectedOrder.phone || selectedOrder.phoneNumber || 'N/A'}</p>
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <div className="p-2 bg-green-50 rounded-lg">
+                                        <Truck className="h-4 w-4 text-green-600" />
+                                      </div>
+                                      <div>
+                                        <p className="text-xs font-black text-gray-400">Shipping address</p>
+                                        <p className="font-medium text-sm">
+                                          {selectedOrder.shippingAddress?.address}<br/>
+                                          {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.zipCode}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <p className="text-xs font-black text-gray-400 mb-3">Order items</p>
+                                    <div className="space-y-3">
+                                      {selectedOrder.items?.map((item: any, idx: number) => (
+                                        <div key={idx} className="flex justify-between items-center p-3 border rounded-xl">
+                                          <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center text-[10px] font-bold">
+                                              {item.quantity}x
+                                            </div>
+                                            <p className="font-bold text-sm">{item.name}</p>
+                                          </div>
+                                          <p className="font-black text-orange-600">{formatPrice(item.price)}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="pt-4 border-t border-dashed flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+                                    <div>
+                                      <p className="text-[10px] font-black text-gray-400 mb-1">Update status</p>
+                                      <Select
+                                        value={selectedOrder.status}
+                                        onValueChange={(val) => handleUpdateOrderStatus(selectedOrder.id, val)}
+                                      >
+                                        <SelectTrigger className="w-full sm:w-[150px] rounded-xl font-bold">
+                                          <SelectValue placeholder="Status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="pending">Pending</SelectItem>
+                                          <SelectItem value="processing">Processing</SelectItem>
+                                          <SelectItem value="shipped">Shipped</SelectItem>
+                                          <SelectItem value="delivered">Delivered</SelectItem>
+                                          <SelectItem value="cancelled">Cancelled</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    </div>
+                                    <div className="flex items-center justify-between sm:justify-end gap-3">
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                        disabled={isLoading}
+                                        className="h-10 rounded-xl font-bold border-2 border-red-200 text-red-600 hover:bg-red-50 text-xs gap-1 transition-colors px-3"
+                                      >
+                                        <Trash2 className="h-3.5 w-3.5" /> Delete
+                                      </Button>
+                                      <div className="text-right">
+                                        <p className="text-xs font-black text-gray-400">Total paid</p>
+                                        <p className="text-xl sm:text-2xl font-black text-orange-600 tracking-tighter">{formatPrice(selectedOrder.totalAmount)}</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredOrders.length === 0 && (
+                    <div className="text-center py-12 text-gray-400 font-bold italic text-xs">
+                      No matching orders found
+                    </div>
+                  )}
+                </div>
+
+                {/* Desktop Orders Table View */}
+                <div className="hidden md:block overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2123,7 +2372,58 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 )}
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto w-full">
+                {/* Mobile Users Cards View */}
+                <div className="block sm:hidden space-y-2.5 p-3">
+                  {filteredUsers.map((u) => {
+                    const isPrimaryAdmin = u.email === 'idemudiawisdom27@gmail.com' || u.email === import.meta.env.VITE_ADMIN_EMAIL;
+                    return (
+                      <div key={u.id} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm space-y-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-black text-xs shrink-0">
+                              {u.displayName?.charAt(0) || u.email?.charAt(0)?.toUpperCase() || '?'}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-bold text-xs text-gray-900 truncate">{u.displayName || 'Unnamed User'}</p>
+                              <p className="text-[10px] text-gray-400 truncate">{u.email}</p>
+                            </div>
+                          </div>
+                          <Badge className={u.role === 'admin' ? 'bg-orange-600 text-white text-[9px]' : 'bg-gray-100 text-gray-600 text-[9px]'}>
+                            {u.role || 'user'}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-end gap-2 border-t border-gray-50 pt-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleAdmin(u.id, u.role)}
+                            className="rounded-lg font-bold text-[10px] h-7 px-2.5"
+                            disabled={isPrimaryAdmin}
+                          >
+                            {u.role === 'admin' ? 'Revoke admin' : 'Make admin'}
+                          </Button>
+                          {!isPrimaryAdmin && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteUser(u.id, u.email)}
+                              disabled={isLoading}
+                              className="h-7 rounded-lg font-bold border-red-200 text-red-600 hover:bg-red-50 text-[10px] gap-1 px-2.5"
+                            >
+                              <Trash2 className="h-3 w-3" /> Delete
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {filteredUsers.length === 0 && (
+                    <div className="text-center py-8 text-gray-400 font-bold text-xs italic">No matching users found</div>
+                  )}
+                </div>
+
+                {/* Desktop Users Table View */}
+                <div className="hidden sm:block overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2197,7 +2497,56 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardDescription>Review and approve new sellers</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto w-full">
+                {/* Mobile Merchants Cards View */}
+                <div className="block sm:hidden space-y-2.5 p-3">
+                  {applications.map((app) => (
+                    <div key={app.id} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-black text-xs text-gray-900 truncate">{app.businessName}</h4>
+                        <Badge className={app.status === 'approved' ? 'bg-green-100 text-green-700 text-[9px]' : 'bg-yellow-100 text-yellow-700 text-[9px]'}>
+                          {app.status}
+                        </Badge>
+                      </div>
+                      <div className="text-[10px] space-y-0.5">
+                        <p className="font-bold text-orange-600">{app.category}</p>
+                        <p className="text-gray-500 truncate">{app.userEmail}</p>
+                      </div>
+                      <div className="flex justify-end gap-2 border-t border-gray-50 pt-2">
+                        {app.status === 'pending' && (
+                          <Button
+                            size="sm"
+                            className="h-7 bg-orange-600 text-white font-bold text-[10px] px-3"
+                            onClick={async () => {
+                              await updateDoc(doc(db, 'merchant_applications', app.id), { status: 'approved' });
+                              toast.success("Merchant approved!");
+                              fetchData();
+                            }}
+                          >
+                            Approve
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-red-500 font-bold text-[10px] px-2"
+                          onClick={async () => {
+                            await deleteDoc(doc(db, 'merchant_applications', app.id));
+                            toast.info("Application rejected/removed");
+                            fetchData();
+                          }}
+                        >
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  {applications.length === 0 && (
+                    <div className="text-center py-8 text-gray-400 font-bold text-xs italic">No pending applications</div>
+                  )}
+                </div>
+
+                {/* Desktop Merchants Table View */}
+                <div className="hidden sm:block overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
@@ -2268,7 +2617,29 @@ export default function AdminDashboard({ onBack }: AdminDashboardProps) {
                 <CardTitle className="text-xl font-black  tracking-tighter">Email notification logs</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="overflow-x-auto w-full">
+                {/* Mobile Email Logs Cards View */}
+                <div className="block sm:hidden space-y-2 p-3">
+                  {notifications.map((n) => (
+                    <div key={n.id} className="bg-white rounded-xl border border-gray-100 p-3 shadow-sm flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-orange-600 text-xs capitalize truncate">{n.type.replace('_', ' ')}</span>
+                          <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[8px] font-black shrink-0">Sent</span>
+                        </div>
+                        <p className="text-[10px] text-gray-600 font-medium truncate mt-0.5">{n.email}</p>
+                      </div>
+                      <span className="text-[9px] text-gray-400 shrink-0 font-medium">
+                        {n.createdAt?.toDate ? n.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
+                      </span>
+                    </div>
+                  ))}
+                  {notifications.length === 0 && (
+                    <div className="text-center py-8 text-gray-400 font-bold text-xs italic">No email logs yet</div>
+                  )}
+                </div>
+
+                {/* Desktop Email Logs Table View */}
+                <div className="hidden sm:block overflow-x-auto w-full">
                 <Table>
                   <TableHeader className="bg-gray-50">
                     <TableRow>
